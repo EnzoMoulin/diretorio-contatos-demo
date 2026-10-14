@@ -32,6 +32,10 @@ python3 app.py
 | PUT | `/api/contatos/<id>` | `X-Admin-Token` | atualiza |
 | DELETE | `/api/contatos/<id>` | `X-Admin-Token` | remove |
 
+## Versão completa (Google Apps Script)
+Mesmo domínio, implementação corporativa completa (auth, papéis, hierarquia,
+auditoria): [EnzoMoulin/diretorio-contatos](https://github.com/EnzoMoulin/diretorio-contatos).
+
 ## Screenshots
 _Vídeo/screenshots entram aqui após primeira execução (só tela + legendas, sem voz/webcam)._
 - `screenshots/` — reservado
