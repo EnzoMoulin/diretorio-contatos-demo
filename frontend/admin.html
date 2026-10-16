@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diretório de Contatos — Área administrativa</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Diretório</h2>
+      <span>área administrativa · demo</span>
+    </div>
+    <nav class="sidebar-menu">
+      <button class="menu-item active" data-view="consulta">🔍 Consulta</button>
+      <button class="menu-item" data-view="gestao">⚙️ Gestão</button>
+      <button class="menu-item" data-view="pedidos">📝 Pedidos <span id="ped-count" class="badge"></span></button>
+      <button class="menu-item" data-view="historico">🕘 Histórico</button>
+      <a class="menu-item link" href="/">🌐 Consulta pública</a>
+    </nav>
+    <div class="sidebar-login">
+      <p class="login-title">Acesso interno</p>
+      <div id="login-box">
+        <input id="user" value="admin" aria-label="usuário" autocomplete="username">
+        <input id="pass" type="password" value="admin123" aria-label="senha" autocomplete="current-password">
+        <button id="login" class="btn-primary">Entrar</button>
+      </div>
+      <div id="who-box" class="hidden">
+        <p class="hint" id="who"></p>
+        <button id="sair" class="btn-ghost">Sair</button>
+      </div>
+      <span id="status"></span>
+      <p class="hint">Sem login: só consulta. Com login: gestão + pedidos + histórico.</p>
+    </div>
+  </aside>
+  <main class="main-content">
+    <section class="card view" id="view-consulta">
+      <h1>Consulta (visão interna)</h1>
+      <input id="q" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
+      <table>
+        <thead><tr><th>Nome</th><th>Cargo</th><th>Local</th><th>Telefone</th><th>E-mail</th><th></th></tr></thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </section>
+    <section class="card view hidden" id="view-gestao">
+      <h1>Gestão de contatos</h1>
+      <p class="hint" id="gestao-hint">Faça login para adicionar ou remover.</p>
+      <div class="form-grid">
+        <select id="g-loc"></select>
+        <select id="g-uni"></select>
+        <select id="g-set"></select>
+        <input id="f-nome" placeholder="Nome*">
+        <input id="f-cargo" placeholder="Cargo">
+        <input id="f-tel" placeholder="Telefone">
+        <input id="f-email" placeholder="E-mail">
+        <button id="salvar" class="btn-primary">Salvar novo</button>
+      </div>
+    </section>
+    <section class="card view hidden" id="view-pedidos">
+      <h1>Pedidos de acesso pendentes</h1>
+      <ul id="pedidos" class="rows"></ul>
+    </section>
+    <section class="card view hidden" id="view-historico">
+      <h1>Histórico de alterações</h1>
+      <ul id="hist"></ul>
+    </section>
+    <footer>Python stdlib + HTML/CSS/JS · sem dependências · dados de exemplo</footer>
+  </main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

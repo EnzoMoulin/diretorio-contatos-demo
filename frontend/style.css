@@ -46,3 +46,24 @@ tbody tr:hover{background:#f8fafc}
 #hist i{color:#64748b}
 footer{color:#94a3b8;font-size:13px;text-align:center;padding:10px}
 code{background:#f1f5f9;padding:1px 6px;border-radius:4px}
+/* ---- navegação em camadas / mapa / admin ---- */
+.breadcrumb{color:#475569;font-size:14px;margin:4px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{border:1px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:999px;
+  padding:7px 14px;font-size:14px;cursor:pointer}
+.chip:hover{border-color:#2563eb;color:#2563eb}
+.chip.active{background:#2563eb;border-color:#2563eb;color:#fff}
+.chip.clear{border-style:dashed;color:#64748b}
+#map{height:340px;border:1px solid #e2e8f0;border-radius:8px}
+.badge{background:#dc2626;color:#fff;border-radius:999px;font-size:12px;
+  padding:1px 8px;margin-left:4px}
+.btn-ghost{background:transparent;color:#cbd5e1;border:1px solid #475569;
+  border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer}
+.btn-del{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:6px;
+  padding:5px 10px;font-size:13px;cursor:pointer}
+select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:15px;
+  color:#1f2937;background:#f8fafc}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{padding:10px 4px;border-bottom:1px solid #e2e8f0;font-size:14px}
+.menu-item.link{display:block;text-decoration:none}
+#ped-count:empty{display:none}
