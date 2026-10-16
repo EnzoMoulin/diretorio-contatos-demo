@@ -7,41 +7,53 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <h1>Diretório de Contatos <small>demo para portfólio</small></h1>
-  <p>Consulta pública + gestão interna + histórico de alterações. Dados fictícios.</p>
-</header>
-<main>
-  <section class="card">
-    <h2>Buscar</h2>
-    <input id="q" type="search" placeholder="nome, setor, telefone ou e-mail…" autocomplete="off">
-    <table>
-      <thead><tr><th>Nome</th><th>Setor</th><th>Telefone</th><th>E-mail</th></tr></thead>
-      <tbody id="lista"></tbody>
-    </table>
-  </section>
-  <section class="card">
-    <h2>Área interna (demo)</h2>
-    <p class="hint">Login de demonstração: <code>admin</code> / <code>admin123</code>. Token fica só no seu navegador.</p>
-    <div class="row">
-      <input id="user" value="admin" aria-label="usuário">
-      <input id="pass" type="password" value="admin123" aria-label="senha">
-      <button id="login">Entrar</button>
+<div class="app-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Diretório</h2>
+      <span>de Contatos · demo</span>
+    </div>
+    <nav class="sidebar-menu">
+      <button class="menu-item active" data-view="consulta">🔍 Consulta pública</button>
+      <button class="menu-item" data-view="gestao">⚙️ Gestão interna</button>
+      <button class="menu-item" data-view="historico">🕘 Histórico</button>
+    </nav>
+    <div class="sidebar-login">
+      <p class="login-title">Acesso demo</p>
+      <input id="user" value="admin" aria-label="usuário" autocomplete="username">
+      <input id="pass" type="password" value="admin123" aria-label="senha" autocomplete="current-password">
+      <button id="login" class="btn-primary">Entrar</button>
       <span id="status"></span>
+      <p class="hint">Dados fictícios. Token fica só no seu navegador.</p>
     </div>
-    <h3>Adicionar / editar</h3>
-    <div class="row">
-      <input id="f-nome" placeholder="Nome*">
-      <input id="f-setor" placeholder="Setor">
-      <input id="f-tel" placeholder="Telefone">
-      <input id="f-email" placeholder="E-mail">
-      <button id="salvar">Salvar novo</button>
-    </div>
-    <h3>Histórico (últimas 50)</h3>
-    <ul id="hist"></ul>
-  </section>
-</main>
-<footer>Feito com Python stdlib + HTML/CSS/JS · sem dependências · dados de exemplo</footer>
+  </aside>
+  <main class="main-content">
+    <section class="card view" id="view-consulta">
+      <h1>Consulta pública</h1>
+      <input id="q" type="search" placeholder="Buscar por nome, setor, telefone ou e-mail…" autocomplete="off">
+      <table>
+        <thead><tr><th>Nome</th><th>Setor</th><th>Telefone</th><th>E-mail</th></tr></thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </section>
+    <section class="card view hidden" id="view-gestao">
+      <h1>Gestão interna</h1>
+      <p class="hint">Requer login demo. Adicionar contato:</p>
+      <div class="form-grid">
+        <input id="f-nome" placeholder="Nome*">
+        <input id="f-setor" placeholder="Setor">
+        <input id="f-tel" placeholder="Telefone">
+        <input id="f-email" placeholder="E-mail">
+        <button id="salvar" class="btn-primary">Salvar novo</button>
+      </div>
+    </section>
+    <section class="card view hidden" id="view-historico">
+      <h1>Histórico de alterações</h1>
+      <ul id="hist"></ul>
+    </section>
+    <footer>Python stdlib + HTML/CSS/JS · sem dependências · dados de exemplo</footer>
+  </main>
+</div>
 <script src="app.js"></script>
 </body>
 </html>

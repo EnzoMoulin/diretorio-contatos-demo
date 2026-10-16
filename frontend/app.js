@@ -23,6 +23,15 @@ function esc(s) {
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+document.querySelectorAll('.menu-item').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    document.getElementById('view-' + btn.dataset.view).classList.remove('hidden');
+  };
+});
+
 $('q').addEventListener('input', carregar);
 
 $('login').onclick = async () => {
