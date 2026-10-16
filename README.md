@@ -24,12 +24,13 @@
   Localidade → Unidade → Setor → contatos (com breadcrumb) + **mapa clicável**
   (Leaflet + GeoJSON público do IBGE) que filtra por município, lado a lado
   com a consulta. Sem nenhum caminho para o acesso interno.
-- **Acesso interno** (`/admin`, URL separada): portão de login demo
-  (`admin` / `admin123`, com auto-login via token salvo); sem login, só o
-  portão (login + solicitar acesso) — a consulta interna não aparece.
-  Logado ("Sair do acesso administrativo" volta ao portão, continua no interno):
-  mesma consulta com mapa + gestão inline por escopo + Solicitações de acesso
-  + Registro de alterações.
+- **Acesso interno** (`/admin`, URL separada, sem nenhum caminho a partir do
+  público): entra direto em **consulta** (mapa + camadas + tabela), sem login e
+  sem funções administrativas; botões na base da sidebar: **Acesso
+  administrativo** (modal de login com e-mail + senha; com cadastro, eleva e
+  libera gestão por escopo + Solicitações + Registro) e **Solicitar acesso**
+  (modal do formulário); **Sair do acesso administrativo** volta à consulta,
+  continua no interno. Demo: admin@empresa-exemplo.com.br / admin123.
 - **Gestão dentro da consulta, com escopo por local**: o usuário cria/remove
   contatos só nos locais liberados para ele (fora deles, só consulta);
   pode pedir acesso a mais locais; admin aprova e o escopo amplia

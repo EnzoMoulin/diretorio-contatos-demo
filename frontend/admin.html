@@ -14,31 +14,20 @@
       <h2>Diretório</h2>
       <span>acesso interno · demo</span>
     </div>
-    <nav class="sidebar-menu" id="menu-interno">
+    <nav class="sidebar-menu">
       <button class="menu-item active" data-view="consulta">🔍 Consulta</button>
       <button class="menu-item hidden" data-view="solicitacoes" id="menu-sol">📝 Solicitações de acesso <span id="ped-count" class="badge"></span></button>
       <button class="menu-item hidden" data-view="registro" id="menu-reg">🕘 Registro de alterações</button>
     </nav>
     <div class="sidebar-bottom">
-      <button id="btn-mais" class="btn-primary wide hidden">📝 Solicitar acesso a mais locais</button>
+      <button id="btn-entrar" class="btn-primary wide">🔑 Acesso administrativo</button>
+      <button id="btn-pedir" class="btn-ghost wide">📝 Solicitar acesso</button>
       <button id="btn-sair" class="btn-ghost wide hidden">🚪 Sair do acesso administrativo</button>
-      <p class="hint" id="estado-hint"></p>
+      <p class="hint" id="estado-hint">Consulta sem login. Com cadastro, entre para gerenciar seus locais.</p>
     </div>
   </aside>
   <main class="main-content">
-    <section class="card" id="view-portao">
-      <h1>Acesso interno</h1>
-      <p class="hint">Área restrita a usuários vinculados (demo: login + e-mail @empresa-exemplo.com.br).
-        Sem cadastro, só o acesso público consulta.</p>
-      <div class="form-grid">
-        <input id="user" value="admin" autocomplete="username" aria-label="usuário">
-        <input id="pass" type="password" value="admin123" autocomplete="current-password" aria-label="senha">
-        <button id="login" class="btn-primary">Entrar no acesso administrativo</button>
-        <span id="l-status"></span>
-      </div>
-      <p class="hint">Ainda sem cadastro? <button id="btn-pedir" class="linklike">Solicitar acesso interno</button></p>
-    </section>
-    <section class="card hidden" id="view-consulta">
+    <section class="card" id="view-consulta">
       <h1>Consulta</h1>
       <p class="hint" id="escopo-hint"></p>
       <input id="q" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
@@ -81,9 +70,22 @@
     <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
   </main>
 </div>
+<div class="modal hidden" id="modal-login">
+  <div class="modal-box">
+    <h2>Acesso administrativo</h2>
+    <p class="hint">Entre com sua conta cadastrada. Demo: admin@empresa-exemplo.com.br / admin123.</p>
+    <label>E-mail ou usuário<input id="user" value="admin@empresa-exemplo.com.br" autocomplete="username"></label>
+    <label>Senha<input id="pass" type="password" value="admin123" autocomplete="current-password"></label>
+    <div class="modal-actions">
+      <button id="l-cancel" class="btn-ghost">Cancelar</button>
+      <button id="login" class="btn-primary">Entrar</button>
+    </div>
+    <p class="hint" id="l-status"></p>
+  </div>
+</div>
 <div class="modal hidden" id="modal-pedido">
   <div class="modal-box">
-    <h2>Solicitar acesso interno</h2>
+    <h2>Solicitar acesso administrativo</h2>
     <p class="hint" id="ped-hint">Exigido e-mail institucional @empresa-exemplo.com.br (equivale ao vínculo da intranet).</p>
     <label>Nome*<input id="p-nome"></label>
     <label>E-mail institucional*<input id="p-email" placeholder="voce@empresa-exemplo.com.br"></label>

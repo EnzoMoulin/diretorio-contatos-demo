@@ -18,6 +18,8 @@ echo "== localidades =="; curl -s "$B/api/localidades"; echo
 echo "== login admin =="
 TA=$(curl -s -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"admin","senha":"admin123"}' | python3 -c "$TOK")
 echo "== me =="; curl -s "$B/api/me" -H "X-Admin-Token: $TA"; echo
+echo -n "login via email (200 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/login -H 'Content-Type: application/json' -d '{"email":"admin@empresa-exemplo.com.br","senha":"admin123"}'
 echo "== pedido c/ local =="
 curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"User VV","email":"u@empresa-exemplo.com.br","usuario":"uservv","motivo":"demo","localidade_id":2}'; echo
 echo -n "pedido c/ email externo (400 esperado): "

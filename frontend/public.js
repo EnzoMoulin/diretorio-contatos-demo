@@ -69,28 +69,6 @@ async function buscar() {
 
 $('q').addEventListener('input', buscar);
 
-/* ---- modal solicitar acesso ---- */
-function abrirPedido() {
-  $('modal-pedido').classList.remove('hidden');
-  $('p-status').textContent = '';
-  if (!$('p-loc').options.length) {
-    $('p-loc').innerHTML = locs.map(l => `<option value="${l.id}">${esc(l.nome)}</option>`).join('');
-  }
-}
-$('btn-acesso').onclick = abrirPedido;
-$('p-cancel').onclick = () => $('modal-pedido').classList.add('hidden');
-
-$('p-enviar').onclick = async () => {
-  const corpo = { nome: $('p-nome').value.trim(), email: $('p-email').value.trim(),
-                  usuario: $('p-user').value.trim(), motivo: $('p-motivo').value.trim(),
-                  localidade_id: $('p-loc').value };
-  const r = await fetch('/api/pedidos', { method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
-  $('p-status').textContent = r.ok
-    ? 'Pedido enviado. Aguarde a aprovação do administrador.'
-    : 'Erro: ' + await r.text();
-};
-
 (async () => {
   locs = await (await fetch('/api/localidades')).json();
   renderChips();

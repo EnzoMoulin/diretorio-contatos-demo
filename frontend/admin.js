@@ -1,11 +1,11 @@
-/* Acesso interno: portão (login) -> consulta com gestão por escopo + solicitações + registro.
-   Sem token válido, nada além do portão é visível. Sair volta ao portão (continua no interno). */
+/* Acesso interno: entra em consulta (sem login, sem funções admin).
+   "Acesso administrativo" (login e-mail+senha) eleva quem tem cadastro;
+   "Solicitar acesso" abre o formulário; "Sair" volta à consulta (continua no interno). */
 const $ = id => document.getElementById(id);
 let token = localStorage.getItem('demo-token') || '';
 let me = null;            // {id, usuario, admin, escopo}
 let state = { loc: null, uni: null, set: null };
 let locs = [];
-let mapaPronto = false;
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, m =>
@@ -75,7 +75,6 @@ function podeEditar(localidade) {
   return l && me.escopo.includes(l.id);
 }
 async function buscar() {
-  if (!logado()) return;
   const params = new URLSearchParams({ q: $('q').value.trim() });
   if (state.set) params.set('setor_id', state.set);
   else if (state.uni) params.set('unidade_id', state.uni);
@@ -96,9 +95,10 @@ async function buscar() {
     };
   });
   const l = locs.find(x => x.id === state.loc);
-  const okEscopo = !!state.set && l && (me.escopo === 'all' || me.escopo.includes(l.id));
+  const setorLoc = l ? l.nome : null;
+  const okEscopo = logado() && !!state.set && setorLoc && podeEditar(setorLoc);
   $('create-box').classList.toggle('hidden', !okEscopo);
-  $('save-status').textContent = (state.set && !okEscopo)
+  $('save-status').textContent = (logado() && state.set && !okEscopo)
     ? 'Você não tem acesso a este local — peça acesso pelo botão "Solicitar acesso".' : '';
 }
 $('q').addEventListener('input', buscar);
@@ -111,7 +111,7 @@ $('salvar').onclick = async () => {
   else $('save-status').textContent = 'Erro: ' + await r.text();
 };
 
-/* ---- portão: login / sair / solicitar ---- */
+/* ---- acesso: entrar / pedir / sair ---- */
 async function refresh() {
   me = null;
   if (token) {
@@ -120,34 +120,22 @@ async function refresh() {
     else { token = ''; localStorage.removeItem('demo-token'); }
   }
   const dentro = logado();
-  $('view-portao').classList.toggle('hidden', dentro);
-  ['consulta', 'solicitacoes', 'registro'].forEach(v => $('view-' + v).classList.toggle('hidden', !dentro || v !== 'consulta'));
-  document.querySelectorAll('.menu-item[data-view]').forEach(b =>
-    b.classList.toggle('active', b.dataset.view === 'consulta'));
-  $('menu-interno').classList.toggle('hidden', !dentro);
   $('menu-sol').classList.toggle('hidden', !dentro);
   $('menu-reg').classList.toggle('hidden', !dentro);
+  $('btn-entrar').classList.toggle('hidden', dentro);
   $('btn-sair').classList.toggle('hidden', !dentro);
-  $('btn-mais').classList.toggle('hidden', !dentro);
-  $('btn-mais').onclick = abrirPedidoMais;
+  $('btn-pedir').onclick = dentro ? abrirPedidoMais : abrirPedidoNovo;
   $('estado-hint').textContent = dentro
     ? 'Logado como ' + me.usuario + (me.escopo === 'all' ? ' (admin: todos os locais).' : ` (locais liberados: ${me.escopo.length}).`)
-    : '';
+    : 'Consulta sem login. Com cadastro, entre para gerenciar seus locais.';
   $('escopo-hint').textContent = dentro
     ? (me.escopo === 'all' ? 'Você edita todos os locais.' : 'Você edita os locais liberados para você; nos demais, só consulta.')
     : '';
-  if (dentro) {
-    if (!mapaPronto) {
-      mapaPronto = true;
-      initMapa('map', 'map-msg', locs, nome => {
-        const loc = locs.find(x => norm(x.nome) === norm(nome));
-        if (loc) { state = { loc: loc.id, uni: null, set: null }; sync(); }
-      });
-    }
-    carregarPedidos();
-    sync();
-  }
+  if (dentro) carregarPedidos();
+  sync();
 }
+$('btn-entrar').onclick = () => { $('modal-login').classList.remove('hidden'); $('l-status').textContent = ''; };
+$('l-cancel').onclick = () => $('modal-login').classList.add('hidden');
 $('login').onclick = async () => {
   const r = await fetch('/api/login', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -155,6 +143,7 @@ $('login').onclick = async () => {
   const j = await r.json();
   if (j.token) {
     token = j.token; localStorage.setItem('demo-token', token);
+    $('modal-login').classList.add('hidden');
     refresh();
   } else $('l-status').textContent = j.erro || 'falhou';
 };
@@ -162,25 +151,28 @@ $('btn-sair').onclick = () => {
   token = ''; localStorage.removeItem('demo-token');
   refresh();
 };
-$('btn-pedir').onclick = () => {
-  $('modal-pedido').classList.remove('hidden');
-  $('p-status').textContent = '';
+
+/* ---- modal pedir acesso (novo cadastro ou mais locais) ---- */
+function preencherLocais() {
   if (!$('p-loc').options.length) {
     $('p-loc').innerHTML = locs.map(l => `<option value="${l.id}">${esc(l.nome)}</option>`).join('');
   }
-};
-
-/* ---- modal pedir acesso (novo cadastro ou mais locais) ---- */
+}
+function abrirPedidoNovo() {
+  $('modal-pedido').classList.remove('hidden');
+  $('p-status').textContent = '';
+  $('ped-hint').textContent = 'Exigido e-mail institucional @empresa-exemplo.com.br (equivale ao vínculo da intranet).';
+  $('p-user').disabled = false;
+  preencherLocais();
+}
 function abrirPedidoMais() {
   $('modal-pedido').classList.remove('hidden');
   $('p-status').textContent = '';
-  if (!$('p-loc').options.length) {
-    $('p-loc').innerHTML = locs.map(l => `<option value="${l.id}">${esc(l.nome)}</option>`).join('');
-  }
   $('ped-hint').textContent = 'Pedir acesso a mais um local (entra como ' + me.usuario + ').';
   $('p-user').value = me.usuario;
   $('p-user').disabled = true;
   $('p-email').value = '';
+  preencherLocais();
 }
 $('p-cancel').onclick = () => {
   $('modal-pedido').classList.add('hidden');
@@ -188,7 +180,7 @@ $('p-cancel').onclick = () => {
 };
 $('p-enviar').onclick = async () => {
   const corpo = { nome: $('p-nome').value.trim(), email: $('p-email').value.trim(),
-                  usuario: (logado() ? me.usuario : $('p-user').value.trim()),
+                  usuario: ($('p-user').disabled && logado() ? me.usuario : $('p-user').value.trim()),
                   motivo: $('p-motivo').value.trim(), localidade_id: $('p-loc').value };
   const r = await fetch('/api/pedidos', { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
@@ -231,4 +223,8 @@ async function carregarHistorico() {
   locs = await (await fetch('/api/localidades')).json();
   renderChips();
   await refresh();
+  initMapa('map', 'map-msg', locs, nome => {
+    const loc = locs.find(x => norm(x.nome) === norm(nome));
+    if (loc) { state = { loc: loc.id, uni: null, set: null }; sync(); }
+  });
 })();

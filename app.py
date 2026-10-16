@@ -136,6 +136,8 @@ def init_db():
     cols_u = [r["name"] for r in con.execute("PRAGMA table_info(usuarios)")]
     if "email" not in cols_u:  # compatível com USUARIOS.EMAIL do original
         con.execute("ALTER TABLE usuarios ADD COLUMN email TEXT NOT NULL DEFAULT ''")
+    con.execute("UPDATE usuarios SET email=? WHERE usuario='admin' AND email=''",
+                ("admin@" + DOMINIO_INSTITUCIONAL,))
     n = con.execute("SELECT COUNT(*) AS c FROM contatos").fetchone()["c"]
     if n == 0:
         locs, uns, sets = {}, {}, {}
@@ -337,9 +339,11 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == "/api/login":
             data = self._body()
             con = get_db()
+            ident = (data.get("usuario") or data.get("email") or "").strip().lower()
             row = con.execute(
-                "SELECT * FROM usuarios WHERE usuario=? AND senha_sha256=?",
-                (data.get("usuario"), sha(data.get("senha") or ""))).fetchone()
+                "SELECT * FROM usuarios WHERE (lower(usuario)=? OR lower(email)=?)"
+                " AND senha_sha256=?",
+                (ident, ident, sha(data.get("senha") or ""))).fetchone()
             con.close()
             if row and row["aprovado"]:
                 tok = secrets.token_hex(16)

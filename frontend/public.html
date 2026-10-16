@@ -18,7 +18,6 @@
       <button class="menu-item active" data-view="consulta">🔍 Consulta</button>
     </nav>
     <div class="sidebar-bottom">
-      <button id="btn-acesso" class="btn-primary wide">📝 Solicitar acesso</button>
       <p class="hint">Consulta pública — dados fictícios da Empresa Exemplo.</p>
     </div>
   </aside>
@@ -45,22 +44,6 @@
     </section>
     <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
   </main>
-</div>
-<div class="modal hidden" id="modal-pedido">
-  <div class="modal-box">
-    <h2>Solicitar acesso interno</h2>
-    <p class="hint">Sem acesso, você só consulta. O admin aprova na área administrativa.</p>
-    <label>Nome*<input id="p-nome"></label>
-    <label>E-mail<input id="p-email"></label>
-    <label>Usuário desejado*<input id="p-user"></label>
-    <label>Local de acesso<select id="p-loc"></select></label>
-    <label>Motivo<input id="p-motivo"></label>
-    <div class="modal-actions">
-      <button id="p-cancel" class="btn-ghost">Cancelar</button>
-      <button id="p-enviar" class="btn-primary">Enviar pedido</button>
-    </div>
-    <p class="hint" id="p-status"></p>
-  </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="mapa.js"></script>
