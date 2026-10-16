@@ -80,3 +80,5 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:15
 .create-box{margin-top:12px;border-top:1px solid #e2e8f0;padding-top:12px}
 .create-box h3{margin:0 0 8px;font-size:15px}
 .linklike{background:none;border:none;color:#2563eb;cursor:pointer;font-size:14px;padding:0;text-decoration:underline}
+.cascade select{display:block;width:100%;margin-bottom:8px}
+.hint-cell{color:#64748b;text-align:center;padding:22px 8px!important}

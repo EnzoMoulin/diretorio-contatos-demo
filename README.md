@@ -20,17 +20,21 @@
   (`usuarios_locais`); admin edita tudo
 
 ## O que faz
-- **Consulta pública** (`/`): busca global + navegação em camadas
-  Localidade → Unidade → Setor → contatos (com breadcrumb) + **mapa clicável**
-  (Leaflet + GeoJSON público do IBGE) que filtra por município, lado a lado
-  com a consulta. Sem nenhum caminho para o acesso interno.
+- **Consulta pública** (`/`): **mapa clicável à esquerda como porta de entrada**
+  (Leaflet + GeoJSON público do IBGE filtra por município) + **painel à direita**
+  com busca global (alcança todos os níveis: nome, cargo, telefone, e-mail,
+  setor, unidade e localidade) e **menus em cascata** Localidade → Unidade →
+  Setor, com breadcrumb do caminho. A tabela **começa vazia**, com orientação
+  — nada de despejar todos os contatos de cara. Sem nenhum caminho para o acesso interno.
 - **Acesso interno** (`/admin`, URL separada, sem nenhum caminho a partir do
-  público): entra direto em **consulta** (mapa + camadas + tabela), sem login e
-  sem funções administrativas; botões na base da sidebar: **Acesso
-  administrativo** (modal de login com e-mail + senha; com cadastro, eleva e
-  libera gestão por escopo + Solicitações + Registro) e **Solicitar acesso**
-  (modal do formulário); **Sair do acesso administrativo** volta à consulta,
-  continua no interno. Demo: admin@empresa-exemplo.com.br / admin123.
+  público): entra direto em **consulta** (mapa + cascata + tabela vazia), sem login e
+  sem funções administrativas; logado, os **menus já vêm filtrados pelo escopo**
+  (só os locais liberados); clicar no mapa em local sem acesso avisa.
+  Botões na base da sidebar: **Acesso administrativo** (modal de login com
+  e-mail + senha; com cadastro, eleva e libera gestão por escopo + Solicitações
+  + Registro) e **Solicitar acesso** (modal do formulário); **Sair do acesso
+  administrativo** volta à consulta, continua no interno.
+  Demo: admin@empresa-exemplo.com.br / admin123.
 - **Gestão dentro da consulta, com escopo por local**: o usuário cria/remove
   contatos só nos locais liberados para ele (fora deles, só consulta);
   pode pedir acesso a mais locais; admin aprova e o escopo amplia

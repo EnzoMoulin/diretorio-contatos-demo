@@ -35,10 +35,12 @@
         <div>
           <div id="map"></div>
           <p class="hint" id="map-msg">Clique em um município com contatos para filtrar.</p>
-          <p class="breadcrumb" id="crumb">Todos os contatos</p>
-          <div class="chips" id="chips-loc"></div>
-          <div class="chips" id="chips-uni"></div>
-          <div class="chips" id="chips-set"></div>
+          <p class="breadcrumb" id="crumb">Selecione um local ou busque</p>
+          <div class="cascade">
+            <select id="sel-loc" aria-label="Localidade"><option value="">Localidade…</option></select>
+            <select id="sel-uni" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
+            <select id="sel-set" aria-label="Setor" disabled><option value="">Setor…</option></select>
+          </div>
           <div class="create-box hidden" id="create-box">
             <h3>Novo contato neste setor</h3>
             <div class="form-grid">

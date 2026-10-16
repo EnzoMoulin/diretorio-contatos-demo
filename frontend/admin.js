@@ -4,7 +4,7 @@
 const $ = id => document.getElementById(id);
 let token = localStorage.getItem('demo-token') || '';
 let me = null;            // {id, usuario, admin, escopo}
-let state = { loc: null, uni: null, set: null };
+let sel = { loc: '', uni: '', set: '' };
 let locs = [];
 
 function esc(s) {
@@ -26,46 +26,66 @@ document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
 });
 
 /* ---- consulta com camadas ---- */
-function chip(label, active, onclick) {
-  const b = document.createElement('button');
-  b.className = 'chip' + (active ? ' active' : '');
-  b.textContent = label;
-  b.onclick = onclick;
-  return b;
+function optLabel(selId) {
+  const s = $(selId);
+  return s.selectedIndex > 0 ? s.options[s.selectedIndex].text : '';
 }
-function renderChips() {
-  const cl = $('chips-loc'); cl.innerHTML = '';
-  locs.forEach(l => cl.appendChild(chip(`${l.nome} (${l.total})`, state.loc === l.id,
-    () => { state = { loc: l.id, uni: null, set: null }; sync(); })));
-  if (state.loc) {
-    const all = chip('✕ limpar', false, () => { state = { loc: null, uni: null, set: null }; sync(); });
-    all.classList.add('clear'); cl.appendChild(all);
-  }
+
+function locsPermitidas() {
+  if (!logado() || me.escopo === 'all') return locs;
+  return locs.filter(l => me.escopo.includes(l.id));
 }
-async function sync() {
-  renderChips();
-  const cu = $('chips-uni'); cu.innerHTML = '';
-  const cs = $('chips-set'); cs.innerHTML = '';
-  const parts = [];
-  if (state.loc) {
-    const l = locs.find(x => x.id === state.loc);
-    parts.push(l ? l.nome : '');
-    const unis = await (await fetch('/api/unidades?localidade_id=' + state.loc)).json();
-    unis.forEach(u => cu.appendChild(chip(u.nome, state.uni === u.id,
-      () => { state.uni = u.id; state.set = null; sync(); })));
-    if (state.uni) {
-      const u = unis.find(x => x.id === state.uni);
-      parts.push(u ? u.nome : '');
-      const sets = await (await fetch('/api/setores?unidade_id=' + state.uni)).json();
-      sets.forEach(s => cs.appendChild(chip(s.nome, state.set === s.id,
-        () => { state.set = s.id; sync(); })));
-      if (state.set) {
-        const s = sets.find(x => x.id === state.set);
-        parts.push(s ? s.nome : '');
-      }
-    }
-  }
-  $('crumb').textContent = parts.length ? parts.join(' › ') : 'Todos os contatos';
+
+async function loadLocs() {
+  const lista = locsPermitidas();
+  $('sel-loc').innerHTML = '<option value="">Localidade…</option>' +
+    lista.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})</option>`).join('');
+  sel.loc = ''; sel.uni = ''; sel.set = '';
+  $('sel-uni').innerHTML = '<option value="">Unidade…</option>';
+  $('sel-set').innerHTML = '<option value="">Setor…</option>';
+  $('sel-uni').disabled = true;
+  $('sel-set').disabled = true;
+}
+
+async function onLoc() {
+  sel.loc = $('sel-loc').value; sel.uni = ''; sel.set = '';
+  const su = $('sel-uni'), ss = $('sel-set');
+  su.innerHTML = '<option value="">Unidade…</option>';
+  ss.innerHTML = '<option value="">Setor…</option>';
+  ss.disabled = true;
+  if (sel.loc) {
+    const unis = await (await fetch('/api/unidades?localidade_id=' + sel.loc)).json();
+    su.innerHTML += unis.map(u => `<option value="${u.id}">${esc(u.nome)}</option>`).join('');
+    su.disabled = false;
+  } else su.disabled = true;
+  sync();
+}
+
+async function onUni() {
+  sel.uni = $('sel-uni').value; sel.set = '';
+  const ss = $('sel-set');
+  ss.innerHTML = '<option value="">Setor…</option>';
+  if (sel.uni) {
+    const sets = await (await fetch('/api/setores?unidade_id=' + sel.uni)).json();
+    ss.innerHTML += sets.map(s => `<option value="${s.id}">${esc(s.nome)}</option>`).join('');
+    ss.disabled = false;
+  } else ss.disabled = true;
+  sync();
+}
+
+function onSet() {
+  sel.set = $('sel-set').value;
+  sync();
+}
+
+function setLoc(id) {
+  $('sel-loc').value = String(id);
+  onLoc();
+}
+
+function sync() {
+  const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
+  $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um local ou busque';
   buscar();
 }
 function podeEditar(localidade) {
@@ -75,10 +95,16 @@ function podeEditar(localidade) {
   return l && me.escopo.includes(l.id);
 }
 async function buscar() {
-  const params = new URLSearchParams({ q: $('q').value.trim() });
-  if (state.set) params.set('setor_id', state.set);
-  else if (state.uni) params.set('unidade_id', state.uni);
-  else if (state.loc) params.set('localidade_id', state.loc);
+  const q = $('q').value.trim();
+  if (!q && !sel.set && !sel.uni && !sel.loc) {
+    $('lista').innerHTML = '<tr><td colspan="6" class="hint-cell">Selecione um local no mapa ou nos menus, ou digite uma busca.</td></tr>';
+    $('create-box').classList.add('hidden');
+    return;
+  }
+  const params = new URLSearchParams({ q });
+  if (sel.set) params.set('setor_id', sel.set);
+  else if (sel.uni) params.set('unidade_id', sel.uni);
+  else if (sel.loc) params.set('localidade_id', sel.loc);
   const lista = await (await fetch('/api/contatos?' + params)).json();
   $('lista').innerHTML = lista.map(c =>
     `<tr><td>${esc(c.nome)}</td><td>${esc(c.cargo)}</td>` +
@@ -94,16 +120,15 @@ async function buscar() {
       sync();
     };
   });
-  const l = locs.find(x => x.id === state.loc);
-  const setorLoc = l ? l.nome : null;
-  const okEscopo = logado() && !!state.set && setorLoc && podeEditar(setorLoc);
+  const locNome = optLabel('sel-loc').replace(/ \(\d+\)$/, '');
+  const okEscopo = logado() && !!sel.set && locNome && podeEditar(locNome);
   $('create-box').classList.toggle('hidden', !okEscopo);
-  $('save-status').textContent = (logado() && state.set && !okEscopo)
+  $('save-status').textContent = (logado() && sel.set && !okEscopo)
     ? 'Você não tem acesso a este local — peça acesso pelo botão "Solicitar acesso".' : '';
 }
 $('q').addEventListener('input', buscar);
 $('salvar').onclick = async () => {
-  const corpo = { setor_id: state.set, nome: $('f-nome').value.trim(),
+  const corpo = { setor_id: sel.set, nome: $('f-nome').value.trim(),
                   cargo: $('f-cargo').value.trim(), telefone: $('f-tel').value.trim(),
                   email: $('f-email').value.trim() };
   const r = await fetch('/api/contatos', { method: 'POST', headers: auth(), body: JSON.stringify(corpo) });
@@ -132,6 +157,7 @@ async function refresh() {
     ? (me.escopo === 'all' ? 'Você edita todos os locais.' : 'Você edita os locais liberados para você; nos demais, só consulta.')
     : '';
   if (dentro) carregarPedidos();
+  loadLocs();
   sync();
 }
 $('btn-entrar').onclick = () => { $('modal-login').classList.remove('hidden'); $('l-status').textContent = ''; };
@@ -221,10 +247,18 @@ async function carregarHistorico() {
 
 (async () => {
   locs = await (await fetch('/api/localidades')).json();
-  renderChips();
+  $('sel-loc').onchange = onLoc;
+  $('sel-uni').onchange = onUni;
+  $('sel-set').onchange = onSet;
   await refresh();
   initMapa('map', 'map-msg', locs, nome => {
     const loc = locs.find(x => norm(x.nome) === norm(nome));
-    if (loc) { state = { loc: loc.id, uni: null, set: null }; sync(); }
+    if (loc) {
+      if (!$('sel-loc').querySelector(`option[value="${loc.id}"]`)) {
+        alert('Você não tem acesso a este local.');
+        return;
+      }
+      setLoc(loc.id);
+    }
   });
 })();

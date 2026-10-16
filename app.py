@@ -298,8 +298,9 @@ class Handler(BaseHTTPRequestHandler):
                 if arg("q"):
                     like = f"%{arg('q')}%"
                     sql += (" AND (c.nome LIKE ? OR c.cargo LIKE ? OR c.telefone LIKE ?"
-                            " OR c.email LIKE ? OR s.nome LIKE ? OR u.nome LIKE ?)")
-                    params += [like] * 6
+                            " OR c.email LIKE ? OR s.nome LIKE ? OR u.nome LIKE ?"
+                            " OR l.nome LIKE ?)")
+                    params += [like] * 7
                 sql += " ORDER BY c.nome"
                 rows = con.execute(sql, params).fetchall()
                 return self._json([dict(r) for r in rows])
