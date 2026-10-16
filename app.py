@@ -19,8 +19,9 @@ Endpoints (JSON):
     GET  /api/historico                   requer token
     GET  /api/me                          requer token -> {usuario}
     POST /api/login                       {usuario, senha} -> {token}
-    POST /api/contatos                    cria (token)
-    DELETE /api/contatos/<id>             remove (token)
+    POST /api/contatos                    cria (token, no seu escopo)
+    PUT  /api/contatos/<id>               edita (token, no seu escopo)
+    DELETE /api/contatos/<id>             remove (token, no seu escopo)
     POST /api/pedidos                     {nome,email,usuario,motivo} (público)
     GET  /api/pedidos                     pendentes (token)
     POST /api/pedidos/<id>/aprovar        cria usuário (token)
@@ -65,15 +66,18 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT, usuario TEXT NOT NULL UNIQUE,
     senha_sha256 TEXT NOT NULL, aprovado INTEGER NOT NULL DEFAULT 1,
     admin INTEGER NOT NULL DEFAULT 0);
-CREATE TABLE IF NOT EXISTS usuarios_locais (
+CREATE TABLE IF NOT EXISTS acessos (
     usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
-    localidade_id INTEGER NOT NULL REFERENCES localidades(id),
-    PRIMARY KEY (usuario_id, localidade_id));
+    nivel TEXT NOT NULL, -- 'municipio' | 'unidade' | 'setor'
+    alvo_id INTEGER NOT NULL,
+    PRIMARY KEY (usuario_id, nivel, alvo_id));
 CREATE TABLE IF NOT EXISTS pedidos (
     id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL,
     email TEXT NOT NULL, usuario_desejado TEXT NOT NULL,
     motivo TEXT NOT NULL DEFAULT '',
     localidade_id INTEGER REFERENCES localidades(id),
+    nivel TEXT NOT NULL DEFAULT 'municipio', -- nível pedido
+    alvo_id INTEGER,                          -- id no nível pedido
     status TEXT NOT NULL DEFAULT 'pendente',
     criado_em TEXT NOT NULL DEFAULT (datetime('now')));
 """
@@ -138,6 +142,15 @@ def init_db():
         con.execute("ALTER TABLE usuarios ADD COLUMN email TEXT NOT NULL DEFAULT ''")
     con.execute("UPDATE usuarios SET email=? WHERE usuario='admin' AND email=''",
                 ("admin@" + DOMINIO_INSTITUCIONAL,))
+    # migração v5->v6: escopo por localidade vira acesso nível 'municipio'
+    try:
+        n_loc = con.execute("SELECT COUNT(*) FROM usuarios_locais").fetchone()[0]
+    except Exception:
+        n_loc = 0
+    if n_loc:
+        con.execute("INSERT OR IGNORE INTO acessos (usuario_id, nivel, alvo_id)"
+                    " SELECT usuario_id, 'municipio', localidade_id FROM usuarios_locais")
+        con.execute("DROP TABLE usuarios_locais")
     n = con.execute("SELECT COUNT(*) AS c FROM contatos").fetchone()["c"]
     if n == 0:
         locs, uns, sets = {}, {}, {}
@@ -159,9 +172,9 @@ def init_db():
                 "INSERT INTO contatos (setor_id, nome, cargo, telefone, email)"
                 " VALUES (?,?,?,?,?)", (sets[key_s], nome, cargo, tel, mail))
         con.execute(
-            "INSERT INTO usuarios (usuario, senha_sha256, aprovado, admin)"
-            " VALUES (?,?,1,1) ON CONFLICT(usuario) DO NOTHING",
-            ("admin", sha("admin123")))
+            "INSERT INTO usuarios (usuario, senha_sha256, aprovado, admin, email)"
+            " VALUES (?,?,1,1,?) ON CONFLICT(usuario) DO NOTHING",
+            ("admin", sha("admin123"), "admin@" + DOMINIO_INSTITUCIONAL))
         con.execute(
             "INSERT INTO historico (acao, detalhe) VALUES (?,?)",
             ("init", "base de demonstração criada com dados fictícios"))
@@ -216,24 +229,66 @@ class Handler(BaseHTTPRequestHandler):
             "SELECT * FROM usuarios WHERE id=?", (uid,)).fetchone()
 
     def _escopo(self, con, uid):
-        """Locais que o usuário pode editar. Admin: todos ('all')."""
+        """Acessos do usuário: 'all' (admin) ou lista {nivel, alvo_id}."""
         u = self._user(con, uid)
         if not u or not u["aprovado"]:
             return None
         if u["admin"]:
             return "all"
         rows = con.execute(
-            "SELECT localidade_id FROM usuarios_locais WHERE usuario_id=?",
+            "SELECT nivel, alvo_id FROM acessos WHERE usuario_id=?",
             (uid,)).fetchall()
-        return {r["localidade_id"] for r in rows}
+        return [dict(r) for r in rows]
 
-    def _pode(self, con, uid, localidade_id):
+    def _cadeia(self, con, setor_id=None, contato_id=None):
+        """Resolve (municipio, unidade, setor) de um setor ou contato."""
+        if contato_id is not None:
+            r = con.execute(
+                "SELECT l.id AS m, u.id AS u, s.id AS s"
+                " FROM localidades l JOIN unidades u ON u.localidade_id=l.id"
+                " JOIN setores s ON s.unidade_id=u.id"
+                " JOIN contatos c ON c.setor_id=s.id WHERE c.id=?",
+                (contato_id,)).fetchone()
+        else:
+            r = con.execute(
+                "SELECT l.id AS m, u.id AS u, s.id AS s"
+                " FROM localidades l JOIN unidades u ON u.localidade_id=l.id"
+                " JOIN setores s ON s.unidade_id=u.id WHERE s.id=?",
+                (setor_id,)).fetchone()
+        return (r["m"], r["u"], r["s"]) if r else (None, None, None)
+
+    def _cobre(self, con, uid, nivel, alvo_id):
+        """O usuário pode editar o alvo? Herda de cima: municipio>unidade>setor."""
         esc = self._escopo(con, uid)
         if esc is None:
             return False
         if esc == "all":
             return True
-        return int(localidade_id) in esc
+        tem = {(a["nivel"], a["alvo_id"]) for a in esc}
+        if nivel == "municipio":
+            return ("municipio", alvo_id) in tem
+        # pais do alvo
+        if nivel == "unidade":
+            m = con.execute("SELECT localidade_id FROM unidades WHERE id=?",
+                            (alvo_id,)).fetchone()
+            pais = [("unidade", alvo_id)]
+            if m:
+                pais.append(("municipio", m["localidade_id"]))
+            return any(p in tem for p in pais)
+        if nivel == "setor":
+            r = con.execute(
+                "SELECT u.id AS u, l.id AS m FROM setores s"
+                " JOIN unidades u ON u.id=s.unidade_id"
+                " JOIN localidades l ON l.id=u.localidade_id WHERE s.id=?",
+                (alvo_id,)).fetchone()
+            pais = [("setor", alvo_id)]
+            if r:
+                pais += [("unidade", r["u"]), ("municipio", r["m"])]
+            return any(p in tem for p in pais)
+        return False
+
+    def _pode(self, con, uid, localidade_id):
+        return self._cobre(con, uid, "municipio", int(localidade_id))
 
     def _loc_de_setor(self, con, setor_id):
         r = con.execute(
@@ -315,13 +370,13 @@ class Handler(BaseHTTPRequestHandler):
                 if not uid:
                     return self._json({"erro": "não autenticado"}, 403)
                 row = con.execute(
-                    "SELECT id, usuario, admin FROM usuarios WHERE id=?",
+                    "SELECT id, usuario, email, admin FROM usuarios WHERE id=?",
                     (uid,)).fetchone()
                 if not row:
                     return self._json({"erro": "não autenticado"}, 403)
                 me = dict(row)
                 esc = self._escopo(con, uid)
-                me["escopo"] = "all" if esc == "all" else sorted(esc or [])
+                me["escopo"] = "all" if esc == "all" else (esc or [])
                 return self._json(me)
             if u.path == "/api/pedidos":
                 if not self._uid():
@@ -330,7 +385,19 @@ class Handler(BaseHTTPRequestHandler):
                     "SELECT p.*, l.nome AS localidade FROM pedidos p"
                     " LEFT JOIN localidades l ON l.id=p.localidade_id"
                     " WHERE p.status='pendente' ORDER BY p.id DESC").fetchall()
-                return self._json([dict(r) for r in rows])
+                nomes = {"municipio": "localidades", "unidade": "unidades",
+                         "setor": "setores"}
+                saida = []
+                for r in rows:
+                    d = dict(r)
+                    d["alvo_nome"] = None
+                    if d.get("alvo_id") and d.get("nivel") in nomes:
+                        t = con.execute(
+                            f"SELECT nome FROM {nomes[d['nivel']]} WHERE id=?",
+                            (d["alvo_id"],)).fetchone()
+                        d["alvo_nome"] = t["nome"] if t else None
+                    saida.append(d)
+                return self._json(saida)
         finally:
             con.close()
         return self.send_error(404)
@@ -359,12 +426,33 @@ class Handler(BaseHTTPRequestHandler):
             if not email.endswith("@" + DOMINIO_INSTITUCIONAL):
                 return self._json({"erro": "use seu e-mail institucional (@" + DOMINIO_INSTITUCIONAL + ")"}, 400)
             con = get_db()
+            nivel = (data.get("nivel") or "municipio").strip().lower()
+            if nivel not in ("municipio", "unidade", "setor"):
+                nivel = "municipio"
+            try:
+                alvo = int(data.get("alvo_id") or data.get("localidade_id") or 0) or None
+            except (TypeError, ValueError):
+                alvo = None
+            # localidade do alvo (para exibir ao admin)
+            loc_id = data.get("localidade_id") or None
+            if nivel == "municipio" and alvo:
+                loc_id = alvo
+            elif nivel == "unidade" and alvo:
+                r = con.execute("SELECT localidade_id FROM unidades WHERE id=?",
+                                (alvo,)).fetchone()
+                loc_id = r["localidade_id"] if r else None
+            elif nivel == "setor" and alvo:
+                r = con.execute(
+                    "SELECT l.id FROM localidades l JOIN unidades u"
+                    " ON u.localidade_id=l.id JOIN setores s ON s.unidade_id=u.id"
+                    " WHERE s.id=?", (alvo,)).fetchone()
+                loc_id = r["id"] if r else None
             cur = con.execute(
                 "INSERT INTO pedidos (nome, email, usuario_desejado, motivo,"
-                " localidade_id) VALUES (?,?,?,?,?)",
+                " localidade_id, nivel, alvo_id) VALUES (?,?,?,?,?,?,?)",
                 (data.get("nome"), data.get("email", ""),
                  data.get("usuario"), data.get("motivo", ""),
-                 data.get("localidade_id") or None))
+                 loc_id, nivel, alvo))
             log(con, "pedido", None,
                 f"solicitação de acesso: {data.get('nome')} ({data.get('usuario')})")
             con.commit()
@@ -393,11 +481,16 @@ class Handler(BaseHTTPRequestHandler):
             uid_novo = con.execute(
                 "SELECT id FROM usuarios WHERE usuario=?",
                 (ped["usuario_desejado"],)).fetchone()["id"]
-            if ped["localidade_id"]:
+            if ped["localidade_id"] and not ped["alvo_id"]:
                 con.execute(
-                    "INSERT INTO usuarios_locais (usuario_id, localidade_id)"
-                    " VALUES (?,?) ON CONFLICT DO NOTHING",
+                    "INSERT INTO acessos (usuario_id, nivel, alvo_id)"
+                    " VALUES (?, 'municipio', ?) ON CONFLICT DO NOTHING",
                     (uid_novo, ped["localidade_id"]))
+            if ped["alvo_id"]:
+                con.execute(
+                    "INSERT INTO acessos (usuario_id, nivel, alvo_id)"
+                    " VALUES (?,?,?) ON CONFLICT DO NOTHING",
+                    (uid_novo, ped["nivel"] or "municipio", ped["alvo_id"]))
             con.execute("UPDATE pedidos SET status='aprovado' WHERE id=?", (pid,))
             log(con, "aprovar", None, f"acesso aprovado: {ped['usuario_desejado']}")
             con.commit()
@@ -412,8 +505,12 @@ class Handler(BaseHTTPRequestHandler):
             if not data.get("nome") or not data.get("setor_id"):
                 return self._json({"erro": "'nome' e 'setor_id' são obrigatórios"}, 400)
             con = get_db()
-            loc = self._loc_de_setor(con, data.get("setor_id"))
-            if loc is None or not self._pode(con, uid, loc):
+            try:
+                sid = int(data.get("setor_id") or 0)
+            except (TypeError, ValueError):
+                con.close()
+                return self._json({"erro": "setor inválido"}, 400)
+            if not self._cobre(con, uid, "setor", sid):
                 con.close()
                 return self._json({"erro": "sem acesso a este local"}, 403)
             cur = con.execute(
@@ -445,15 +542,33 @@ class Handler(BaseHTTPRequestHandler):
             if not row:
                 con.close()
                 return self._json({"erro": "não encontrado"}, 404)
-            if not self._pode(con, uid, self._loc_de_contato(con, cid)):
+            if not self._cobre(con, uid, "setor", self._cadeia(con, contato_id=cid)[2] or 0):
                 con.close()
                 return self._json({"erro": "sem acesso a este local"}, 403)
+            if self.command == "PUT":
+                data = self._body()
+                if not data.get("nome"):
+                    con.close()
+                    return self._json({"erro": "'nome' é obrigatório"}, 400)
+                con.execute(
+                    "UPDATE contatos SET nome=?, cargo=?, telefone=?, email=?"
+                    " WHERE id=?",
+                    (data.get("nome"), data.get("cargo", ""),
+                     data.get("telefone", ""), data.get("email", ""), cid))
+                log(con, "editar", cid, f"editado: {data.get('nome')}")
+                con.commit()
+                row = con.execute(
+                    "SELECT * FROM contatos WHERE id=?", (cid,)).fetchone()
+                con.close()
+                return self._json(dict(row))
             con.execute("DELETE FROM contatos WHERE id=?", (cid,))
             log(con, "remover", cid, f"removido: {row['nome']}")
             con.commit()
             con.close()
             return self._json({"ok": True})
         return self.send_error(404)
+
+    do_PUT = do_DELETE
 
     def log_message(self, *a):
         pass

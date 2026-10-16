@@ -17,7 +17,9 @@
   pedido exigindo e-mail `@empresa-exemplo.com.br` (validado no servidor, 400 fora do domínio)
 - **Tabela de usuários decide permissões**: sem cadastro, mesmo no interno a
   visão seria só consulta; com cadastro, edita os locais do seu escopo
-  (`usuarios_locais`); admin edita tudo
+  (`acessos`, com herança municipio > unidade > setor); admin edita tudo
+- **Gestão por contato**: em cada linha, botões **Editar** (modal) e **Remover**,
+  só onde há cobertura; **Criar** no setor selecionado coberto; edição via PUT
 
 ## O que faz
 - **Consulta pública** (`/`): **mapa clicável à esquerda como porta de entrada**
@@ -35,9 +37,12 @@
   + Registro) e **Solicitar acesso** (modal do formulário); **Sair do acesso
   administrativo** volta à consulta, continua no interno.
   Demo: admin@empresa-exemplo.com.br / admin123.
-- **Gestão dentro da consulta, com escopo por local**: o usuário cria/remove
-  contatos só nos locais liberados para ele (fora deles, só consulta);
-  pode pedir acesso a mais locais; admin aprova e o escopo amplia
+- **Gestão dentro da consulta, com escopo por nível**: o usuário cria/edita/remove
+  contatos só onde tem cobertura (município, unidade ou setor, com herança de
+  cima); fora dela, só consulta. Ao lado de cada nível selecionado sem cobertura,
+  botão **Solicitar acesso** com modal de confirmação dinâmico (município inteiro
+  = todas as unidades e setores; unidade inteira = todos os setores; setor = só ele).
+  Admin aprova e a cobertura amplia. Servidor barra tudo fora do escopo (403).
 - **Solicitação de acesso**: modal (nome, e-mail institucional, usuário, local,
   motivo) → pedido pendente → admin aprova e o novo usuário entra com senha
   inicial, já com o escopo do local pedido (e-mails fora do domínio: 400)

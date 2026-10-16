@@ -4,9 +4,16 @@
 set -u
 cd "$(dirname "$0")"
 rm -f contatos.db
+pkill -9 -f "python3 app.py" 2>/dev/null
+sleep 2
 python3 app.py &>/tmp/demo_test.log &
 PID=$!
-sleep 4
+# espera o servidor responder (com timeout)
+for i in $(seq 1 15); do
+  curl -s -m 2 -o /dev/null http://localhost:8000/api/localidades && break
+  sleep 1
+done
+if ! kill -0 $PID 2>/dev/null; then echo "FALHOU: servidor não subiu"; cat /tmp/demo_test.log; exit 1; fi
 B=http://localhost:8000
 TOK="import sys,json; print(json.load(sys.stdin)['token'])"
 SID="import sys,json; print(json.load(sys.stdin)[0]['id'])"
@@ -36,6 +43,14 @@ echo -n "criar fora do escopo (403 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/contatos -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d "{\"setor_id\":$SVT,\"nome\":\"QA VT\",\"telefone\":\"(27) 3333-0088\"}"
 echo -n "remover fora do escopo (403 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X DELETE $B/api/contatos/1 -H "X-Admin-Token: $TV"
+CIDV=$(curl -s "$B/api/contatos?localidade_id=2" | python3 -c "$SID")
+echo -n "editar no proprio escopo (200 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X PUT $B/api/contatos/$CIDV -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d '{"nome":"QA VV editado"}'
+echo -n "editar fora do escopo (403 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X PUT $B/api/contatos/1 -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d '{"nome":"invasao"}'
+echo "== pedido de setor =="
+curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d "{\"nome\":\"User VV\",\"email\":\"u@empresa-exemplo.com.br\",\"usuario\":\"uservv\",\"motivo\":\"mais um setor\",\"nivel\":\"setor\",\"alvo_id\":$SVV}"; echo
+echo "== pendentes com nivel =="; curl -s "$B/api/pedidos" -H "X-Admin-Token: $TA" | head -c 300; echo
 echo "== historico =="; curl -s "$B/api/historico" -H "X-Admin-Token: $TA" | head -c 150; echo
 kill $PID 2>/dev/null
 rm -f contatos.db /tmp/demo_test.log

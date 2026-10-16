@@ -39,7 +39,7 @@ function marcaEscopo(locId) {
 
 async function loadLocs() {
   $('sel-loc').innerHTML = '<option value="">Localidade…</option>' +
-    locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})${marcaEscopo(l.id)}</option>`).join('');
+    locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})${cobre('municipio', l.id) ? ' ✓' : ''}</option>`).join('');
   sel.loc = ''; sel.uni = ''; sel.set = '';
   $('sel-uni').innerHTML = '<option value="">Unidade…</option>';
   $('sel-set').innerHTML = '<option value="">Setor…</option>';
@@ -54,9 +54,10 @@ async function onLoc() {
   ss.innerHTML = '<option value="">Setor…</option>';
   ss.disabled = true;
   if (sel.loc) {
-    const unis = await (await fetch('/api/unidades?localidade_id=' + sel.loc)).json();
-    su.innerHTML += unis.map(u => `<option value="${u.id}">${esc(u.nome)}</option>`).join('');
-    su.disabled = false;
+  const unis = await (await fetch('/api/unidades?localidade_id=' + sel.loc)).json();
+  unisCache = unis;
+  su.innerHTML += unis.map(u => `<option value="${u.id}">${esc(u.nome)}${cobre('unidade', u.id) ? ' ✓' : ''}</option>`).join('');
+  su.disabled = false;
   } else su.disabled = true;
   sync();
 }
@@ -67,7 +68,8 @@ async function onUni() {
   ss.innerHTML = '<option value="">Setor…</option>';
   if (sel.uni) {
     const sets = await (await fetch('/api/setores?unidade_id=' + sel.uni)).json();
-    ss.innerHTML += sets.map(s => `<option value="${s.id}">${esc(s.nome)}</option>`).join('');
+    setsCache = sets;
+    ss.innerHTML += sets.map(s => `<option value="${s.id}">${esc(s.nome)}${cobre('setor', s.id) ? ' ✓' : ''}</option>`).join('');
     ss.disabled = false;
   } else ss.disabled = true;
   sync();
@@ -86,13 +88,49 @@ function setLoc(id) {
 function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
   $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um local ou busque';
+  refreshSol();
   buscar();
 }
+
+// "Solicitar acesso" aparece ao lado de cada nível selecionado sem cobertura.
+function refreshSol() {
+  $('sol-loc').classList.toggle('hidden', !(logado() && sel.loc && !cobre('municipio', sel.loc)));
+  $('sol-uni').classList.toggle('hidden', !(logado() && sel.uni && !cobre('unidade', sel.uni)));
+  $('sol-set').classList.toggle('hidden', !(logado() && sel.set && !cobre('setor', sel.set)));
+}
 function podeEditar(localidade) {
+  const l = locs.find(x => x.nome === localidade);
+  return l && cobre('municipio', l.id);
+}
+
+let unisCache = [], setsCache = [];
+
+// cobertura com herança de cima: municipio > unidade > setor
+function cobre(nivel, id) {
   if (!logado()) return false;
   if (me.escopo === 'all') return true;
-  const l = locs.find(x => x.nome === localidade);
-  return l && me.escopo.includes(l.id);
+  const g = new Set(me.escopo.map(a => a.nivel + ':' + a.alvo_id));
+  id = Number(id);
+  if (g.has(nivel + ':' + id)) return true;
+  if (nivel === 'unidade') {
+    const u = unisCache.find(x => x.id === id);
+    return !!(u && g.has('municipio:' + u.localidade_id));
+  }
+  if (nivel === 'setor') {
+    const s = setsCache.find(x => x.id === id);
+    if (!s) return false;
+    const u = unisCache.find(x => x.id === s.unidade_id);
+    return g.has('unidade:' + s.unidade_id) || !!(u && g.has('municipio:' + u.localidade_id));
+  }
+  return false;
+}
+
+function cobreContato(c) {
+  if (!logado()) return false;
+  if (me.escopo === 'all') return true;
+  const g = new Set(me.escopo.map(a => a.nivel + ':' + a.alvo_id));
+  return g.has('setor:' + c.setor_id) || g.has('unidade:' + c.unidade_id) ||
+         g.has('municipio:' + c.localidade_id);
 }
 async function buscar() {
   const q = $('q').value.trim();
@@ -106,12 +144,16 @@ async function buscar() {
   else if (sel.uni) params.set('unidade_id', sel.uni);
   else if (sel.loc) params.set('localidade_id', sel.loc);
   const lista = await (await fetch('/api/contatos?' + params)).json();
+  lastList = lista;
   $('lista').innerHTML = lista.map(c =>
     `<tr><td>${esc(c.nome)}</td><td>${esc(c.cargo)}</td>` +
     `<td>${esc(c.localidade)} · ${esc(c.unidade)} · ${esc(c.setor)}</td>` +
     `<td>${esc(c.telefone)}</td><td>${esc(c.email)}</td>` +
-    `<td>${podeEditar(c.localidade) ? `<button class="btn-del" data-id="${c.id}">remover</button>` : ''}</td></tr>`
+    `<td>${cobreContato(c) ? `<button class="btn-edit" data-id="${c.id}">editar</button> <button class="btn-del" data-id="${c.id}">remover</button>` : ''}</td></tr>`
   ).join('') || '<tr><td colspan="6">Nenhum contato.</td></tr>';
+  document.querySelectorAll('.btn-edit').forEach(b => {
+    b.onclick = () => abrirEdicao(Number(b.dataset.id));
+  });
   document.querySelectorAll('.btn-del').forEach(b => {
     b.onclick = async () => {
       if (!confirm('Remover este contato?')) return;
@@ -126,6 +168,28 @@ async function buscar() {
   $('save-status').textContent = (logado() && sel.set && !okEscopo)
     ? 'Você não tem acesso a este local — peça acesso pelo botão "Solicitar acesso".' : '';
 }
+let lastList = [];
+let editId = null;
+
+function abrirEdicao(id) {
+  const c = lastList.find(x => x.id === id);
+  if (!c) return;
+  editId = id;
+  $('e-nome').value = c.nome || '';
+  $('e-cargo').value = c.cargo || '';
+  $('e-tel').value = c.telefone || '';
+  $('e-email').value = c.email || '';
+  $('e-status').textContent = '';
+  $('modal-edit').classList.remove('hidden');
+}
+$('e-cancel').onclick = () => $('modal-edit').classList.add('hidden');
+$('e-salvar').onclick = async () => {
+  const corpo = { nome: $('e-nome').value.trim(), cargo: $('e-cargo').value.trim(),
+                  telefone: $('e-tel').value.trim(), email: $('e-email').value.trim() };
+  const r = await fetch('/api/contatos/' + editId, { method: 'PUT', headers: auth(), body: JSON.stringify(corpo) });
+  if (r.ok) { $('modal-edit').classList.add('hidden'); sync(); }
+  else $('e-status').textContent = 'Erro: ' + await r.text();
+};
 $('q').addEventListener('input', buscar);
 $('salvar').onclick = async () => {
   const corpo = { setor_id: sel.set, nome: $('f-nome').value.trim(),
@@ -204,6 +268,42 @@ $('p-cancel').onclick = () => {
   $('modal-pedido').classList.add('hidden');
   $('p-user').disabled = false;
 };
+
+/* ---- confirmação dinâmica de solicitação por nível ---- */
+let confPed = null; // {nivel, alvo_id}
+async function abrirConf(nivel, id, nome) {
+  confPed = { nivel, alvo_id: Number(id) };
+  $('c-status').textContent = '';
+  $('c-motivo').value = '';
+  let texto = '';
+  if (nivel === 'municipio') {
+    const unis = await (await fetch('/api/unidades?localidade_id=' + id)).json();
+    texto = `Solicitar acesso ao município <b>${esc(nome)}</b> inteiro — ` +
+            `todas as ${unis.length} unidade(s) e seus setores?`;
+  } else if (nivel === 'unidade') {
+    const sets = await (await fetch('/api/setores?unidade_id=' + id)).json();
+    texto = `Solicitar acesso à unidade <b>${esc(nome)}</b> inteira — ` +
+            `todos os ${sets.length} setor(es)?`;
+  } else {
+    texto = `Solicitar acesso ao setor <b>${esc(nome)}</b>?`;
+  }
+  $('conf-texto').innerHTML = texto;
+  $('modal-conf').classList.remove('hidden');
+}
+$('sol-loc').onclick = () => abrirConf('municipio', sel.loc, optLabel('sel-loc').replace(/ \(\d+\)( ✓)?$/, ''));
+$('sol-uni').onclick = () => abrirConf('unidade', sel.uni, optLabel('sel-uni').replace(/ ✓$/, ''));
+$('sol-set').onclick = () => abrirConf('setor', sel.set, optLabel('sel-set').replace(/ ✓$/, ''));
+$('c-cancel').onclick = () => $('modal-conf').classList.add('hidden');
+$('c-enviar').onclick = async () => {
+  const corpo = { nome: me.usuario, email: me.email, usuario: me.usuario,
+                  motivo: $('c-motivo').value.trim(),
+                  nivel: confPed.nivel, alvo_id: confPed.alvo_id };
+  const r = await fetch('/api/pedidos', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+  $('c-status').textContent = r.ok
+    ? 'Pedido enviado. Aguarde a aprovação do administrador.'
+    : 'Erro: ' + await r.text();
+};
 $('p-enviar').onclick = async () => {
   const corpo = { nome: $('p-nome').value.trim(), email: $('p-email').value.trim(),
                   usuario: ($('p-user').disabled && logado() ? me.usuario : $('p-user').value.trim()),
@@ -223,7 +323,7 @@ async function carregarPedidos() {
   $('ped-count').textContent = n || '';
   $('pedidos').innerHTML = (Array.isArray(lista) ? lista : []).map(p =>
     `<li><b>${esc(p.nome)}</b> (${esc(p.email)}) — usuário: <code>${esc(p.usuario_desejado)}</code>` +
-    (p.localidade ? ` — local: <b>${esc(p.localidade)}</b>` : '') +
+    (p.alvo_nome ? ` — ${esc(p.nivel)}: <b>${esc(p.alvo_nome)}</b>` : (p.localidade ? ` — local: <b>${esc(p.localidade)}</b>` : '')) +
     (p.motivo ? ` — ${esc(p.motivo)}` : '') +
     ` <button class="btn-primary" data-id="${p.id}">aprovar</button></li>`
   ).join('') || '<li>Nenhuma solicitação pendente.</li>';
