@@ -14,14 +14,16 @@ function esc(s) {
 const auth = () => ({ 'Content-Type': 'application/json', 'X-Admin-Token': token });
 const logado = () => !!me;
 
+const VIEWS = ['consulta', 'dashboard', 'solicitacoes', 'registro', 'manual', 'config'];
 document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.menu-item[data-view]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    ['consulta', 'solicitacoes', 'registro'].forEach(v => $('view-' + v).classList.add('hidden'));
+    VIEWS.forEach(v => $('view-' + v).classList.add('hidden'));
     $('view-' + btn.dataset.view).classList.remove('hidden');
     if (btn.dataset.view === 'solicitacoes') carregarPedidos();
     if (btn.dataset.view === 'registro') carregarHistorico();
+    if (btn.dataset.view === 'dashboard') carregarDashboard();
   };
 });
 
@@ -209,8 +211,10 @@ async function refresh() {
     else { token = ''; localStorage.removeItem('demo-token'); }
   }
   const dentro = logado();
+  $('menu-dash').classList.toggle('hidden', !dentro);
   $('menu-sol').classList.toggle('hidden', !dentro);
   $('menu-reg').classList.toggle('hidden', !dentro);
+  $('menu-conf').classList.toggle('hidden', !dentro);
   $('btn-entrar').classList.toggle('hidden', dentro);
   $('btn-sair').classList.toggle('hidden', !dentro);
   $('btn-pedir').onclick = dentro ? abrirPedidoMais : abrirPedidoNovo;
@@ -221,6 +225,14 @@ async function refresh() {
     ? (me.escopo === 'all' ? 'Você edita todos os locais.' : 'Você edita os locais liberados para você; nos demais, só consulta.')
     : '';
   if (dentro) carregarPedidos();
+  VIEWS.forEach(v => $('view-' + v).classList.add('hidden'));
+  $('view-consulta').classList.remove('hidden');
+  document.querySelectorAll('.menu-item[data-view]').forEach(b =>
+    b.classList.toggle('active', b.dataset.view === 'consulta'));
+  if (dentro) {
+    $('conf-conta').textContent = `Usuário: ${me.usuario} · e-mail: ${me.email || '—'}` +
+      (me.escopo === 'all' ? ' · admin (todos os locais).' : ` · ${me.escopo.length} acesso(s).`);
+  }
   loadLocs();
   sync();
 }
@@ -314,6 +326,56 @@ $('p-enviar').onclick = async () => {
     ? 'Pedido enviado. Aguarde a aprovação do administrador.'
     : 'Erro: ' + await r.text();
 };
+
+/* ---- dashboard ---- */
+async function carregarDashboard() {
+  if (!logado()) return;
+  const r = await (await fetch('/api/resumo', { headers: auth() })).json();
+  const munEdit = locs.filter(l => cobre('municipio', l.id));
+  const totalEdit = munEdit.reduce((a, l) => a + l.total, 0);
+  const totalGeral = locs.reduce((a, l) => a + l.total, 0);
+  $('dash-sub').textContent = me.escopo === 'all'
+    ? `Admin: ${totalGeral} contatos em ${locs.length} municípios.`
+    : `Você edita ${totalEdit} de ${totalGeral} contatos (${munEdit.length} município(s) com cobertura total).`;
+  $('dash-cards').innerHTML = [
+    ['🏙️ Municípios', locs.length],
+    ['🏢 Unidades', r.por_unidade.length],
+    ['🗂️ Setores', r.por_setor.length],
+    ['👥 Contatos (total)', totalGeral],
+    ['✏️ Contatos editáveis', me.escopo === 'all' ? totalGeral : totalEdit],
+    ['⏳ Solicitações pendentes', r.pendentes],
+  ].map(([t, v]) => `<div class="dash-card"><span>${v}</span>${t}</div>`).join('');
+  const max = Math.max(1, ...locs.map(l => l.total));
+  $('dash-mun').innerHTML = locs.map(l => {
+    const w = Math.round(100 * l.total / max);
+    const ok = cobre('municipio', l.id);
+    return `<div class="bar-row"><span class="bar-label">${esc(l.nome)}${ok ? ' ✓' : ''}</span>` +
+      `<span class="bar-track"><span class="bar-fill${ok ? '' : ' ro'}" style="width:${w}%"></span></span>` +
+      `<span class="bar-num">${l.total}</span></div>`;
+  }).join('');
+  $('dash-ult').innerHTML = (r.ultimos || []).map(x =>
+    `<li><b>${esc(x.acao)}</b> — ${esc(x.detalhe)} <i>${esc(x.data)}</i></li>`
+  ).join('') || '<li>Sem registros.</li>';
+}
+
+/* ---- configurações: senha + tema ---- */
+$('s-salvar').onclick = async () => {
+  const r = await fetch('/api/me/senha', { method: 'POST', headers: auth(),
+    body: JSON.stringify({ atual: $('s-atual').value, nova: $('s-nova').value }) });
+  $('s-status').textContent = r.ok
+    ? 'Senha atualizada.'
+    : 'Erro: ' + (await r.json()).erro;
+  if (r.ok) { $('s-atual').value = ''; $('s-nova').value = ''; }
+};
+function aplicarTema() {
+  document.body.dataset.theme = localStorage.getItem('demo-theme') || 'light';
+}
+$('tema-toggle').onclick = () => {
+  localStorage.setItem('demo-theme',
+    (localStorage.getItem('demo-theme') || 'light') === 'light' ? 'dark' : 'light');
+  aplicarTema();
+};
+aplicarTema();
 
 /* ---- solicitações / registro ---- */
 async function carregarPedidos() {

@@ -86,3 +86,29 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:15
 .cascade .btn-ghost{margin:-4px 0 8px}
 .btn-ghost.dark{color:#334155;border-color:#cbd5e1}
 .hint-cell{color:#64748b;text-align:center;padding:22px 8px!important}
+/* ---- dashboard ---- */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.dash-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;text-align:center;font-size:13px;color:#475569}
+.dash-card span{display:block;font-size:26px;font-weight:800;color:#1e293b}
+.bar-row{display:grid;grid-template-columns:140px 1fr 30px;gap:8px;align-items:center;margin-bottom:6px;font-size:14px}
+.bar-track{background:#e2e8f0;border-radius:999px;height:12px;overflow:hidden}
+.bar-fill{display:block;height:100%;background:#2563eb;border-radius:999px}
+.bar-fill.ro{background:#94a3b8}
+.bar-num{text-align:right;color:#475569}
+/* ---- tema escuro ---- */
+body[data-theme="dark"]{background:#0f172a;color:#e2e8f0}
+body[data-theme="dark"] .card{background:#1e293b;color:#e2e8f0}
+body[data-theme="dark"] table{color:#e2e8f0}
+body[data-theme="dark"] th{border-color:#334155;color:#94a3b8}
+body[data-theme="dark"] td{border-color:#334155}
+body[data-theme="dark"] input,body[data-theme="dark"] select{background:#0f172a;color:#e2e8f0;border-color:#475569}
+body[data-theme="dark"] .breadcrumb,body[data-theme="dark"] .hint{color:#94a3b8}
+body[data-theme="dark"] .dash-card{background:#0f172a;border-color:#334155;color:#94a3b8}
+body[data-theme="dark"] .dash-card span{color:#f1f5f9}
+body[data-theme="dark"] .bar-track{background:#334155}
+body[data-theme="dark"] .modal-box{background:#1e293b;color:#e2e8f0}
+body[data-theme="dark"] .modal-box label{color:#94a3b8}
+body[data-theme="dark"] #hist li,body[data-theme="dark"] #dash-ult li,body[data-theme="dark"] .rows li{border-color:#334155}
+body[data-theme="dark"] .btn-ghost.dark{color:#e2e8f0;border-color:#475569}
+body[data-theme="dark"] footer{color:#64748b}
+body[data-theme="dark"] code{background:#0f172a}

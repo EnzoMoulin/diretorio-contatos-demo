@@ -52,6 +52,15 @@ echo "== pedido de setor =="
 curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d "{\"nome\":\"User VV\",\"email\":\"u@empresa-exemplo.com.br\",\"usuario\":\"uservv\",\"motivo\":\"mais um setor\",\"nivel\":\"setor\",\"alvo_id\":$SVV}"; echo
 echo "== pendentes com nivel =="; curl -s "$B/api/pedidos" -H "X-Admin-Token: $TA" | head -c 300; echo
 echo "== historico =="; curl -s "$B/api/historico" -H "X-Admin-Token: $TA" | head -c 150; echo
+echo "== resumo =="; curl -s "$B/api/resumo" -H "X-Admin-Token: $TA" | head -c 200; echo
+echo -n "resumo sem token (403 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" $B/api/resumo
+echo -n "trocar senha curta (400 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/me/senha -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d '{"atual":"bemvindo123","nova":"123"}'
+echo -n "trocar senha (200 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/me/senha -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d '{"atual":"bemvindo123","nova":"novasenha123"}'
+echo -n "login com nova senha (200 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"uservv","senha":"novasenha123"}'
 kill $PID 2>/dev/null
 rm -f contatos.db /tmp/demo_test.log
 echo "OK"

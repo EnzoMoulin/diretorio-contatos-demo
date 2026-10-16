@@ -16,8 +16,11 @@
     </div>
     <nav class="sidebar-menu">
       <button class="menu-item active" data-view="consulta">🔍 Consulta</button>
+      <button class="menu-item hidden" data-view="dashboard" id="menu-dash">📊 Dashboard</button>
       <button class="menu-item hidden" data-view="solicitacoes" id="menu-sol">📝 Solicitações de acesso <span id="ped-count" class="badge"></span></button>
       <button class="menu-item hidden" data-view="registro" id="menu-reg">🕘 Registro de alterações</button>
+      <button class="menu-item" data-view="manual">📖 Manual do Usuário</button>
+      <button class="menu-item hidden" data-view="config" id="menu-conf">⚙️ Configurações</button>
     </nav>
     <div class="sidebar-bottom">
       <button id="btn-entrar" class="btn-primary wide">🔑 Acesso administrativo</button>
@@ -71,6 +74,61 @@
     <section class="card hidden" id="view-registro">
       <h1>Registro de alterações</h1>
       <ul id="hist"></ul>
+    </section>
+    <section class="card hidden" id="view-dashboard">
+      <h1>Dashboard</h1>
+      <p class="hint" id="dash-sub">Somente seus escopos.</p>
+      <div class="dash-grid" id="dash-cards"></div>
+      <h3>Contatos por município (seu acesso)</h3>
+      <div id="dash-mun"></div>
+      <h3>Últimas alterações</h3>
+      <ul id="dash-ult"></ul>
+    </section>
+    <section class="card hidden" id="view-manual">
+      <h1>📖 Manual do Usuário</h1>
+      <p class="hint">Guia rápido — da consulta à gestão. Consulta inicial: selecione um local no mapa ou nos menus, ou digite uma busca.</p>
+      <h3>🗺️ 01 — Localizar</h3>
+      <ol>
+        <li>Clique em um município com contatos no <b>mapa</b> para filtrar, ou</li>
+        <li>Use os <b>menus em cascata</b>: Localidade → Unidade → Setor. O caminho aparece acima dos menus.</li>
+      </ol>
+      <h3>🔍 02 — Buscar</h3>
+      <p>O campo de busca alcança todos os níveis: nome, cargo, telefone, e-mail, setor, unidade e município. Pode combinar busca + nível selecionado.</p>
+      <h3>🔑 03 — Acesso administrativo</h3>
+      <ol>
+        <li>Sem cadastro: clique em <b>Solicitar acesso</b> e preencha o formulário (exigido e-mail institucional <code>@empresa-exemplo.com.br</code>).</li>
+        <li>Com cadastro: clique em <b>Acesso administrativo</b> e entre com e-mail + senha.</li>
+        <li>Logado, os locais editáveis vêm marcados com <b>✓</b>; nos demais, só consulta.</li>
+        <li><b>Sair do acesso administrativo</b> volta à consulta, sem sair do acesso interno.</li>
+      </ol>
+      <h3>✏️ 04 — Gerenciar contatos</h3>
+      <ol>
+        <li><b>Criar</b>: selecione o setor e use o formulário "Novo contato neste setor".</li>
+        <li><b>Editar/Remover</b>: botões em cada linha, só onde você tem cobertura.</li>
+        <li>Sem cobertura no nível selecionado, aparece <b>Solicitar acesso</b>: município inteiro (todas as unidades e setores), unidade inteira (todos os setores) ou só o setor.</li>
+      </ol>
+      <h3>📝 05 — Solicitações e registro</h3>
+      <p>Na aba <b>Solicitações de acesso</b>, o admin aprova pedidos (o novo usuário entra com senha inicial). A aba <b>Registro de alterações</b> mostra criar / editar / remover / pedidos / aprovações.</p>
+      <h3>💡 06 — Dicas</h3>
+      <ul>
+        <li>Em telas menores, mapa e painel se reorganizam sozinhos.</li>
+        <li>Na aba <b>Configurações</b> dá para trocar a senha e alternar o tema claro/escuro.</li>
+      </ul>
+    </section>
+    <section class="card hidden" id="view-config">
+      <h1>⚙️ Configurações</h1>
+      <h3>Sua conta</h3>
+      <p class="hint" id="conf-conta"></p>
+      <h3>Trocar senha</h3>
+      <div class="form-grid">
+        <input id="s-atual" type="password" placeholder="Senha atual" autocomplete="current-password">
+        <input id="s-nova" type="password" placeholder="Nova senha (6+ caracteres)" autocomplete="new-password">
+        <button id="s-salvar" class="btn-primary">Salvar nova senha</button>
+        <span id="s-status"></span>
+      </div>
+      <h3>Aparência</h3>
+      <button id="tema-toggle" class="btn-ghost dark">🌙 Alternar tema claro/escuro</button>
+      <p class="hint">A preferência fica salva neste navegador.</p>
     </section>
     <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
   </main>

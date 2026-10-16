@@ -46,7 +46,13 @@
 - **Solicitação de acesso**: modal (nome, e-mail institucional, usuário, local,
   motivo) → pedido pendente → admin aprova e o novo usuário entra com senha
   inicial, já com o escopo do local pedido (e-mails fora do domínio: 400)
-- **Registro de alterações**: criar / remover / pedidos / aprovações
+- **Registro de alterações**: criar / editar / remover / pedidos / aprovações
+- **Dashboard** (só logado): cards (municípios, unidades, setores, contatos,
+  editáveis, pendências), barras por município com ✓ de cobertura e últimas
+  alterações — tudo recortado pelo seu escopo
+- **Manual do Usuário** (aba do interno): localizar, buscar, acesso, gestão,
+  solicitações e dicas
+- **Configurações** (só logado): dados da conta, troca de senha e tema claro/escuro
 
 ## Stack
 - Backend: Python 3, somente biblioteca padrão (`http.server` + `sqlite3`) — zero dependências
@@ -76,6 +82,8 @@ bash teste_rapido.sh   # verifica o fluxo completo, incl. escopo por local
 | POST | `/api/pedidos` | não | solicita acesso (com local) |
 | GET | `/api/pedidos` | `X-Admin-Token` | pendentes (com local pedido) |
 | POST | `/api/pedidos/<id>/aprovar` | `X-Admin-Token` | aprova, cria usuário e concede escopo |
+| GET | `/api/resumo` | `X-Admin-Token` | totais por unidade/setor + últimos 5 + pendentes |
+| POST | `/api/me/senha` | `X-Admin-Token` | troca a própria senha |
 
 ## Versão completa (Google Apps Script)
 Mesmo domínio, implementação corporativa completa (auth, papéis, hierarquia,

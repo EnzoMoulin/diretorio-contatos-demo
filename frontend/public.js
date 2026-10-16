@@ -82,6 +82,7 @@ async function buscar() {
 $('q').addEventListener('input', buscar);
 
 (async () => {
+  document.body.dataset.theme = localStorage.getItem('demo-theme') || 'light';
   locs = await (await fetch('/api/localidades')).json();
   await loadLocs();
   $('sel-loc').onchange = onLoc;

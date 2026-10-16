@@ -359,6 +359,31 @@ class Handler(BaseHTTPRequestHandler):
                 sql += " ORDER BY c.nome"
                 rows = con.execute(sql, params).fetchall()
                 return self._json([dict(r) for r in rows])
+            if u.path == "/api/resumo":
+                uid = self._uid()
+                if not uid:
+                    return self._json({"erro": "não autenticado"}, 403)
+                por_uni = con.execute(
+                    "SELECT u.id, u.nome, u.localidade_id, l.nome AS localidade,"
+                    " COUNT(c.id) AS total FROM unidades u"
+                    " JOIN localidades l ON l.id=u.localidade_id"
+                    " LEFT JOIN setores s ON s.unidade_id=u.id"
+                    " LEFT JOIN contatos c ON c.setor_id=s.id"
+                    " GROUP BY u.id ORDER BY l.nome, u.nome").fetchall()
+                por_set = con.execute(
+                    "SELECT s.id, s.nome, s.unidade_id, COUNT(c.id) AS total"
+                    " FROM setores s LEFT JOIN contatos c ON c.setor_id=s.id"
+                    " GROUP BY s.id ORDER BY s.nome").fetchall()
+                ult = con.execute(
+                    "SELECT * FROM historico ORDER BY id DESC LIMIT 5").fetchall()
+                pend = con.execute(
+                    "SELECT COUNT(*) AS c FROM pedidos"
+                    " WHERE status='pendente'").fetchone()["c"]
+                return self._json({
+                    "por_unidade": [dict(r) for r in por_uni],
+                    "por_setor": [dict(r) for r in por_set],
+                    "ultimos": [dict(r) for r in ult],
+                    "pendentes": pend})
             if u.path == "/api/historico":
                 if not self._uid():
                     return self._json({"erro": "não autenticado"}, 403)
@@ -497,6 +522,25 @@ class Handler(BaseHTTPRequestHandler):
             con.close()
             return self._json({"ok": True, "usuario": ped["usuario_desejado"],
                                "senha_inicial": SENHA_INICIAL})
+        if u.path == "/api/me/senha":
+            uid = self._uid()
+            if not uid:
+                return self._json({"erro": "não autenticado"}, 403)
+            data = self._body()
+            nova = (data.get("nova") or "")
+            if len(nova) < 6:
+                return self._json({"erro": "nova senha precisa de 6+ caracteres"}, 400)
+            con = get_db()
+            row = con.execute(
+                "SELECT * FROM usuarios WHERE id=?", (uid,)).fetchone()
+            if not row or row["senha_sha256"] != sha(data.get("atual") or ""):
+                con.close()
+                return self._json({"erro": "senha atual incorreta"}, 401)
+            con.execute("UPDATE usuarios SET senha_sha256=? WHERE id=?",
+                        (sha(nova), uid))
+            con.commit()
+            con.close()
+            return self._json({"ok": True})
         if u.path == "/api/contatos":
             uid = self._uid()
             if not uid:
