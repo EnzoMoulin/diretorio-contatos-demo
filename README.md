@@ -28,8 +28,8 @@
   — nada de despejar todos os contatos de cara. Sem nenhum caminho para o acesso interno.
 - **Acesso interno** (`/admin`, URL separada, sem nenhum caminho a partir do
   público): entra direto em **consulta** (mapa + cascata + tabela vazia), sem login e
-  sem funções administrativas; logado, os **menus já vêm filtrados pelo escopo**
-  (só os locais liberados); clicar no mapa em local sem acesso avisa.
+  sem funções administrativas; logado, os locais liberados vêm marcados com ✓
+  (consulta em todos, edição só no escopo); clicar no mapa filtra qualquer local.
   Botões na base da sidebar: **Acesso administrativo** (modal de login com
   e-mail + senha; com cadastro, eleva e libera gestão por escopo + Solicitações
   + Registro) e **Solicitar acesso** (modal do formulário); **Sair do acesso

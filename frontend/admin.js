@@ -31,15 +31,15 @@ function optLabel(selId) {
   return s.selectedIndex > 0 ? s.options[s.selectedIndex].text : '';
 }
 
-function locsPermitidas() {
-  if (!logado() || me.escopo === 'all') return locs;
-  return locs.filter(l => me.escopo.includes(l.id));
+// ✓ nos locais editáveis; fora deles, consulta liberada, edição bloqueada.
+function marcaEscopo(locId) {
+  if (!logado() || me.escopo === 'all') return '';
+  return me.escopo.includes(locId) ? ' ✓' : '';
 }
 
 async function loadLocs() {
-  const lista = locsPermitidas();
   $('sel-loc').innerHTML = '<option value="">Localidade…</option>' +
-    lista.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})</option>`).join('');
+    locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})${marcaEscopo(l.id)}</option>`).join('');
   sel.loc = ''; sel.uni = ''; sel.set = '';
   $('sel-uni').innerHTML = '<option value="">Unidade…</option>';
   $('sel-set').innerHTML = '<option value="">Setor…</option>';
@@ -253,12 +253,6 @@ async function carregarHistorico() {
   await refresh();
   initMapa('map', 'map-msg', locs, nome => {
     const loc = locs.find(x => norm(x.nome) === norm(nome));
-    if (loc) {
-      if (!$('sel-loc').querySelector(`option[value="${loc.id}"]`)) {
-        alert('Você não tem acesso a este local.');
-        return;
-      }
-      setLoc(loc.id);
-    }
+    if (loc) setLoc(loc.id);
   });
 })();
