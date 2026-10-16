@@ -50,9 +50,13 @@
 - **Dashboard** (só logado): cards (municípios, unidades, setores, contatos,
   editáveis, pendências), barras por município com ✓ de cobertura e últimas
   alterações — tudo recortado pelo seu escopo
-- **Manual do Usuário** (aba do interno): localizar, buscar, acesso, gestão,
-  solicitações e dicas
-- **Configurações** (só logado): dados da conta, troca de senha e tema claro/escuro
+- **Notificações** (aba do interno): solicitações chegam aos admins, aprovação
+  chega ao solicitante, criar/editar/remover avisa os admins; badge de não
+  lidas, marcar uma/todas como lidas. Sem login, a aba pede para entrar.
+- **Configurações**: tema claro/escuro para todo mundo (externo e interno,
+  com ou sem login); logado ganha dados da conta e troca de senha
+- **E-mails clicáveis**: toda coluna de e-mail abre o app de e-mail (mailto),
+  igual ao original
 
 ## Stack
 - Backend: Python 3, somente biblioteca padrão (`http.server` + `sqlite3`) — zero dependências
@@ -84,6 +88,9 @@ bash teste_rapido.sh   # verifica o fluxo completo, incl. escopo por local
 | POST | `/api/pedidos/<id>/aprovar` | `X-Admin-Token` | aprova, cria usuário e concede escopo |
 | GET | `/api/resumo` | `X-Admin-Token` | totais por unidade/setor + últimos 5 + pendentes |
 | POST | `/api/me/senha` | `X-Admin-Token` | troca a própria senha |
+| GET | `/api/notificacoes` | `X-Admin-Token` | minhas notificações + `nao_lidas` |
+| POST | `/api/notificacoes/lida` | `X-Admin-Token` | marca uma como lida (`{"id"}`) |
+| POST | `/api/notificacoes/lidas` | `X-Admin-Token` | marca todas como lidas |
 
 ## Versão completa (Google Apps Script)
 Mesmo domínio, implementação corporativa completa (auth, papéis, hierarquia,

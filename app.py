@@ -66,6 +66,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT, usuario TEXT NOT NULL UNIQUE,
     senha_sha256 TEXT NOT NULL, aprovado INTEGER NOT NULL DEFAULT 1,
     admin INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS notificacoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, usuario_id INTEGER NOT NULL,
+    tipo TEXT NOT NULL DEFAULT 'info', texto TEXT NOT NULL DEFAULT '',
+    lida INTEGER NOT NULL DEFAULT 0,
+    data TEXT NOT NULL DEFAULT (datetime('now')));
 CREATE TABLE IF NOT EXISTS acessos (
     usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
     nivel TEXT NOT NULL, -- 'municipio' | 'unidade' | 'setor'
@@ -186,6 +191,15 @@ def log(con, acao, contato_id=None, detalhe=""):
     con.execute(
         "INSERT INTO historico (acao, contato_id, detalhe) VALUES (?,?,?)",
         (acao, contato_id, detalhe))
+
+def notify(con, usuario_id, tipo, texto):
+    con.execute(
+        "INSERT INTO notificacoes (usuario_id, tipo, texto) VALUES (?,?,?)",
+        (usuario_id, tipo, texto))
+
+def admin_ids(con):
+    return [r["id"] for r in con.execute(
+        "SELECT id FROM usuarios WHERE admin=1 AND aprovado=1").fetchall()]
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -384,6 +398,17 @@ class Handler(BaseHTTPRequestHandler):
                     "por_setor": [dict(r) for r in por_set],
                     "ultimos": [dict(r) for r in ult],
                     "pendentes": pend})
+            if u.path == "/api/notificacoes":
+                uid = self._uid()
+                if not uid:
+                    return self._json({"erro": "não autenticado"}, 403)
+                rows = con.execute(
+                    "SELECT * FROM notificacoes WHERE usuario_id=?"
+                    " ORDER BY id DESC LIMIT 30", (uid,)).fetchall()
+                lista = [dict(r) for r in rows]
+                return self._json({
+                    "lista": lista,
+                    "nao_lidas": sum(1 for r in lista if not r["lida"])})
             if u.path == "/api/historico":
                 if not self._uid():
                     return self._json({"erro": "não autenticado"}, 403)
@@ -445,11 +470,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"erro": "credenciais inválidas ou acesso não aprovado"}, 401)
         if u.path == "/api/pedidos":
             data = self._body()
-            if not data.get("nome") or not data.get("usuario"):
-                return self._json({"erro": "nome e usuário desejado são obrigatórios"}, 400)
+            if not data.get("nome"):
+                return self._json({"erro": "nome é obrigatório"}, 400)
             email = (data.get("email") or "").strip().lower()
             if not email.endswith("@" + DOMINIO_INSTITUCIONAL):
                 return self._json({"erro": "use seu e-mail institucional (@" + DOMINIO_INSTITUCIONAL + ")"}, 400)
+            usuario = (data.get("usuario") or "").strip() or email.split("@")[0]
             con = get_db()
             nivel = (data.get("nivel") or "municipio").strip().lower()
             if nivel not in ("municipio", "unidade", "setor"):
@@ -476,10 +502,14 @@ class Handler(BaseHTTPRequestHandler):
                 "INSERT INTO pedidos (nome, email, usuario_desejado, motivo,"
                 " localidade_id, nivel, alvo_id) VALUES (?,?,?,?,?,?,?)",
                 (data.get("nome"), data.get("email", ""),
-                 data.get("usuario"), data.get("motivo", ""),
+                 usuario, data.get("motivo", ""),
                  loc_id, nivel, alvo))
+            for aid in admin_ids(con):
+                notify(con, aid, "solicitacao",
+                       f"Nova solicitação de {data.get('nome')} ({usuario}):"
+                       f" {nivel} id {alvo or '-'}")
             log(con, "pedido", None,
-                f"solicitação de acesso: {data.get('nome')} ({data.get('usuario')})")
+                f"solicitação de acesso: {data.get('nome')} ({usuario})")
             con.commit()
             con.close()
             return self._json({"ok": True, "id": cur.lastrowid}, 201)
@@ -518,10 +548,36 @@ class Handler(BaseHTTPRequestHandler):
                     (uid_novo, ped["nivel"] or "municipio", ped["alvo_id"]))
             con.execute("UPDATE pedidos SET status='aprovado' WHERE id=?", (pid,))
             log(con, "aprovar", None, f"acesso aprovado: {ped['usuario_desejado']}")
+            notify(con, uid_novo, "aprovada",
+                   "Seu acesso foi aprovado. Senha inicial: " + SENHA_INICIAL)
             con.commit()
             con.close()
             return self._json({"ok": True, "usuario": ped["usuario_desejado"],
                                "senha_inicial": SENHA_INICIAL})
+        if u.path == "/api/notificacoes/lidas":
+            uid = self._uid()
+            if not uid:
+                return self._json({"erro": "não autenticado"}, 403)
+            con = get_db()
+            con.execute("UPDATE notificacoes SET lida=1 WHERE usuario_id=?",
+                        (uid,))
+            con.commit()
+            con.close()
+            return self._json({"ok": True})
+        parts = urllib.parse.urlparse(self.path).path.rstrip("/").split("/")
+        if len(parts) == 4 and parts[1] == "api" and parts[2] == "notificacoes" \
+                and parts[3] == "lida":
+            # POST /api/notificacoes/lida {"id": N}
+            uid = self._uid()
+            if not uid:
+                return self._json({"erro": "não autenticado"}, 403)
+            data = self._body()
+            con = get_db()
+            con.execute("UPDATE notificacoes SET lida=1 WHERE id=? AND usuario_id=?",
+                        (data.get("id"), uid))
+            con.commit()
+            con.close()
+            return self._json({"ok": True})
         if u.path == "/api/me/senha":
             uid = self._uid()
             if not uid:
@@ -563,6 +619,9 @@ class Handler(BaseHTTPRequestHandler):
                 (data.get("setor_id"), data.get("nome"), data.get("cargo", ""),
                  data.get("telefone", ""), data.get("email", "")))
             log(con, "criar", cur.lastrowid, f"criado: {data.get('nome')}")
+            for aid in admin_ids(con):
+                notify(con, aid, "contato",
+                       f"Contato criado: {data.get('nome')}")
             con.commit()
             row = con.execute(
                 "SELECT * FROM contatos WHERE id=?", (cur.lastrowid,)).fetchone()
@@ -600,6 +659,9 @@ class Handler(BaseHTTPRequestHandler):
                     (data.get("nome"), data.get("cargo", ""),
                      data.get("telefone", ""), data.get("email", ""), cid))
                 log(con, "editar", cid, f"editado: {data.get('nome')}")
+                for aid in admin_ids(con):
+                    notify(con, aid, "contato",
+                           f"Contato editado: {data.get('nome')}")
                 con.commit()
                 row = con.execute(
                     "SELECT * FROM contatos WHERE id=?", (cid,)).fetchone()
@@ -607,6 +669,9 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(dict(row))
             con.execute("DELETE FROM contatos WHERE id=?", (cid,))
             log(con, "remover", cid, f"removido: {row['nome']}")
+            for aid in admin_ids(con):
+                notify(con, aid, "contato",
+                       f"Contato removido: {row['nome']}")
             con.commit()
             con.close()
             return self._json({"ok": True})

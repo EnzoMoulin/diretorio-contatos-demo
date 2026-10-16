@@ -61,6 +61,16 @@ echo -n "trocar senha (200 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/me/senha -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d '{"atual":"bemvindo123","nova":"novasenha123"}'
 echo -n "login com nova senha (200 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"uservv","senha":"novasenha123"}'
+echo "== pedido sem usuario (default = inicio do email) =="
+curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"Sem User","email":"semuser@empresa-exemplo.com.br","motivo":"t","localidade_id":1}'; echo
+echo "== notificacoes do admin (deve listar solicitacoes) =="
+curl -s "$B/api/notificacoes" -H "X-Admin-Token: $TA" | head -c 300; echo
+echo -n "notificacoes sem token (403 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" $B/api/notificacoes
+NID=$(curl -s "$B/api/notificacoes" -H "X-Admin-Token: $TA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['lista'][0]['id'] if d['lista'] else 0)")
+echo "marcar lida id=$NID:"; curl -s -X POST $B/api/notificacoes/lida -H 'Content-Type: application/json' -H "X-Admin-Token: $TA" -d "{\"id\":$NID}"; echo
+echo -n "marcar todas lidas (200 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/notificacoes/lidas -H "X-Admin-Token: $TA"
 kill $PID 2>/dev/null
 rm -f contatos.db /tmp/demo_test.log
 echo "OK"

@@ -20,9 +20,11 @@
       <button class="menu-item hidden" data-view="solicitacoes" id="menu-sol">📝 Solicitações de acesso <span id="ped-count" class="badge"></span></button>
       <button class="menu-item hidden" data-view="registro" id="menu-reg">🕘 Registro de alterações</button>
       <button class="menu-item" data-view="manual">📖 Manual do Usuário</button>
-      <button class="menu-item hidden" data-view="config" id="menu-conf">⚙️ Configurações</button>
+      <button class="menu-item" data-view="notificacoes" id="menu-notif">🔔 Notificações <span id="notif-count" class="badge"></span></button>
+      <button class="menu-item" data-view="config" id="menu-conf">⚙️ Configurações</button>
     </nav>
     <div class="sidebar-bottom">
+      <p class="hint hidden" id="who-line"></p>
       <button id="btn-entrar" class="btn-primary wide">🔑 Acesso administrativo</button>
       <button id="btn-pedir" class="btn-ghost wide">📝 Solicitar acesso</button>
       <button id="btn-sair" class="btn-ghost wide hidden">🚪 Sair do acesso administrativo</button>
@@ -117,6 +119,7 @@
     </section>
     <section class="card hidden" id="view-config">
       <h1>⚙️ Configurações</h1>
+      <div id="conf-logado" class="hidden">
       <h3>Sua conta</h3>
       <p class="hint" id="conf-conta"></p>
       <h3>Trocar senha</h3>
@@ -126,9 +129,18 @@
         <button id="s-salvar" class="btn-primary">Salvar nova senha</button>
         <span id="s-status"></span>
       </div>
+      </div>
       <h3>Aparência</h3>
       <button id="tema-toggle" class="btn-ghost dark">🌙 Alternar tema claro/escuro</button>
       <p class="hint">A preferência fica salva neste navegador.</p>
+    </section>
+    <section class="card hidden" id="view-notificacoes">
+      <h1>🔔 Notificações</h1>
+      <div id="notif-logado" class="hidden">
+        <button id="btn-todas-lidas" class="btn-ghost dark">Marcar todas como lidas</button>
+        <ul id="notifs" class="rows"></ul>
+      </div>
+      <p class="hint" id="notif-entrar">Entre com sua conta para ver suas notificações.</p>
     </section>
     <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
   </main>
@@ -152,7 +164,7 @@
     <p class="hint" id="ped-hint">Exigido e-mail institucional @empresa-exemplo.com.br (equivale ao vínculo da intranet).</p>
     <label>Nome*<input id="p-nome"></label>
     <label>E-mail institucional*<input id="p-email" placeholder="voce@empresa-exemplo.com.br"></label>
-    <label>Usuário desejado*<input id="p-user"></label>
+    <label>Usuário desejado <span class="hint">(opcional — padrão: início do e-mail)</span><input id="p-user"></label>
     <label>Local de acesso<select id="p-loc"></select></label>
     <label>Motivo<input id="p-motivo"></label>
     <div class="modal-actions">

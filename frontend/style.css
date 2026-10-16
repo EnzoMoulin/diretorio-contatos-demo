@@ -68,7 +68,9 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:15
 .rows{list-style:none;margin:0;padding:0}
 .rows li{padding:10px 4px;border-bottom:1px solid #e2e8f0;font-size:14px}
 .menu-item.link{display:block;text-decoration:none}
-#ped-count:empty{display:none}
+#ped-count:empty,#notif-count:empty{display:none}
+.rows li.nao-lida{background:#eff6ff}
+body[data-theme="dark"] .rows li.nao-lida{background:#1e3a8a33}
 /* ---- v3: layout dividido, modal ---- */
 .consulta-grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:16px;align-items:start}
 @media (max-width:900px){.consulta-grid{grid-template-columns:1fr}}

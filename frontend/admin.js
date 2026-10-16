@@ -14,7 +14,7 @@ function esc(s) {
 const auth = () => ({ 'Content-Type': 'application/json', 'X-Admin-Token': token });
 const logado = () => !!me;
 
-const VIEWS = ['consulta', 'dashboard', 'solicitacoes', 'registro', 'manual', 'config'];
+const VIEWS = ['consulta', 'dashboard', 'solicitacoes', 'registro', 'manual', 'config', 'notificacoes'];
 document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.menu-item[data-view]').forEach(b => b.classList.remove('active'));
@@ -24,6 +24,7 @@ document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
     if (btn.dataset.view === 'solicitacoes') carregarPedidos();
     if (btn.dataset.view === 'registro') carregarHistorico();
     if (btn.dataset.view === 'dashboard') carregarDashboard();
+    if (btn.dataset.view === 'notificacoes') carregarNotificacoes();
   };
 });
 
@@ -150,7 +151,7 @@ async function buscar() {
   $('lista').innerHTML = lista.map(c =>
     `<tr><td>${esc(c.nome)}</td><td>${esc(c.cargo)}</td>` +
     `<td>${esc(c.localidade)} · ${esc(c.unidade)} · ${esc(c.setor)}</td>` +
-    `<td>${esc(c.telefone)}</td><td>${esc(c.email)}</td>` +
+    `<td>${esc(c.telefone)}</td><td><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></td>` +
     `<td>${cobreContato(c) ? `<button class="btn-edit" data-id="${c.id}">editar</button> <button class="btn-del" data-id="${c.id}">remover</button>` : ''}</td></tr>`
   ).join('') || '<tr><td colspan="6">Nenhum contato.</td></tr>';
   document.querySelectorAll('.btn-edit').forEach(b => {
@@ -214,7 +215,8 @@ async function refresh() {
   $('menu-dash').classList.toggle('hidden', !dentro);
   $('menu-sol').classList.toggle('hidden', !dentro);
   $('menu-reg').classList.toggle('hidden', !dentro);
-  $('menu-conf').classList.toggle('hidden', !dentro);
+  $('who-line').classList.toggle('hidden', !dentro);
+  if (dentro) $('who-line').textContent = '👤 ' + me.usuario;
   $('btn-entrar').classList.toggle('hidden', dentro);
   $('btn-sair').classList.toggle('hidden', !dentro);
   $('btn-pedir').onclick = dentro ? abrirPedidoMais : abrirPedidoNovo;
@@ -225,14 +227,17 @@ async function refresh() {
     ? (me.escopo === 'all' ? 'Você edita todos os locais.' : 'Você edita os locais liberados para você; nos demais, só consulta.')
     : '';
   if (dentro) carregarPedidos();
+  if (dentro) notifBadge(); else $('notif-count').textContent = '';
   VIEWS.forEach(v => $('view-' + v).classList.add('hidden'));
   $('view-consulta').classList.remove('hidden');
   document.querySelectorAll('.menu-item[data-view]').forEach(b =>
     b.classList.toggle('active', b.dataset.view === 'consulta'));
   if (dentro) {
+    $('conf-logado').classList.remove('hidden');
     $('conf-conta').textContent = `Usuário: ${me.usuario} · e-mail: ${me.email || '—'}` +
       (me.escopo === 'all' ? ' · admin (todos os locais).' : ` · ${me.escopo.length} acesso(s).`);
   }
+  else $('conf-logado').classList.add('hidden');
   loadLocs();
   sync();
 }
@@ -376,6 +381,35 @@ $('tema-toggle').onclick = () => {
   aplicarTema();
 };
 aplicarTema();
+
+/* ---- notificações ---- */
+async function notifBadge() {
+  if (!logado()) { $('notif-count').textContent = ''; return; }
+  const r = await (await fetch('/api/notificacoes', { headers: auth() })).json();
+  $('notif-count').textContent = r.nao_lidas ? r.nao_lidas : '';
+}
+async function carregarNotificacoes() {
+  $('notif-logado').classList.toggle('hidden', !logado());
+  $('notif-entrar').classList.toggle('hidden', logado());
+  if (!logado()) return;
+  const r = await (await fetch('/api/notificacoes', { headers: auth() })).json();
+  $('notifs').innerHTML = (r.lista || []).map(n =>
+    `<li${n.lida ? '' : ' class="nao-lida"'}>${esc(n.texto)} <i>${esc(n.data)}</i>` +
+    (n.lida ? '' : ` <button class="btn-ghost dark" data-nid="${n.id}">Marcar como lida</button>`) +
+    `</li>`).join('') || '<li>Não há notificações.</li>';
+  $('notif-count').textContent = r.nao_lidas ? r.nao_lidas : '';
+  document.querySelectorAll('#notifs [data-nid]').forEach(b => {
+    b.onclick = async () => {
+      await fetch('/api/notificacoes/lida', { method: 'POST', headers: auth(),
+        body: JSON.stringify({ id: +b.dataset.nid }) });
+      carregarNotificacoes();
+    };
+  });
+}
+$('btn-todas-lidas').onclick = async () => {
+  await fetch('/api/notificacoes/lidas', { method: 'POST', headers: auth() });
+  carregarNotificacoes();
+};
 
 /* ---- solicitações / registro ---- */
 async function carregarPedidos() {
