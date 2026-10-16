@@ -107,6 +107,9 @@ SEED = [
 ]
 
 SENHA_INICIAL = "bemvindo123"
+# Domínio institucional da demo: equivale à checagem de e-mail institucional
+# do sistema original (lá, sessão Google + intranet; aqui, login + domínio).
+DOMINIO_INSTITUCIONAL = "empresa-exemplo.com.br"
 
 
 def sha(s):
@@ -130,6 +133,9 @@ def init_db():
             DROP TABLE IF EXISTS localidades; DROP TABLE IF EXISTS usuarios_locais;
         """)
     con.executescript(SCHEMA)
+    cols_u = [r["name"] for r in con.execute("PRAGMA table_info(usuarios)")]
+    if "email" not in cols_u:  # compatível com USUARIOS.EMAIL do original
+        con.execute("ALTER TABLE usuarios ADD COLUMN email TEXT NOT NULL DEFAULT ''")
     n = con.execute("SELECT COUNT(*) AS c FROM contatos").fetchone()["c"]
     if n == 0:
         locs, uns, sets = {}, {}, {}
@@ -344,6 +350,9 @@ class Handler(BaseHTTPRequestHandler):
             data = self._body()
             if not data.get("nome") or not data.get("usuario"):
                 return self._json({"erro": "nome e usuário desejado são obrigatórios"}, 400)
+            email = (data.get("email") or "").strip().lower()
+            if not email.endswith("@" + DOMINIO_INSTITUCIONAL):
+                return self._json({"erro": "use seu e-mail institucional (@" + DOMINIO_INSTITUCIONAL + ")"}, 400)
             con = get_db()
             cur = con.execute(
                 "INSERT INTO pedidos (nome, email, usuario_desejado, motivo,"
@@ -372,9 +381,10 @@ class Handler(BaseHTTPRequestHandler):
                 con.close()
                 return self._json({"erro": "pedido não encontrado"}, 404)
             con.execute(
-                "INSERT INTO usuarios (usuario, senha_sha256, aprovado)"
-                " VALUES (?,?,1) ON CONFLICT(usuario) DO UPDATE SET aprovado=1",
-                (ped["usuario_desejado"], sha(SENHA_INICIAL)))
+                "INSERT INTO usuarios (usuario, senha_sha256, aprovado, email)"
+                " VALUES (?,?,1,?) ON CONFLICT(usuario) DO UPDATE SET aprovado=1,"
+                " email=excluded.email",
+                (ped["usuario_desejado"], sha(SENHA_INICIAL), ped["email"]))
             uid_novo = con.execute(
                 "SELECT id FROM usuarios WHERE usuario=?",
                 (ped["usuario_desejado"],)).fetchone()["id"]

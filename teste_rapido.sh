@@ -19,7 +19,9 @@ echo "== login admin =="
 TA=$(curl -s -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"admin","senha":"admin123"}' | python3 -c "$TOK")
 echo "== me =="; curl -s "$B/api/me" -H "X-Admin-Token: $TA"; echo
 echo "== pedido c/ local =="
-curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"User VV","email":"u@e.com","usuario":"uservv","motivo":"demo","localidade_id":2}'; echo
+curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"User VV","email":"u@empresa-exemplo.com.br","usuario":"uservv","motivo":"demo","localidade_id":2}'; echo
+echo -n "pedido c/ email externo (400 esperado): "
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"Fora","email":"f@gmail.com","usuario":"fora","localidade_id":2}'
 echo "== aprovar =="; curl -s -X POST $B/api/pedidos/1/aprovar -H "X-Admin-Token: $TA"; echo
 echo "== login uservv =="
 TV=$(curl -s -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"uservv","senha":"bemvindo123"}' | python3 -c "$TOK")

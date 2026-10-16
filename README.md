@@ -7,22 +7,35 @@
 > **Nenhum dado real ou interno é usado aqui** — todos os contatos são
 > fictícios (Empresa Exemplo).
 
+## Arquitetura (espelha o sistema original)
+- **Duas implantações isoladas, sem trânsito entre elas** — como no original
+  (implantação pública no site × privada na intranet, definidas por propriedade):
+  - `/` pública: só consulta; falha fechada (nenhuma mutação sem token)
+  - `/admin` interna: portão de login; sem token válido, nada além do portão aparece
+- **Portão institucional**: no original, sessão Google + intranet + domínio
+  institucional (`AuthService.emailPermitidoNoPrivado`); aqui, login demo +
+  pedido exigindo e-mail `@empresa-exemplo.com.br` (validado no servidor, 400 fora do domínio)
+- **Tabela de usuários decide permissões**: sem cadastro, mesmo no interno a
+  visão seria só consulta; com cadastro, edita os locais do seu escopo
+  (`usuarios_locais`); admin edita tudo
+
 ## O que faz
 - **Consulta pública** (`/`): busca global + navegação em camadas
   Localidade → Unidade → Setor → contatos (com breadcrumb) + **mapa clicável**
   (Leaflet + GeoJSON público do IBGE) que filtra por município, lado a lado
-  com a consulta; botão **Solicitar acesso** abre modal com formulário
-  (nome, e-mail, usuário, local, motivo)
-- **Área administrativa** (`/admin`): mesma consulta com mapa; sem cadastro, a
-  visão é igual à pública; botões de estado na base da sidebar:
-  sem cadastro → "Solicitar acesso"; com cadastro → "Acesso administrativo"
-  (entra direto pelo token salvo ou modal de login); logado →
-  "Sair do acesso administrativo" (volta à visão pública)
+  com a consulta. Sem nenhum caminho para o acesso interno.
+- **Acesso interno** (`/admin`, URL separada): portão de login demo
+  (`admin` / `admin123`, com auto-login via token salvo); sem login, só o
+  portão (login + solicitar acesso) — a consulta interna não aparece.
+  Logado ("Sair do acesso administrativo" volta ao portão, continua no interno):
+  mesma consulta com mapa + gestão inline por escopo + Solicitações de acesso
+  + Registro de alterações.
 - **Gestão dentro da consulta, com escopo por local**: o usuário cria/remove
   contatos só nos locais liberados para ele (fora deles, só consulta);
   pode pedir acesso a mais locais; admin aprova e o escopo amplia
-- **Solicitações de acesso** (só interno): lista pedidos com local pedido;
-  aprovar cria o usuário (senha inicial) já com o escopo concedido
+- **Solicitação de acesso**: modal (nome, e-mail institucional, usuário, local,
+  motivo) → pedido pendente → admin aprova e o novo usuário entra com senha
+  inicial, já com o escopo do local pedido (e-mails fora do domínio: 400)
 - **Registro de alterações**: criar / remover / pedidos / aprovações
 
 ## Stack
