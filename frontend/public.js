@@ -1,26 +1,13 @@
-/* Consulta pública: busca + navegação em camadas + mapa (Leaflet). */
+/* Consulta pública: busca + camadas + mapa + modal de solicitação. */
 const $ = id => document.getElementById(id);
-const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-const GEOJSON_URL = 'https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-32-mun.json';
-
-let state = { loc: null, uni: null, set: null };
-let locs = [];
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, m =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
 
-document.querySelectorAll('.menu-item[data-view]').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.menu-item[data-view]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-    const v = document.getElementById('view-' + btn.dataset.view);
-    v.classList.remove('hidden');
-    if (btn.dataset.view === 'mapa') initMapa();
-  };
-});
+let state = { loc: null, uni: null, set: null };
+let locs = [];
 
 function chip(label, active, onclick) {
   const b = document.createElement('button');
@@ -82,57 +69,34 @@ async function buscar() {
 
 $('q').addEventListener('input', buscar);
 
+/* ---- modal solicitar acesso ---- */
+function abrirPedido() {
+  $('modal-pedido').classList.remove('hidden');
+  $('p-status').textContent = '';
+  if (!$('p-loc').options.length) {
+    $('p-loc').innerHTML = locs.map(l => `<option value="${l.id}">${esc(l.nome)}</option>`).join('');
+  }
+}
+$('btn-acesso').onclick = abrirPedido;
+$('p-cancel').onclick = () => $('modal-pedido').classList.add('hidden');
+
 $('p-enviar').onclick = async () => {
   const corpo = { nome: $('p-nome').value.trim(), email: $('p-email').value.trim(),
-                  usuario: $('p-user').value.trim(), motivo: $('p-motivo').value.trim() };
+                  usuario: $('p-user').value.trim(), motivo: $('p-motivo').value.trim(),
+                  localidade_id: $('p-loc').value };
   const r = await fetch('/api/pedidos', { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
   $('p-status').textContent = r.ok
-    ? 'Pedido enviado. O admin aprova na área administrativa.'
+    ? 'Pedido enviado. Aguarde a aprovação do administrador.'
     : 'Erro: ' + await r.text();
 };
-
-/* ---- mapa ---- */
-let mapaOK = false;
-async function initMapa() {
-  if (mapaOK || typeof L === 'undefined') {
-    if (typeof L === 'undefined') $('map-msg').textContent = 'Leaflet não carregou (offline?) — use as localidades acima.';
-    return;
-  }
-  mapaOK = true;
-  const map = L.map('map').setView([-19.9, -40.6], 7);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    { attribution: '© OpenStreetMap' }).addTo(map);
-  const dens = {};
-  locs.forEach(l => { dens[norm(l.nome)] = l.total; });
-  try {
-    const gj = await (await fetch(GEOJSON_URL)).json();
-    const layer = L.geoJSON(gj, {
-      style: f => {
-        const n = dens[norm(f.properties.name)] || 0;
-        return { color: '#475569', weight: 1, fillOpacity: .55,
-                 fillColor: !n ? '#e2e8f0' : n <= 3 ? '#bfdbfe' : '#2563eb' };
-      },
-      onEachFeature: (f, l) => {
-        const nome = f.properties.name;
-        l.bindTooltip(`${nome} (${dens[norm(nome)] || 0})`);
-        l.on('click', () => {
-          const loc = locs.find(x => norm(x.nome) === norm(nome));
-          if (loc) {
-            state = { loc: loc.id, uni: null, set: null }; sync();
-            document.querySelector('.menu-item[data-view="consulta"]').click();
-          }
-        });
-      }
-    }).addTo(map);
-    map.fitBounds(layer.getBounds());
-  } catch (e) {
-    $('map-msg').textContent = 'GeoJSON não carregou (offline?) — use as localidades na Consulta.';
-  }
-}
 
 (async () => {
   locs = await (await fetch('/api/localidades')).json();
   renderChips();
   buscar();
+  initMapa('map', 'map-msg', locs, nome => {
+    const loc = locs.find(x => norm(x.nome) === norm(nome));
+    if (loc) { state = { loc: loc.id, uni: null, set: null }; sync(); }
+  });
 })();

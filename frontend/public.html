@@ -16,49 +16,55 @@
     </div>
     <nav class="sidebar-menu">
       <button class="menu-item active" data-view="consulta">🔍 Consulta</button>
-      <button class="menu-item" data-view="mapa">🗺️ Mapa</button>
-      <button class="menu-item" data-view="pedido">📝 Solicitar acesso</button>
       <a class="menu-item link" href="/admin">⚙️ Área administrativa</a>
     </nav>
-    <div class="sidebar-login">
+    <div class="sidebar-bottom">
+      <button id="btn-acesso" class="btn-primary wide">📝 Solicitar acesso</button>
       <p class="hint">Consulta pública — dados fictícios da Empresa Exemplo.</p>
     </div>
   </aside>
   <main class="main-content">
-    <section class="card view" id="view-consulta">
+    <section class="card" id="view-consulta">
       <h1>Consulta pública</h1>
       <input id="q" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
-      <p class="breadcrumb" id="crumb">Todos os contatos</p>
-      <div class="chips" id="chips-loc"></div>
-      <div class="chips" id="chips-uni"></div>
-      <div class="chips" id="chips-set"></div>
-      <table>
-        <thead><tr><th>Nome</th><th>Cargo</th><th>Local</th><th>Telefone</th><th>E-mail</th></tr></thead>
-        <tbody id="lista"></tbody>
-      </table>
-    </section>
-    <section class="card view hidden" id="view-mapa">
-      <h1>Mapa por localidade</h1>
-      <p class="hint">Clique em um município com contatos para filtrar. GeoJSON público (IBGE).</p>
-      <div id="map"></div>
-      <p class="hint" id="map-msg"></p>
-    </section>
-    <section class="card view hidden" id="view-pedido">
-      <h1>Solicitar acesso interno</h1>
-      <p class="hint">Sem acesso, você só consulta. Preencha para pedir funções administrativas (demo: o admin aprova em /admin).</p>
-      <div class="form-grid">
-        <input id="p-nome" placeholder="Seu nome*">
-        <input id="p-email" placeholder="Seu e-mail">
-        <input id="p-user" placeholder="Usuário desejado*">
-        <input id="p-motivo" placeholder="Motivo">
-        <button id="p-enviar" class="btn-primary">Enviar pedido</button>
-        <span id="p-status"></span>
+      <div class="consulta-grid">
+        <div>
+          <div id="map"></div>
+          <p class="hint" id="map-msg">Clique em um município com contatos para filtrar. GeoJSON público (IBGE).</p>
+          <p class="breadcrumb" id="crumb">Todos os contatos</p>
+          <div class="chips" id="chips-loc"></div>
+          <div class="chips" id="chips-uni"></div>
+          <div class="chips" id="chips-set"></div>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th>Nome</th><th>Cargo</th><th>Local</th><th>Telefone</th><th>E-mail</th></tr></thead>
+            <tbody id="lista"></tbody>
+          </table>
+        </div>
       </div>
     </section>
     <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
   </main>
 </div>
+<div class="modal hidden" id="modal-pedido">
+  <div class="modal-box">
+    <h2>Solicitar acesso interno</h2>
+    <p class="hint">Sem acesso, você só consulta. O admin aprova na área administrativa.</p>
+    <label>Nome*<input id="p-nome"></label>
+    <label>E-mail<input id="p-email"></label>
+    <label>Usuário desejado*<input id="p-user"></label>
+    <label>Local de acesso<select id="p-loc"></select></label>
+    <label>Motivo<input id="p-motivo"></label>
+    <div class="modal-actions">
+      <button id="p-cancel" class="btn-ghost">Cancelar</button>
+      <button id="p-enviar" class="btn-primary">Enviar pedido</button>
+    </div>
+    <p class="hint" id="p-status"></p>
+  </div>
+</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="mapa.js"></script>
 <script src="public.js"></script>
 </body>
 </html>

@@ -67,3 +67,15 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:15
 .rows li{padding:10px 4px;border-bottom:1px solid #e2e8f0;font-size:14px}
 .menu-item.link{display:block;text-decoration:none}
 #ped-count:empty{display:none}
+/* ---- v3: layout dividido, modal ---- */
+.consulta-grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.consulta-grid{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;z-index:2000}
+.modal-box{background:#fff;border-radius:10px;padding:24px;width:min(440px,92vw);display:flex;flex-direction:column;gap:10px}
+.modal-box h2{margin:0}
+.modal-box label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:#475569}
+.modal-box input,.modal-box select{padding:8px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px}
+.wide{width:100%;margin-bottom:8px}
+.create-box{margin-top:12px;border-top:1px solid #e2e8f0;padding-top:12px}
+.create-box h3{margin:0 0 8px;font-size:15px}

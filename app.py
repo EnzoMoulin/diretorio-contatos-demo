@@ -63,11 +63,18 @@ CREATE TABLE IF NOT EXISTS historico (
     data TEXT NOT NULL DEFAULT (datetime('now')));
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT, usuario TEXT NOT NULL UNIQUE,
-    senha_sha256 TEXT NOT NULL, aprovado INTEGER NOT NULL DEFAULT 1);
+    senha_sha256 TEXT NOT NULL, aprovado INTEGER NOT NULL DEFAULT 1,
+    admin INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS usuarios_locais (
+    usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+    localidade_id INTEGER NOT NULL REFERENCES localidades(id),
+    PRIMARY KEY (usuario_id, localidade_id));
 CREATE TABLE IF NOT EXISTS pedidos (
     id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL,
     email TEXT NOT NULL, usuario_desejado TEXT NOT NULL,
-    motivo TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'pendente',
+    motivo TEXT NOT NULL DEFAULT '',
+    localidade_id INTEGER REFERENCES localidades(id),
+    status TEXT NOT NULL DEFAULT 'pendente',
     criado_em TEXT NOT NULL DEFAULT (datetime('now')));
 """
 
@@ -114,6 +121,14 @@ def get_db():
 
 def init_db():
     con = get_db()
+    cols = [r["name"] for r in con.execute("PRAGMA table_info(usuarios)")]
+    if cols and "admin" not in cols:  # esquema v1 -> recria (demo)
+        con.executescript("""
+            DROP TABLE IF EXISTS pedidos; DROP TABLE IF EXISTS usuarios;
+            DROP TABLE IF EXISTS historico; DROP TABLE IF EXISTS contatos;
+            DROP TABLE IF EXISTS setores; DROP TABLE IF EXISTS unidades;
+            DROP TABLE IF EXISTS localidades; DROP TABLE IF EXISTS usuarios_locais;
+        """)
     con.executescript(SCHEMA)
     n = con.execute("SELECT COUNT(*) AS c FROM contatos").fetchone()["c"]
     if n == 0:
@@ -136,8 +151,8 @@ def init_db():
                 "INSERT INTO contatos (setor_id, nome, cargo, telefone, email)"
                 " VALUES (?,?,?,?,?)", (sets[key_s], nome, cargo, tel, mail))
         con.execute(
-            "INSERT INTO usuarios (usuario, senha_sha256, aprovado)"
-            " VALUES (?,?,1) ON CONFLICT(usuario) DO NOTHING",
+            "INSERT INTO usuarios (usuario, senha_sha256, aprovado, admin)"
+            " VALUES (?,?,1,1) ON CONFLICT(usuario) DO NOTHING",
             ("admin", sha("admin123")))
         con.execute(
             "INSERT INTO historico (acao, detalhe) VALUES (?,?)",
@@ -188,6 +203,45 @@ class Handler(BaseHTTPRequestHandler):
         tok = self.headers.get("X-Admin-Token") or ""
         return SESSIONS.get(tok)
 
+    def _user(self, con, uid):
+        return con.execute(
+            "SELECT * FROM usuarios WHERE id=?", (uid,)).fetchone()
+
+    def _escopo(self, con, uid):
+        """Locais que o usuário pode editar. Admin: todos ('all')."""
+        u = self._user(con, uid)
+        if not u or not u["aprovado"]:
+            return None
+        if u["admin"]:
+            return "all"
+        rows = con.execute(
+            "SELECT localidade_id FROM usuarios_locais WHERE usuario_id=?",
+            (uid,)).fetchall()
+        return {r["localidade_id"] for r in rows}
+
+    def _pode(self, con, uid, localidade_id):
+        esc = self._escopo(con, uid)
+        if esc is None:
+            return False
+        if esc == "all":
+            return True
+        return int(localidade_id) in esc
+
+    def _loc_de_setor(self, con, setor_id):
+        r = con.execute(
+            "SELECT l.id FROM localidades l JOIN unidades u ON u.localidade_id=l.id"
+            " JOIN setores s ON s.unidade_id=u.id WHERE s.id=?",
+            (setor_id,)).fetchone()
+        return r["id"] if r else None
+
+    def _loc_de_contato(self, con, cid):
+        r = con.execute(
+            "SELECT l.id FROM localidades l JOIN unidades u ON u.localidade_id=l.id"
+            " JOIN setores s ON s.unidade_id=u.id"
+            " JOIN contatos c ON c.setor_id=s.id WHERE c.id=?",
+            (cid,)).fetchone()
+        return r["id"] if r else None
+
     def do_GET(self):
         u = urllib.parse.urlparse(self.path)
         q = urllib.parse.parse_qs(u.query)
@@ -196,7 +250,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._static("public.html", "text/html; charset=utf-8")
         if u.path == "/admin":
             return self._static("admin.html", "text/html; charset=utf-8")
-        if u.path in ("/public.js", "/admin.js"):
+        if u.path in ("/public.js", "/admin.js", "/mapa.js"):
             return self._static(u.path[1:], "application/javascript; charset=utf-8")
         if u.path == "/style.css":
             return self._static("style.css", "text/css; charset=utf-8")
@@ -252,14 +306,21 @@ class Handler(BaseHTTPRequestHandler):
                 if not uid:
                     return self._json({"erro": "não autenticado"}, 403)
                 row = con.execute(
-                    "SELECT id, usuario FROM usuarios WHERE id=?", (uid,)).fetchone()
-                return self._json(dict(row))
+                    "SELECT id, usuario, admin FROM usuarios WHERE id=?",
+                    (uid,)).fetchone()
+                if not row:
+                    return self._json({"erro": "não autenticado"}, 403)
+                me = dict(row)
+                esc = self._escopo(con, uid)
+                me["escopo"] = "all" if esc == "all" else sorted(esc or [])
+                return self._json(me)
             if u.path == "/api/pedidos":
                 if not self._uid():
                     return self._json({"erro": "não autenticado"}, 403)
                 rows = con.execute(
-                    "SELECT * FROM pedidos WHERE status='pendente'"
-                    " ORDER BY id DESC").fetchall()
+                    "SELECT p.*, l.nome AS localidade FROM pedidos p"
+                    " LEFT JOIN localidades l ON l.id=p.localidade_id"
+                    " WHERE p.status='pendente' ORDER BY p.id DESC").fetchall()
                 return self._json([dict(r) for r in rows])
         finally:
             con.close()
@@ -285,10 +346,11 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"erro": "nome e usuário desejado são obrigatórios"}, 400)
             con = get_db()
             cur = con.execute(
-                "INSERT INTO pedidos (nome, email, usuario_desejado, motivo)"
-                " VALUES (?,?,?,?)",
+                "INSERT INTO pedidos (nome, email, usuario_desejado, motivo,"
+                " localidade_id) VALUES (?,?,?,?,?)",
                 (data.get("nome"), data.get("email", ""),
-                 data.get("usuario"), data.get("motivo", "")))
+                 data.get("usuario"), data.get("motivo", ""),
+                 data.get("localidade_id") or None))
             log(con, "pedido", None,
                 f"solicitação de acesso: {data.get('nome')} ({data.get('usuario')})")
             con.commit()
@@ -313,6 +375,14 @@ class Handler(BaseHTTPRequestHandler):
                 "INSERT INTO usuarios (usuario, senha_sha256, aprovado)"
                 " VALUES (?,?,1) ON CONFLICT(usuario) DO UPDATE SET aprovado=1",
                 (ped["usuario_desejado"], sha(SENHA_INICIAL)))
+            uid_novo = con.execute(
+                "SELECT id FROM usuarios WHERE usuario=?",
+                (ped["usuario_desejado"],)).fetchone()["id"]
+            if ped["localidade_id"]:
+                con.execute(
+                    "INSERT INTO usuarios_locais (usuario_id, localidade_id)"
+                    " VALUES (?,?) ON CONFLICT DO NOTHING",
+                    (uid_novo, ped["localidade_id"]))
             con.execute("UPDATE pedidos SET status='aprovado' WHERE id=?", (pid,))
             log(con, "aprovar", None, f"acesso aprovado: {ped['usuario_desejado']}")
             con.commit()
@@ -320,12 +390,17 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True, "usuario": ped["usuario_desejado"],
                                "senha_inicial": SENHA_INICIAL})
         if u.path == "/api/contatos":
-            if not self._uid():
+            uid = self._uid()
+            if not uid:
                 return self._json({"erro": "não autenticado"}, 403)
             data = self._body()
             if not data.get("nome") or not data.get("setor_id"):
                 return self._json({"erro": "'nome' e 'setor_id' são obrigatórios"}, 400)
             con = get_db()
+            loc = self._loc_de_setor(con, data.get("setor_id"))
+            if loc is None or not self._pode(con, uid, loc):
+                con.close()
+                return self._json({"erro": "sem acesso a este local"}, 403)
             cur = con.execute(
                 "INSERT INTO contatos (setor_id, nome, cargo, telefone, email)"
                 " VALUES (?,?,?,?,?)",
@@ -342,7 +417,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         parts = urllib.parse.urlparse(self.path).path.rstrip("/").split("/")
         if len(parts) == 4 and parts[1] == "api" and parts[2] == "contatos":
-            if not self._uid():
+            uid = self._uid()
+            if not uid:
                 return self._json({"erro": "não autenticado"}, 403)
             try:
                 cid = int(parts[3])
@@ -354,6 +430,9 @@ class Handler(BaseHTTPRequestHandler):
             if not row:
                 con.close()
                 return self._json({"erro": "não encontrado"}, 404)
+            if not self._pode(con, uid, self._loc_de_contato(con, cid)):
+                con.close()
+                return self._json({"erro": "sem acesso a este local"}, 403)
             con.execute("DELETE FROM contatos WHERE id=?", (cid,))
             log(con, "remover", cid, f"removido: {row['nome']}")
             con.commit()
@@ -367,6 +446,7 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     init_db()
+    HTTPServer.allow_reuse_address = True
     print("Pública: http://localhost:8000  |  Admin: http://localhost:8000/admin"
           "  (demo: admin / admin123)")
     HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()

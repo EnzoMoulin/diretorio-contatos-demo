@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diretório de Contatos — Área administrativa</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,60 +16,91 @@
     </div>
     <nav class="sidebar-menu">
       <button class="menu-item active" data-view="consulta">🔍 Consulta</button>
-      <button class="menu-item" data-view="gestao">⚙️ Gestão</button>
-      <button class="menu-item" data-view="pedidos">📝 Pedidos <span id="ped-count" class="badge"></span></button>
-      <button class="menu-item" data-view="historico">🕘 Histórico</button>
+      <button class="menu-item hidden" data-view="solicitacoes" id="menu-sol">📝 Solicitações de acesso <span id="ped-count" class="badge"></span></button>
+      <button class="menu-item hidden" data-view="registro" id="menu-reg">🕘 Registro de alterações</button>
       <a class="menu-item link" href="/">🌐 Consulta pública</a>
     </nav>
-    <div class="sidebar-login">
-      <p class="login-title">Acesso interno</p>
-      <div id="login-box">
-        <input id="user" value="admin" aria-label="usuário" autocomplete="username">
-        <input id="pass" type="password" value="admin123" aria-label="senha" autocomplete="current-password">
-        <button id="login" class="btn-primary">Entrar</button>
-      </div>
-      <div id="who-box" class="hidden">
-        <p class="hint" id="who"></p>
-        <button id="sair" class="btn-ghost">Sair</button>
-      </div>
-      <span id="status"></span>
-      <p class="hint">Sem login: só consulta. Com login: gestão + pedidos + histórico.</p>
+    <div class="sidebar-bottom">
+      <button id="btn-estado" class="btn-primary wide">📝 Solicitar acesso</button>
+      <button id="btn-login" class="btn-ghost wide hidden">Já tenho cadastro — entrar</button>
+      <p class="hint" id="estado-hint"></p>
     </div>
   </aside>
   <main class="main-content">
-    <section class="card view" id="view-consulta">
-      <h1>Consulta (visão interna)</h1>
+    <section class="card" id="view-consulta">
+      <h1>Consulta</h1>
+      <p class="hint" id="escopo-hint"></p>
       <input id="q" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
-      <table>
-        <thead><tr><th>Nome</th><th>Cargo</th><th>Local</th><th>Telefone</th><th>E-mail</th><th></th></tr></thead>
-        <tbody id="lista"></tbody>
-      </table>
-    </section>
-    <section class="card view hidden" id="view-gestao">
-      <h1>Gestão de contatos</h1>
-      <p class="hint" id="gestao-hint">Faça login para adicionar ou remover.</p>
-      <div class="form-grid">
-        <select id="g-loc"></select>
-        <select id="g-uni"></select>
-        <select id="g-set"></select>
-        <input id="f-nome" placeholder="Nome*">
-        <input id="f-cargo" placeholder="Cargo">
-        <input id="f-tel" placeholder="Telefone">
-        <input id="f-email" placeholder="E-mail">
-        <button id="salvar" class="btn-primary">Salvar novo</button>
+      <div class="consulta-grid">
+        <div>
+          <div id="map"></div>
+          <p class="hint" id="map-msg">Clique em um município com contatos para filtrar.</p>
+          <p class="breadcrumb" id="crumb">Todos os contatos</p>
+          <div class="chips" id="chips-loc"></div>
+          <div class="chips" id="chips-uni"></div>
+          <div class="chips" id="chips-set"></div>
+          <div class="create-box hidden" id="create-box">
+            <h3>Novo contato neste setor</h3>
+            <div class="form-grid">
+              <input id="f-nome" placeholder="Nome*">
+              <input id="f-cargo" placeholder="Cargo">
+              <input id="f-tel" placeholder="Telefone">
+              <input id="f-email" placeholder="E-mail">
+              <button id="salvar" class="btn-primary">Salvar</button>
+              <span id="save-status"></span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th>Nome</th><th>Cargo</th><th>Local</th><th>Telefone</th><th>E-mail</th><th></th></tr></thead>
+            <tbody id="lista"></tbody>
+          </table>
+        </div>
       </div>
     </section>
-    <section class="card view hidden" id="view-pedidos">
-      <h1>Pedidos de acesso pendentes</h1>
+    <section class="card hidden" id="view-solicitacoes">
+      <h1>Solicitações de acesso</h1>
       <ul id="pedidos" class="rows"></ul>
     </section>
-    <section class="card view hidden" id="view-historico">
-      <h1>Histórico de alterações</h1>
+    <section class="card hidden" id="view-registro">
+      <h1>Registro de alterações</h1>
       <ul id="hist"></ul>
     </section>
-    <footer>Python stdlib + HTML/CSS/JS · sem dependências · dados de exemplo</footer>
+    <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
   </main>
 </div>
+<div class="modal hidden" id="modal-login">
+  <div class="modal-box">
+    <h2>Acesso administrativo</h2>
+    <p class="hint">Demo: admin / admin123 (ou usuário aprovado).</p>
+    <label>Usuário<input id="user" value="admin" autocomplete="username"></label>
+    <label>Senha<input id="pass" type="password" value="admin123" autocomplete="current-password"></label>
+    <div class="modal-actions">
+      <button id="l-cancel" class="btn-ghost">Cancelar</button>
+      <button id="login" class="btn-primary">Entrar</button>
+    </div>
+    <p class="hint" id="l-status"></p>
+  </div>
+</div>
+<div class="modal hidden" id="modal-pedido">
+  <div class="modal-box">
+    <h2>Solicitar acesso interno</h2>
+    <p class="hint" id="ped-hint">O admin aprova e libera o local pedido.</p>
+    <label>Nome*<input id="p-nome"></label>
+    <label>E-mail<input id="p-email"></label>
+    <label>Usuário desejado*<input id="p-user"></label>
+    <label>Local de acesso<select id="p-loc"></select></label>
+    <label>Motivo<input id="p-motivo"></label>
+    <div class="modal-actions">
+      <button id="p-cancel" class="btn-ghost">Cancelar</button>
+      <button id="p-enviar" class="btn-primary">Enviar pedido</button>
+    </div>
+    <p class="hint" id="p-status"></p>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="mapa.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>
