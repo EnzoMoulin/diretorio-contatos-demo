@@ -37,6 +37,10 @@
   <main class="main-content">
     <section id="view-consulta">
       <div class="consulta-layout">
+        <section id="consulta-mapa" aria-label="Mapa dos municípios">
+          <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
+          <p class="hint" id="map-msg">Clique em um município com contatos para filtrar.</p>
+        </section>
         <div class="fc-panel">
           <div class="fc-head">
             <div>
@@ -71,10 +75,6 @@
             <tbody id="lista"></tbody>
           </table>
         </div>
-        <section id="consulta-mapa" aria-label="Mapa dos municípios">
-          <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
-          <p class="hint" id="map-msg">Clique em um município com contatos para filtrar.</p>
-        </section>
       </div>
     </section>
     <section class="card hidden" id="view-dashboard">
@@ -231,7 +231,7 @@
         <section id="m-consultar" class="panel manual-section">
           <div class="manual-section-head"><div><h3>🔍 02 — Consultar contatos</h3><p>Acesso livre, sem login. Mapa, menus e busca combináveis.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Clique no mapa ou nos menus</strong><p>Clique num município com contatos no <code>mapa à direita</code> ou use os menus <code>Localidade → Unidade → Setor</code> no painel.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Clique no mapa ou nos menus</strong><p>Clique num município com contatos no <code>mapa à esquerda</code> ou use os menus <code>Localidade → Unidade → Setor</code> no painel.</p></div></li>
             <li><span class="manual-step-num">2</span><div><strong>Busque por qualquer nível</strong><p>O campo de busca alcança nome, cargo, telefone, e-mail, setor, unidade e município — pode combinar busca + nível.</p></div></li>
             <li><span class="manual-step-num">3</span><div><strong>Use os contatos</strong><p><code>E-mail</code> abre seu app de e-mail (<code>mailto:</code>). Valores vazios aparecem como "—".</p></div></li>
           </ol>

@@ -29,6 +29,10 @@
   <main class="main-content">
     <section id="view-consulta">
       <div class="consulta-layout">
+        <section id="consulta-mapa" aria-label="Mapa dos municípios">
+          <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
+          <p class="hint" id="map-msg">Clique em um município com contatos para filtrar. GeoJSON público (IBGE).</p>
+        </section>
         <div class="fc-panel">
           <div class="fc-head">
             <div>
@@ -49,10 +53,6 @@
             <tbody id="lista"></tbody>
           </table>
         </div>
-        <section id="consulta-mapa" aria-label="Mapa dos municípios">
-          <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
-          <p class="hint" id="map-msg">Clique em um município com contatos para filtrar. GeoJSON público (IBGE).</p>
-        </section>
       </div>
     </section>
     <section class="hidden" id="view-config">
