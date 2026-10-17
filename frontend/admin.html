@@ -62,6 +62,9 @@
           </div>
         </div>
         <div>
+          <div class="print-head">
+            <button class="btn-ghost dark noprint" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+          </div>
           <table>
             <thead><tr><th>Nome</th><th>Cargo</th><th>Local</th><th>Telefone</th><th>E-mail</th><th></th></tr></thead>
             <tbody id="lista"></tbody>
@@ -75,10 +78,12 @@
     </section>
     <section class="card hidden" id="view-registro">
       <h1>Registro de alterações</h1>
+      <button class="btn-ghost dark noprint" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
       <ul id="hist"></ul>
     </section>
     <section class="card hidden" id="view-dashboard">
       <h1>Dashboard</h1>
+      <button class="btn-ghost dark noprint" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
       <p class="hint" id="dash-sub">Somente seus escopos.</p>
       <div class="dash-grid" id="dash-cards"></div>
       <h3>Contatos por município (seu acesso)</h3>
