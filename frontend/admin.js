@@ -213,6 +213,7 @@ async function refresh() {
   }
   const dentro = logado();
   $('menu-dash').classList.toggle('hidden', !dentro);
+  $('menu-notif').classList.toggle('hidden', !dentro);
   $('menu-sol').classList.toggle('hidden', !dentro);
   $('menu-reg').classList.toggle('hidden', !dentro);
   $('who-line').classList.toggle('hidden', !dentro);

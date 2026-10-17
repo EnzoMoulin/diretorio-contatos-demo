@@ -50,9 +50,9 @@
 - **Dashboard** (só logado): cards (municípios, unidades, setores, contatos,
   editáveis, pendências), barras por município com ✓ de cobertura e últimas
   alterações — tudo recortado pelo seu escopo
-- **Notificações** (aba do interno): solicitações chegam aos admins, aprovação
+- **Notificações** (só logado): solicitações chegam aos admins, aprovação
   chega ao solicitante, criar/editar/remover avisa os admins; badge de não
-  lidas, marcar uma/todas como lidas. Sem login, a aba pede para entrar.
+  lidas, marcar uma/todas como lidas. A aba só aparece após o login.
 - **Configurações**: tema claro/escuro para todo mundo (externo e interno,
   com ou sem login); logado ganha dados da conta e troca de senha
 - **E-mails clicáveis**: toda coluna de e-mail abre o app de e-mail (mailto),
