@@ -261,6 +261,7 @@ async function buscar() {
   $('create-box').classList.add('hidden');
   $('save-status').textContent = '';
   if (!q && !sel.set && !sel.uni && !sel.loc) {
+    document.querySelector('.fc-panel').insertBefore($('sel-row'), $('lista'));
     box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
       cardNivel('loc', l.id, l.nome + (cobre('municipio', l.id) ? ' ✓' : ''),
         pill(l.n_unidades || 0, 'Unidade', 'Unidades') +
@@ -280,6 +281,7 @@ async function buscar() {
     box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2>` +
       `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
+      `<div id="sel-slot"></div>` +
       `<div class="fc-section"><h3>Unidades</h3>` +
       unis.map(u => cardNivel('uni', u.id, u.nome + (cobre('unidade', u.id) ? ' ✓' : ''),
         `<span class="fc-pill fc-pill-type">Unidade</span>` +
@@ -297,6 +299,7 @@ async function buscar() {
     box.innerHTML = `<button class="fc-back" data-back="loc">← ${esc(optLabel('sel-loc'))}</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(optLabel('sel-uni'))}</h2>` +
       `<p class="fc-subtitle">${sets.length} Setores · ${ctts.length} Contatos</p></div></div>` +
+      `<div id="sel-slot"></div>` +
       `<div class="fc-section"><h3>Setores</h3>` +
       (q
         ? ctts.map(c => cardContato(c, c.setor)).join('') || '<div class="fc-empty">Nenhum contato.</div>'
@@ -311,7 +314,8 @@ async function buscar() {
     lastList = ctts;
     box.innerHTML = (sel.set
       ? `<button class="fc-back" data-back="uni">← ${esc(optLabel('sel-uni'))}</button>` +
-        `<div class="fc-head"><div><h2 class="fc-title">${esc(optLabel('sel-set'))}</h2></div></div>`
+        `<div class="fc-head"><div><h2 class="fc-title">${esc(optLabel('sel-set'))}</h2></div></div>` +
+        `<div id="sel-slot"></div>`
       : '') +
       ctts.map(c => cardContato(c, sel.set ? '' : `${c.localidade} · ${c.unidade} · ${c.setor}`)).join('') ||
       '<div class="fc-empty">Nenhum contato.</div>';
@@ -321,6 +325,8 @@ async function buscar() {
       if (!ok) $('save-status').textContent = '';
     }
   }
+  const slot = $('sel-slot');
+  if (slot) slot.appendChild($('sel-row'));
   bindCards();
 }
 let lastList = [];
