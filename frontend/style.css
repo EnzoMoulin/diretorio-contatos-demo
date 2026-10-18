@@ -174,7 +174,7 @@ body[data-theme="dark"] code{background:#0f172a}
 .consulta-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2vw,24px);align-items:stretch}
 @media(max-width:900px){.consulta-layout{grid-template-columns:1fr}}
 /* consulta cabe na tela: painel rola por dentro, mapa preenche a altura */
-#view-consulta .consulta-layout{height:calc(100vh - 110px);min-height:480px}
+#view-consulta .consulta-layout{height:calc(100vh - 180px);min-height:440px}
 @media(max-width:900px){#view-consulta .consulta-layout{height:auto;min-height:0}}
 .fc-panel{max-height:100%}
 #consulta-mapa{height:100%;min-height:0}
@@ -185,6 +185,11 @@ body[data-theme="dark"] code{background:#0f172a}
 .fc-title{font-size:21px;font-weight:800;color:#0f172a;margin:0 0 5px}
 .fc-subtitle{color:#64748b;font-size:13px;margin:0;line-height:1.5}
 .fc-toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.fc-toolbar-end{justify-content:flex-end;margin-bottom:4px}
+.fc-page-head{margin:0 0 12px}
+.fc-page-head .fc-title{font-size:24px}
+.main-content{display:flex;flex-direction:column}
+.main-content footer{margin-top:auto}
 .fc-btn{appearance:none;border:1px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:9px;padding:8px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .fc-btn:hover{background:#f8fafc}
 .fc-btn--primary{background:#1d4ed8;border-color:#1d4ed8;color:#fff}

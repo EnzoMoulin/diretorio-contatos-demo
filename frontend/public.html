@@ -28,24 +28,20 @@
   </aside>
   <main class="main-content">
     <section id="view-consulta">
+      <div class="fc-page-head">
+        <h1 class="fc-title">Consulta pública</h1>
+      </div>
       <div class="consulta-layout">
         <section id="consulta-mapa" aria-label="Mapa dos municípios">
           <div class="fc-map-head">
-            <h3 class="fc-title">Mapa dos municípios</h3>
-            <p class="fc-subtitle">Clique num município com contatos para filtrar o painel.</p>
+            <p class="fc-subtitle">Selecione um município válido no mapa abaixo ou no painel ao lado.</p>
           </div>
           <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
           <p class="hint" id="map-msg"></p>
         </section>
         <div class="fc-panel">
-          <div class="fc-head">
-            <div>
-              <h2 class="fc-title">Consulta pública</h2>
-              <p class="fc-subtitle">Selecione um local no mapa ao lado ou nos menus abaixo.</p>
-            </div>
-            <div class="fc-toolbar">
-              <button type="button" class="fc-btn hidden" id="btn-print" title="Imprimir / Salvar PDF dos contatos do nível selecionado">🖨️ Imprimir / Salvar PDF</button>
-            </div>
+          <div class="fc-toolbar fc-toolbar-end">
+            <button type="button" class="fc-btn hidden" id="btn-print" title="Imprimir / Salvar PDF dos contatos do nível selecionado">🖨️ Imprimir / Salvar PDF</button>
           </div>
           <input id="q" class="fc-search" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
           <p class="fc-subtitle" id="crumb">Selecione um local ou busque</p>
