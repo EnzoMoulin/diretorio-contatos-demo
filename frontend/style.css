@@ -186,7 +186,8 @@ body[data-theme="dark"] code{background:#0f172a}
 .fc-subtitle{color:#64748b;font-size:13px;margin:0;line-height:1.5}
 .fc-toolbar{display:flex;gap:8px;flex-wrap:wrap}
 .fc-toolbar-end{justify-content:flex-end;margin-bottom:4px}
-.fc-page-head{margin:0 0 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fc-page-head{margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-page-head .fc-title{font-size:24px}
 .fc-page-head h1{margin:0;font-size:24px;font-weight:800;color:#0f172a}
 .fc-eyebrow{margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#2563eb}
