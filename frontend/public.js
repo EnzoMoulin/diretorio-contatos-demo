@@ -174,7 +174,7 @@ async function buscar() {
     ctts.forEach(c => { porUni[c.unidade_id] = (porUni[c.unidade_id] || 0) + 1; });
     const loc = locs.find(x => String(x.id) === String(sel.loc));
     const nSet = unis.reduce((a, u) => a + (u.n_setores || 0), 0);
-    box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
+    box.innerHTML = `<button class="fc-back" data-back="home">← Municípios</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2>` +
       `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
       `<div id="sel-slot"></div>` +
