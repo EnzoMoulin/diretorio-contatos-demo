@@ -115,6 +115,10 @@ function sync() {
       else { $('q').value = ''; buscar(); }
     };
   }
+  if (typeof destacarMunicipioMapa === 'function') {
+    const loc = locs.find(x => String(x.id) === String(sel.loc));
+    destacarMunicipioMapa(sel.loc && loc ? loc.nome : '');
+  }
   buscar();
 }
 

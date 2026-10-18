@@ -200,6 +200,12 @@ body[data-theme="dark"] code{background:#0f172a}
 .fc-selects-row .fc-select{flex:1 1 0;min-width:0}
 .fc-map-head{margin:4px 4px 8px}
 .fc-map-head .fc-title{font-size:17px}
+.fc-map-legenda{padding:7px 9px;background:rgba(255,255,255,.94);border:1px solid #cbd5e1;border-radius:7px;box-shadow:0 2px 8px rgba(15,23,42,.12);font-size:11px;color:#334155}
+.fc-map-legenda span{display:block;margin:2px 0}
+.fc-map-legenda .tem-contato{color:#2563eb}
+.fc-map-legenda .sem-contato{color:#94a3b8}
+.tooltip-premium{font-weight:800;font-size:13px;color:#0f172a}
+.tooltip-premium small{display:block;font-weight:600;font-size:11px;color:#475569}
 .fc-bottom-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0}
 .fc-pill-type{background:#dbeafe;color:#1e40af}
 #print-area{display:none}
