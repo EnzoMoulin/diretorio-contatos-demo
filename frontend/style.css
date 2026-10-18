@@ -22,7 +22,7 @@ html,body{margin:0;padding:0;width:100%;height:100vh;overflow:hidden;
 .hint{font-size:12px;color:#94a3b8}
 
 /* ---- conteúdo ---- */
-.main-content{flex:1 1 auto;min-width:0;height:100vh;padding:25px;overflow-y:auto}
+.main-content{flex:1 1 auto;min-width:0;height:100vh;padding:25px 25px 12px;overflow-y:auto}
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:22px 24px;
   margin-bottom:20px;box-shadow:0 1px 3px rgba(15,23,42,.06)}
 .card h1{margin:0 0 14px;font-size:22px;color:#0f172a}
@@ -184,7 +184,7 @@ body[data-theme="dark"] code{background:#0f172a}
 .consulta-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2vw,24px);align-items:stretch}
 @media(max-width:900px){.consulta-layout{grid-template-columns:1fr}}
 /* consulta cabe na tela: painel rola por dentro, mapa preenche a altura */
-#view-consulta{display:flex;flex-direction:column;height:calc(100vh - 50px);min-height:0}
+#view-consulta{display:flex;flex-direction:column;height:calc(100vh - 37px);min-height:0}
 #view-consulta .consulta-layout{flex:1 1 auto;min-height:0;height:auto}
 @media(max-width:900px){#view-consulta{height:auto}#view-consulta .consulta-layout{height:auto;min-height:0}}
 .fc-panel{max-height:100%}
@@ -210,6 +210,7 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .sidebar-public .sidebar-header span{font-size:12px}
 .sidebar-header span{font-size:14px}
 .sidebar-user{font-size:14px}
+.sidebar-public .sidebar-user{margin-bottom:14px}
 .fc-profile{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#334155;white-space:nowrap;box-shadow:0 1px 3px rgba(15,23,42,.06)}
 .fc-profile i{font-style:normal;color:#22c55e;font-size:10px}
 .fc-total-localidades{display:inline-flex;align-self:flex-start;margin:2px 0 10px;background:#dbeafe;color:#1e40af;font-weight:800}
