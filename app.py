@@ -90,35 +90,35 @@ CREATE TABLE IF NOT EXISTS pedidos (
 # (localidade, unidade, setor, nome, cargo, telefone, email) — tudo fictício
 SEED = [
     ("Vitória", "Unidade Centro", "Atendimento", "Ana Souza", "Atendente",
-     "(27) 3333-0001", "atendimento@empresa-exemplo.com.br"),
+     "(27) 3333-0001", "atendimento@exemplar.com.br"),
     ("Vitória", "Unidade Centro", "Atendimento", "Paulo Reis", "Atendente",
-     "(27) 3333-0007", "paulo.reis@empresa-exemplo.com.br"),
+     "(27) 3333-0007", "paulo.reis@exemplar.com.br"),
     ("Vitória", "Unidade Centro", "Suporte", "Bruno Lima", "Técnico de suporte",
-     "(27) 3333-0002", "suporte@empresa-exemplo.com.br"),
+     "(27) 3333-0002", "suporte@exemplar.com.br"),
     ("Vitória", "Unidade Jardim", "Financeiro", "Carla Dias", "Analista financeira",
-     "(27) 3333-0003", "financeiro@empresa-exemplo.com.br"),
+     "(27) 3333-0003", "financeiro@exemplar.com.br"),
     ("Vitória", "Unidade Jardim", "RH", "Diego Rocha", "Analista de RH",
-     "(27) 3333-0004", "rh@empresa-exemplo.com.br"),
+     "(27) 3333-0004", "rh@exemplar.com.br"),
     ("Vila Velha", "Unidade Praia", "Atendimento", "Elisa Prado", "Atendente",
-     "(27) 3333-0005", "elisaprado@empresa-exemplo.com.br"),
+     "(27) 3333-0005", "elisaprado@exemplar.com.br"),
     ("Vila Velha", "Unidade Praia", "TI", "Fabio Nunes", "Desenvolvedor",
-     "(27) 3333-0006", "ti@empresa-exemplo.com.br"),
+     "(27) 3333-0006", "ti@exemplar.com.br"),
     ("Vila Velha", "Unidade Centro", "Suporte", "Gabi Moura", "Técnica de suporte",
-     "(27) 3333-0008", "gabi.moura@empresa-exemplo.com.br"),
+     "(27) 3333-0008", "gabi.moura@exemplar.com.br"),
     ("Serra", "Unidade Laranjeiras", "Atendimento", "Hugo Alves", "Atendente",
-     "(27) 3333-0009", "hugo.alves@empresa-exemplo.com.br"),
+     "(27) 3333-0009", "hugo.alves@exemplar.com.br"),
     ("Serra", "Unidade Laranjeiras", "Logística", "Inês Castro", "Coordenadora",
-     "(27) 3333-0010", "logistica@empresa-exemplo.com.br"),
+     "(27) 3333-0010", "logistica@exemplar.com.br"),
     ("Cariacica", "Unidade Centro", "Atendimento", "João Pinto", "Atendente",
-     "(27) 3333-0011", "joao.pinto@empresa-exemplo.com.br"),
+     "(27) 3333-0011", "joao.pinto@exemplar.com.br"),
     ("Cariacica", "Unidade Centro", "TI", "Karla Mendes", "Analista de sistemas",
-     "(27) 3333-0012", "karla.mendes@empresa-exemplo.com.br"),
+     "(27) 3333-0012", "karla.mendes@exemplar.com.br"),
 ]
 
 SENHA_INICIAL = "bemvindo123"
 # Domínio institucional da demo: equivale à checagem de e-mail institucional
 # do sistema original (lá, sessão Google + intranet; aqui, login + domínio).
-DOMINIO_INSTITUCIONAL = "empresa-exemplo.com.br"
+DOMINIO_INSTITUCIONAL = "exemplar.com.br"
 
 
 def sha(s):

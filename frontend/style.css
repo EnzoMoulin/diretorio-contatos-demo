@@ -116,7 +116,7 @@ body[data-theme="dark"] .rows li.nao-lida{background:#1e3a8a33}
 .fc-card h4{margin:0 0 6px;font-size:15px;color:#0f172a}
 .fc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .fc-pill{font-size:11px;background:#f1f5f9;color:#334155;border-radius:999px;padding:4px 8px}
-.fc-back{border:0;background:transparent;color:#1d4ed8;font-weight:700;padding:0;margin:0 auto 12px;cursor:pointer;display:block}
+.fc-back{border:0;background:transparent;color:#1d4ed8;font-weight:700;padding:0;margin:0 0 12px;cursor:pointer}
 .fc-breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:0 0 10px;color:#64748b;font-size:13px;line-height:1.5}
 .fc-breadcrumb button{appearance:none;border:0;background:transparent;padding:0;color:#1d4ed8;font:inherit;font-weight:700;cursor:pointer}
 .fc-breadcrumb button:hover{text-decoration:underline}
