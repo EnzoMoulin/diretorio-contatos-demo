@@ -103,15 +103,51 @@ function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
   $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um local ou busque';
   refreshSol();
+  $('sel-row').classList.toggle('hidden', !!sel.loc);
+  $('btn-print').classList.toggle('hidden', !sel.loc);
+  const bv = $('btn-voltar');
+  if (!sel.loc && !sel.uni && !sel.set && !$('q').value.trim()) bv.classList.add('hidden');
+  else {
+    bv.classList.remove('hidden');
+    bv.onclick = () => {
+      if (sel.set) navTo(sel.loc, sel.uni);
+      else if (sel.uni) navTo(sel.loc);
+      else if (sel.loc) navTo('');
+      else { $('q').value = ''; buscar(); }
+    };
+  }
   buscar();
 }
 
-// "Solicitar acesso" aparece ao lado de cada nível selecionado sem cobertura.
-function refreshSol() {
-  $('sol-loc').classList.toggle('hidden', !(logado() && sel.loc && !cobre('municipio', sel.loc)));
-  $('sol-uni').classList.toggle('hidden', !(logado() && sel.uni && !cobre('unidade', sel.uni)));
-  $('sol-set').classList.toggle('hidden', !(logado() && sel.set && !cobre('setor', sel.set)));
+$('btn-topo').onclick = () =>
+  document.querySelector('.fc-panel').scrollTo({ top: 0, behavior: 'smooth' });
+
+function printRow(c, caminho) {
+  return `<div class="fc-contato"><div class="fc-contato-main">` +
+    `<span class="fc-contato-tipo">${esc(c.cargo || '')}${caminho ? ' · ' + esc(caminho) : ''}</span>` +
+    `<h4>${esc(c.nome)}</h4></div><div class="fc-contato-side">` +
+    (c.telefone ? `<span class="fc-contato-valor">${esc(c.telefone)}</span>` : '') +
+    (c.email ? `<span class="fc-contato-valor">${esc(c.email)}</span>` : '') + `</div></div>`;
 }
+
+async function imprimirEscopo() {
+  const params = new URLSearchParams();
+  let titulo = '';
+  if (sel.set) { params.set('setor_id', sel.set); titulo = optLabel('sel-set'); }
+  else if (sel.uni) { params.set('unidade_id', sel.uni); titulo = optLabel('sel-uni'); }
+  else if (sel.loc) { params.set('localidade_id', sel.loc); titulo = optLabel('sel-loc'); }
+  else return;
+  titulo = titulo.replace(/ \(\d+\)( ✓)?$/, '').replace(/ ✓$/, '');
+  const ctts = await (await fetch('/api/contatos?' + params)).json();
+  $('print-area').innerHTML = `<h2 class="fc-title">${esc(titulo)}</h2>` +
+    `<p class="fc-subtitle">${ctts.length} contato(s)</p>` +
+    ctts.map(c => printRow(c, sel.set ? '' : `${c.localidade} · ${c.unidade} · ${c.setor}`)).join('');
+  window.print();
+}
+$('btn-print').onclick = imprimirEscopo;
+
+// "Solicitar acesso" agora vive dentro dos cards sem cobertura.
+function refreshSol() {}
 function podeEditar(localidade) {
   const l = locs.find(x => x.nome === localidade);
   return l && cobre('municipio', l.id);
@@ -234,7 +270,7 @@ async function buscar() {
     box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2></div></div>` +
       unis.map(u => cardNivel('uni', u.id, u.nome + (cobre('unidade', u.id) ? ' ✓' : ''),
-        pill(porUni[u.id] || 0, 'contato', 'contatos'), solBtnNivel('unidade', u.id))).join('');
+        `<span class="fc-pill fc-pill-type">Unidade</span>` + pill(porUni[u.id] || 0, 'contato', 'contatos'), solBtnNivel('unidade', u.id))).join('');
   } else if (!sel.set && sel.uni) {
     const params = new URLSearchParams({ unidade_id: sel.uni, q });
     const [sets, ctts] = await Promise.all([
@@ -249,7 +285,7 @@ async function buscar() {
       (q
         ? ctts.map(c => cardContato(c, c.setor)).join('') || '<div class="fc-empty">Nenhum contato.</div>'
         : sets.map(s => cardNivel('set', s.id, s.nome + (cobre('setor', s.id) ? ' ✓' : ''),
-            pill(porSet[s.id] || 0, 'contato', 'contatos'), solBtnNivel('setor', s.id))).join(''));
+            `<span class="fc-pill fc-pill-type">Setor</span>` + pill(porSet[s.id] || 0, 'contato', 'contatos'), solBtnNivel('setor', s.id))).join(''));
   } else {
     const params = new URLSearchParams({ q });
     if (sel.set) params.set('setor_id', sel.set);
@@ -407,9 +443,6 @@ async function abrirConf(nivel, id, nome) {
   $('conf-texto').innerHTML = texto;
   $('modal-conf').classList.remove('hidden');
 }
-$('sol-loc').onclick = () => abrirConf('municipio', sel.loc, optLabel('sel-loc').replace(/ \(\d+\)( ✓)?$/, ''));
-$('sol-uni').onclick = () => abrirConf('unidade', sel.uni, optLabel('sel-uni').replace(/ ✓$/, ''));
-$('sol-set').onclick = () => abrirConf('setor', sel.set, optLabel('sel-set').replace(/ ✓$/, ''));
 $('c-cancel').onclick = () => $('modal-conf').classList.add('hidden');
 $('c-enviar').onclick = async () => {
   const corpo = { nome: me.usuario, email: me.email, usuario: me.usuario,

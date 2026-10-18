@@ -38,6 +38,10 @@
     <section id="view-consulta">
       <div class="consulta-layout">
         <section id="consulta-mapa" aria-label="Mapa dos municípios">
+          <div class="fc-map-head">
+            <h3 class="fc-title">Mapa dos municípios</h3>
+            <p class="fc-subtitle">Clique num município com contatos para filtrar o painel.</p>
+          </div>
           <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
           <p class="hint" id="map-msg">Clique em um município com contatos para filtrar.</p>
         </section>
@@ -48,17 +52,16 @@
               <p class="fc-subtitle" id="escopo-hint">Selecione um local no mapa ao lado ou nos menus abaixo.</p>
             </div>
             <div class="fc-toolbar">
-              <button type="button" class="fc-btn noprint" onclick="window.print()" title="Imprimir / Salvar PDF">🖨️ Imprimir / Salvar PDF</button>
+              <button type="button" class="fc-btn hidden" id="btn-print" title="Imprimir / Salvar PDF dos contatos do nível selecionado">🖨️ Imprimir / Salvar PDF</button>
             </div>
           </div>
           <input id="q" class="fc-search" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
           <p class="fc-subtitle" id="crumb">Selecione um local ou busque</p>
-          <select id="sel-loc" class="fc-select" aria-label="Localidade"><option value="">Localidade…</option></select>
-          <button id="sol-loc" class="fc-access hidden">Solicitar acesso a este município</button>
-          <select id="sel-uni" class="fc-select" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
-          <button id="sol-uni" class="fc-access hidden">Solicitar acesso a esta unidade</button>
-          <select id="sel-set" class="fc-select" aria-label="Setor" disabled><option value="">Setor…</option></select>
-          <button id="sol-set" class="fc-access hidden">Solicitar acesso a este setor</button>
+          <div class="fc-selects-row" id="sel-row">
+            <select id="sel-loc" class="fc-select" aria-label="Localidade"><option value="">Localidade…</option></select>
+            <select id="sel-uni" class="fc-select" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
+            <select id="sel-set" class="fc-select" aria-label="Setor" disabled><option value="">Setor…</option></select>
+          </div>
           <div class="create-box hidden" id="create-box">
             <h3>Novo contato neste setor</h3>
             <div class="form-grid">
@@ -71,6 +74,11 @@
             </div>
           </div>
           <div id="lista"></div>
+          <div id="print-area"></div>
+          <div class="fc-bottom-nav">
+            <button type="button" class="fc-btn hidden" id="btn-voltar">← Voltar</button>
+            <button type="button" class="fc-btn" id="btn-topo">↑ Voltar ao topo</button>
+          </div>
         </div>
       </div>
     </section>
@@ -281,7 +289,7 @@
           <div class="manual-section-head"><div><h3>⚙️ 10 — Configurações</h3><p>Modo escuro para todos; conta e troca de senha para logados.</p></div></div>
         </section>
         <section id="m-imprimir" class="panel manual-section">
-          <div class="manual-section-head"><div><h3>🖨️ 11 — Imprimir ou salvar PDF</h3><p>Consulta, Dashboard e Registro têm botão próprio; a folha sai limpa em A4.</p></div></div>
+          <div class="manual-section-head"><div><h3>🖨️ 11 — Imprimir ou salvar PDF</h3><p>O botão aparece após selecionar um município e imprime todos os contatos do nível atual (município, unidade ou setor). Dashboard e Registro têm botão próprio; a folha sai limpa em A4.</p></div></div>
         </section>
         <section id="m-faq" class="panel manual-section">
           <div class="manual-section-head"><div><h3>❓ 12 — Perguntas frequentes</h3></div></div>

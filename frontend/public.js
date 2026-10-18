@@ -69,8 +69,48 @@ function setLoc(id) { navTo(String(id)); }
 function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
   $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um local ou busque';
+  $('sel-row').classList.toggle('hidden', !!sel.loc);
+  $('btn-print').classList.toggle('hidden', !sel.loc);
+  const bv = $('btn-voltar');
+  if (!sel.loc && !sel.uni && !sel.set && !$('q').value.trim()) bv.classList.add('hidden');
+  else {
+    bv.classList.remove('hidden');
+    bv.onclick = () => {
+      if (sel.set) navTo(sel.loc, sel.uni);
+      else if (sel.uni) navTo(sel.loc);
+      else if (sel.loc) navTo('');
+      else { $('q').value = ''; buscar(); }
+    };
+  }
   buscar();
 }
+
+$('btn-topo').onclick = () =>
+  document.querySelector('.fc-panel').scrollTo({ top: 0, behavior: 'smooth' });
+
+function printRow(c, caminho) {
+  return `<div class="fc-contato"><div class="fc-contato-main">` +
+    `<span class="fc-contato-tipo">${esc(c.cargo || '')}${caminho ? ' · ' + esc(caminho) : ''}</span>` +
+    `<h4>${esc(c.nome)}</h4></div><div class="fc-contato-side">` +
+    (c.telefone ? `<span class="fc-contato-valor">${esc(c.telefone)}</span>` : '') +
+    (c.email ? `<span class="fc-contato-valor">${esc(c.email)}</span>` : '') + `</div></div>`;
+}
+
+async function imprimirEscopo() {
+  const params = new URLSearchParams();
+  let titulo = '';
+  if (sel.set) { params.set('setor_id', sel.set); titulo = optLabel('sel-set'); }
+  else if (sel.uni) { params.set('unidade_id', sel.uni); titulo = optLabel('sel-uni'); }
+  else if (sel.loc) { params.set('localidade_id', sel.loc); titulo = optLabel('sel-loc'); }
+  else return;
+  titulo = titulo.replace(/ \(\d+\)$/, '');
+  const ctts = await get('/api/contatos?' + params);
+  $('print-area').innerHTML = `<h2 class="fc-title">${esc(titulo)}</h2>` +
+    `<p class="fc-subtitle">${ctts.length} contato(s)</p>` +
+    ctts.map(c => printRow(c, sel.set ? '' : `${c.localidade} · ${c.unidade} · ${c.setor}`)).join('');
+  window.print();
+}
+$('btn-print').onclick = imprimirEscopo;
 
 const pill = (n, s, p) => `<span class="fc-pill">${n} ${n == 1 ? s : p}</span>`;
 
@@ -125,7 +165,8 @@ async function buscar() {
     const loc = locs.find(x => String(x.id) === String(sel.loc));
     box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2></div></div>` +
-      unis.map(u => cardNivel('uni', u.id, u.nome, pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('');
+      unis.map(u => cardNivel('uni', u.id, u.nome,
+        `<span class="fc-pill fc-pill-type">Unidade</span>` + pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('');
   } else if (!sel.set && sel.uni) {
     const params = new URLSearchParams({ unidade_id: sel.uni, q });
     const [sets, ctts] = await Promise.all([
@@ -139,7 +180,8 @@ async function buscar() {
       `<div class="fc-head"><div><h2 class="fc-title">${esc(uniNome)}</h2></div></div>` +
       (q
         ? ctts.map(c => cardContato(c, c.setor)).join('') || '<div class="fc-empty">Nenhum contato.</div>'
-        : sets.map(s => cardNivel('set', s.id, s.nome, pill(porSet[s.id] || 0, 'contato', 'contatos'))).join(''));
+        : sets.map(s => cardNivel('set', s.id, s.nome,
+            `<span class="fc-pill fc-pill-type">Setor</span>` + pill(porSet[s.id] || 0, 'contato', 'contatos'))).join(''));
   } else {
     const params = new URLSearchParams({ q });
     if (sel.set) params.set('setor_id', sel.set);
