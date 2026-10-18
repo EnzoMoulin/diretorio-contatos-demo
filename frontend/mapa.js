@@ -79,9 +79,9 @@ async function initMapa(mapId, msgId, locs, onSelect) {
       },
     }).addTo(_map);
     _layer.eachLayer(l => { if (l._total) l.bringToFront(); });
-    try { _map.fitBounds(_layer.getBounds(), { padding: [6, 6] }); } catch (e) {}
+    try { _map.fitBounds(_layer.getBounds(), { padding: [-14, -14] }); } catch (e) {}
     setTimeout(() => {
-      try { _map.invalidateSize(); _map.fitBounds(_layer.getBounds(), { padding: [6, 6] }); } catch (e) {}
+      try { _map.invalidateSize(); _map.fitBounds(_layer.getBounds(), { padding: [-14, -14] }); } catch (e) {}
     }, 220);
     const legenda = L.control({ position: 'bottomright' });
     legenda.onAdd = () => {
