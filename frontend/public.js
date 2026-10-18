@@ -68,7 +68,8 @@ function setLoc(id) { navTo(String(id)); }
 
 function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
-  $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um município';
+  $('crumb').textContent = parts.join(' › ');
+  $('crumb').classList.toggle('hidden', !parts.length);
   $('btn-print').classList.toggle('hidden', !sel.loc);
   const bv = $('btn-voltar');
   if (!sel.loc && !sel.uni && !sel.set) bv.classList.add('hidden');
