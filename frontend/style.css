@@ -197,7 +197,8 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-eyebrow{margin:0 0 4px;font-size:16px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1d4ed8}
 .fc-page-head .fc-subtitle{font-size:14px}
 #panel-head .fc-title{font-size:18px}
-#panel-head .fc-subtitle{font-size:13px}
+#panel-head .fc-subtitle{font-size:13.5px}
+.sidebar-public .sidebar-header span{font-size:12px}
 .sidebar-header span{font-size:14px}
 .sidebar-user{font-size:14px}
 .fc-profile{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#334155;white-space:nowrap;box-shadow:0 1px 3px rgba(15,23,42,.06)}
