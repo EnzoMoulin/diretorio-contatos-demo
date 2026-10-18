@@ -161,7 +161,7 @@ body[data-theme="dark"] footer{color:#64748b}
 body[data-theme="dark"] code{background:#0f172a}
 /* ================= original: sidebar ================= */
 :root{--bg-panel:#fff;--text-secondary:#64748b}
-.sidebar-header{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-header{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
 .sidebar-logo{height:42px;width:auto;max-width:190px;flex:0 0 auto}
 .sidebar-brand-copy{min-width:0;margin-left:50px}
 .sidebar-header h2{font-size:20px}
