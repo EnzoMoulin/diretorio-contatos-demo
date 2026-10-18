@@ -106,6 +106,34 @@ body[data-theme="dark"] .rows li.nao-lida{background:#1e3a8a33}
 .bar-fill{display:block;height:100%;background:#2563eb;border-radius:999px}
 .bar-fill.ro{background:#94a3b8}
 .bar-num{text-align:right;color:#475569}
+/* ================= original: cards de navegação ================= */
+.fc-card{border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:10px;background:#fff;transition:.15s}
+.fc-card[data-nav]{cursor:pointer}
+.fc-card[data-nav]:hover{box-shadow:0 8px 22px rgba(15,23,42,.08);transform:translateY(-1px)}
+.fc-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fc-card h4{margin:0 0 6px;font-size:15px;color:#0f172a}
+.fc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fc-pill{font-size:11px;background:#f1f5f9;color:#334155;border-radius:999px;padding:4px 8px}
+.fc-back{border:0;background:transparent;color:#1d4ed8;font-weight:700;padding:0;margin-bottom:12px;cursor:pointer}
+.fc-contato{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f8fafc;border:1px solid #dbe3ed;border-radius:10px;margin-top:9px}
+.fc-contato-main{min-width:0}
+.fc-contato h4{margin:4px 0 0;font-size:14px;color:#0f172a}
+.fc-contato-tipo{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#475569}
+.fc-contato-side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.fc-contato-valor{color:#1d4ed8;font-size:14px;font-weight:700;text-decoration:none;overflow-wrap:anywhere}
+.fc-contato-actions{display:flex;gap:5px}
+.fc-icon-btn{border:1px solid #dbe3ed;background:#fff;border-radius:8px;padding:5px 7px;cursor:pointer;font-size:12px}
+.fc-icon-btn:hover{background:#f1f5f9}
+.fc-icon-btn--danger{color:#b91c1c;border-color:#fecaca}
+.fc-empty{padding:20px;border:1px dashed #cbd5e1;border-radius:12px;color:#64748b;text-align:center}
+@media(max-width:680px){.fc-contato{align-items:flex-start;flex-direction:column}.fc-contato-side{justify-content:flex-start}}
+body[data-theme="dark"] .fc-card{background:#1e293b;border-color:#334155}
+body[data-theme="dark"] .fc-card h4,body[data-theme="dark"] .fc-contato h4{color:#f8fafc}
+body[data-theme="dark"] .fc-pill{background:#0f172a;color:#cbd5e1}
+body[data-theme="dark"] .fc-contato{background:#0f172a;border-color:#334155}
+body[data-theme="dark"] .fc-contato-tipo{color:#94a3b8}
+body[data-theme="dark"] .fc-icon-btn{background:#1e293b;border-color:#475569;color:#e2e8f0}
+body[data-theme="dark"] .fc-back{color:#93c5fd}
 /* ---- tema escuro ---- */
 body[data-theme="dark"]{background:#0f172a;color:#e2e8f0}
 body[data-theme="dark"] .card{background:#1e293b;color:#e2e8f0}
@@ -273,6 +301,7 @@ body[data-theme="dark"] .config-card-subtitle{color:#94a3b8}
   body{background:#fff!important}
   .consulta-layout{grid-template-columns:1fr}
   .fc-panel{border:0;box-shadow:none;height:auto;overflow:visible}
+  .fc-contato,.fc-card{break-inside:avoid}
   .main-content{margin:0;padding:0}
   .card{box-shadow:none;border:none}
   table{font-size:12px}

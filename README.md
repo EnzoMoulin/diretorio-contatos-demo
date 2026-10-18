@@ -18,8 +18,9 @@
 - **Tabela de usuários decide permissões**: sem cadastro, mesmo no interno a
   visão seria só consulta; com cadastro, edita os locais do seu escopo
   (`acessos`, com herança municipio > unidade > setor); admin edita tudo
-- **Gestão por contato**: em cada linha, botões **Editar** (modal) e **Remover**,
-  só onde há cobertura; **Criar** no setor selecionado coberto; edição via PUT
+- **Consulta em cards por nível**: sem tabela — Localidade → Unidade → Setor
+  em cards clicáveis com contagem, botão voltar e breadcrumb; contato em card
+  com `tel:` + `mailto:`; Criar/Editar/Remover só onde há cobertura
 
 ## O que faz
 - **Consulta pública** (`/`): **mapa clicável à esquerda como porta de entrada**
