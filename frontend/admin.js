@@ -43,6 +43,7 @@ function marcaEscopo(locId) {
 async function loadLocs() {
   $('sel-loc').innerHTML = '<option value="">Localidade…</option>' +
     locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})${cobre('municipio', l.id) ? ' ✓' : ''}</option>`).join('');
+  $('loc-count').textContent = `${locs.length} Municípios`;
   sel.loc = ''; sel.uni = ''; sel.set = '';
   $('sel-uni').innerHTML = '<option value="">Unidade…</option>';
   $('sel-set').innerHTML = '<option value="">Setor…</option>';
@@ -257,10 +258,12 @@ async function buscar() {
   $('create-box').classList.add('hidden');
   $('save-status').textContent = '';
   if (!q && !sel.set && !sel.uni && !sel.loc) {
-    box.innerHTML = locs.map(l =>
+    box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
       cardNivel('loc', l.id, l.nome + (cobre('municipio', l.id) ? ' ✓' : ''),
+        pill(l.n_unidades || 0, 'Unidade', 'Unidades') +
+        pill(l.n_setores || 0, 'Setor', 'Setores') +
         pill(l.total, 'contato', 'contatos'), solBtnNivel('municipio', l.id))
-    ).join('') || '<div class="fc-empty">Nenhum local.</div>';
+    ).join('') + `</div>` || '<div class="fc-empty">Nenhum local.</div>';
   } else if (!sel.set && !sel.uni && sel.loc && !q) {
     const [unis, ctts] = await Promise.all([
       (await fetch('/api/unidades?localidade_id=' + sel.loc)).json(),
@@ -273,7 +276,9 @@ async function buscar() {
     box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2></div></div>` +
       unis.map(u => cardNivel('uni', u.id, u.nome + (cobre('unidade', u.id) ? ' ✓' : ''),
-        `<span class="fc-pill fc-pill-type">Unidade</span>` + pill(porUni[u.id] || 0, 'contato', 'contatos'), solBtnNivel('unidade', u.id))).join('');
+        `<span class="fc-pill fc-pill-type">Unidade</span>` +
+        pill(u.n_setores || 0, 'Setor', 'Setores') +
+        pill(porUni[u.id] || 0, 'contato', 'contatos'), solBtnNivel('unidade', u.id))).join('');
   } else if (!sel.set && sel.uni) {
     const params = new URLSearchParams({ unidade_id: sel.uni, q });
     const [sets, ctts] = await Promise.all([
@@ -362,9 +367,9 @@ async function refresh() {
   $('estado-hint').textContent = dentro
     ? 'Logado como ' + me.usuario + (me.escopo === 'all' ? ' (admin: todos os locais).' : ` (locais liberados: ${me.escopo.length}).`)
     : 'Consulta sem login. Com cadastro, entre para gerenciar seus locais.';
-  $('escopo-hint').textContent = dentro
-    ? (me.escopo === 'all' ? 'Você edita todos os locais.' : 'Você edita os locais liberados para você; nos demais, só consulta.')
-    : '';
+  $('profile-badge').innerHTML = dentro
+    ? '👤 ' + esc(me.usuario)
+    : '<i>●</i> Visitante';
   if (dentro) carregarPedidos();
   if (dentro) notifBadge(); else $('notif-count').textContent = '';
   VIEWS.forEach(v => $('view-' + v).classList.add('hidden'));

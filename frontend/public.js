@@ -155,9 +155,12 @@ async function buscar() {
   const q = $('q').value.trim();
   const box = $('lista');
   if (!q && !sel.set && !sel.uni && !sel.loc) {
-    box.innerHTML = locs.map(l =>
-      cardNivel('loc', l.id, l.nome, pill(l.total, 'contato', 'contatos'))
-    ).join('') || '<div class="fc-empty">Nenhum local.</div>';
+    box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
+      cardNivel('loc', l.id, l.nome,
+        pill(l.n_unidades || 0, 'Unidade', 'Unidades') +
+        pill(l.n_setores || 0, 'Setor', 'Setores') +
+        pill(l.total, 'contato', 'contatos'))
+    ).join('') + `</div>` || '<div class="fc-empty">Nenhum local.</div>';
   } else if (!sel.set && !sel.uni && sel.loc && !q) {
     const [unis, ctts] = await Promise.all([
       get('/api/unidades?localidade_id=' + sel.loc),
@@ -169,7 +172,9 @@ async function buscar() {
     box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2></div></div>` +
       unis.map(u => cardNivel('uni', u.id, u.nome,
-        `<span class="fc-pill fc-pill-type">Unidade</span>` + pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('');
+        `<span class="fc-pill fc-pill-type">Unidade</span>` +
+        pill(u.n_setores || 0, 'Setor', 'Setores') +
+        pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('');
   } else if (!sel.set && sel.uni) {
     const params = new URLSearchParams({ unidade_id: sel.uni, q });
     const [sets, ctts] = await Promise.all([
@@ -220,11 +225,12 @@ $('toggle-dark-mode').onchange = (e) => {
     btn.onclick = () => {
       document.querySelectorAll('.menu-item[data-view]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      ['consulta', 'config'].forEach(v => $('view-' + v).classList.add('hidden'));
+      ['consulta', 'config', 'manual'].forEach(v => $('view-' + v).classList.add('hidden'));
       $('view-' + btn.dataset.view).classList.remove('hidden');
     };
   });
   locs = await get('/api/localidades');
+  $('loc-count').textContent = `${locs.length} Municípios`;
   await loadLocs();
   $('sel-loc').onchange = () => onLoc();
   $('sel-uni').onchange = () => onUni();

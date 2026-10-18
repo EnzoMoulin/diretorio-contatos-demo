@@ -17,10 +17,10 @@ function corPorDensidade(n) {
 function estiloMunicipio(nome, total) {
   const isSel = _selecionado && norm(nome) === norm(_selecionado);
   return {
-    fillColor: isSel ? '#00adb5' : corPorDensidade(total),
-    fillOpacity: !total ? 0.35 : 0.6,
-    color: isSel ? '#0f172a' : '#ffffff',
-    weight: isSel ? 2.2 : 1.2,
+    fillColor: isSel ? '#00adb5' : (total ? '#dbeafe' : '#f8fafc'),
+    fillOpacity: isSel ? 0.85 : (total ? 0.45 : 0.25),
+    color: isSel ? '#0f172a' : (total ? '#1d63b8' : '#94a3b8'),
+    weight: isSel ? 2.4 : 2,
     opacity: 1,
   };
 }

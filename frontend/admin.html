@@ -37,8 +37,12 @@
   <main class="main-content">
     <section id="view-consulta">
       <div class="fc-page-head">
-        <h1 class="fc-title">Consulta</h1>
-        <p class="fc-subtitle" id="escopo-hint"></p>
+        <div>
+          <p class="fc-eyebrow">Diretório institucional · demo</p>
+          <h1>Diretório de Contatos — Demo</h1>
+          <p class="fc-subtitle">Guia de contatos da Empresa Exemplo</p>
+        </div>
+        <span class="fc-profile" id="profile-badge"><i>●</i> Visitante</span>
       </div>
       <div class="consulta-layout">
         <section id="consulta-mapa" aria-label="Mapa dos municípios">
@@ -49,9 +53,13 @@
           <p class="hint" id="map-msg"></p>
         </section>
         <div class="fc-panel">
-          <div class="fc-toolbar fc-toolbar-end">
-            <button type="button" class="fc-btn hidden" id="btn-print" title="Imprimir / Salvar PDF dos contatos do nível selecionado">🖨️ Imprimir / Salvar PDF</button>
+          <div class="fc-head">
+            <div>
+              <h2 class="fc-title">Contatos da Empresa Exemplo</h2>
+              <p class="fc-subtitle">Consulte a estrutura completa por Município, Unidade e Setor. Selecione um município no mapa, nos menus ou na lista abaixo.</p>
+            </div>
           </div>
+          <span class="fc-pill fc-total-localidades" id="loc-count"></span>
           <input id="q" class="fc-search" type="search" placeholder="Buscar por nome, cargo, telefone, e-mail ou setor…" autocomplete="off">
           <p class="fc-subtitle" id="crumb">Selecione um local ou busque</p>
           <div class="fc-selects-row" id="sel-row">
@@ -59,6 +67,7 @@
             <select id="sel-uni" class="fc-select" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
             <select id="sel-set" class="fc-select" aria-label="Setor" disabled><option value="">Setor…</option></select>
           </div>
+          <button type="button" class="fc-btn fc-print-all hidden" id="btn-print" title="Imprimir / Salvar PDF dos contatos do nível selecionado">🖨️ Imprimir / Salvar PDF</button>
           <div class="create-box hidden" id="create-box">
             <h3>Novo contato neste setor</h3>
             <div class="form-grid">
