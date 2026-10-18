@@ -197,7 +197,7 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-eyebrow{margin:0 0 4px;font-size:16px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1d4ed8}
 .fc-page-head .fc-subtitle{font-size:14px}
 #panel-head .fc-title{font-size:18px}
-#panel-head .fc-subtitle{font-size:13px}
+#panel-head .fc-subtitle{font-size:13px;text-align:justify}
 .sidebar-public .sidebar-header span{font-size:12px}
 .sidebar-header span{font-size:14px}
 .sidebar-user{font-size:14px}
