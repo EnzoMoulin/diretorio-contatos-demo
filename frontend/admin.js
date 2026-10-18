@@ -41,7 +41,7 @@ function marcaEscopo(locId) {
 }
 
 async function loadLocs() {
-  $('sel-loc').innerHTML = '<option value="">Selecione o Município</option>' +
+  $('sel-loc').innerHTML = '<option value="">Selecione um município</option>' +
     locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})${cobre('municipio', l.id) ? ' ✓' : ''}</option>`).join('');
   $('loc-count').textContent = `${locs.length} Municípios`;
   sel.loc = ''; sel.uni = ''; sel.set = '';
