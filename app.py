@@ -90,35 +90,35 @@ CREATE TABLE IF NOT EXISTS pedidos (
 # (localidade, unidade, setor, nome, cargo, telefone, email) — tudo fictício
 SEED = [
     ("Vitória", "Unidade Centro", "Atendimento", "Ana Souza", "Atendente",
-     "(27) 3333-0001", "atendimento@exemplar.com.br"),
+     "(27) 3333-0001", "atendimento@capixaba.com.br"),
     ("Vitória", "Unidade Centro", "Atendimento", "Paulo Reis", "Atendente",
-     "(27) 3333-0007", "paulo.reis@exemplar.com.br"),
+     "(27) 3333-0007", "paulo.reis@capixaba.com.br"),
     ("Vitória", "Unidade Centro", "Suporte", "Bruno Lima", "Técnico de suporte",
-     "(27) 3333-0002", "suporte@exemplar.com.br"),
+     "(27) 3333-0002", "suporte@capixaba.com.br"),
     ("Vitória", "Unidade Jardim", "Financeiro", "Carla Dias", "Analista financeira",
-     "(27) 3333-0003", "financeiro@exemplar.com.br"),
+     "(27) 3333-0003", "financeiro@capixaba.com.br"),
     ("Vitória", "Unidade Jardim", "RH", "Diego Rocha", "Analista de RH",
-     "(27) 3333-0004", "rh@exemplar.com.br"),
+     "(27) 3333-0004", "rh@capixaba.com.br"),
     ("Vila Velha", "Unidade Praia", "Atendimento", "Elisa Prado", "Atendente",
-     "(27) 3333-0005", "elisaprado@exemplar.com.br"),
+     "(27) 3333-0005", "elisaprado@capixaba.com.br"),
     ("Vila Velha", "Unidade Praia", "TI", "Fabio Nunes", "Desenvolvedor",
-     "(27) 3333-0006", "ti@exemplar.com.br"),
+     "(27) 3333-0006", "ti@capixaba.com.br"),
     ("Vila Velha", "Unidade Centro", "Suporte", "Gabi Moura", "Técnica de suporte",
-     "(27) 3333-0008", "gabi.moura@exemplar.com.br"),
+     "(27) 3333-0008", "gabi.moura@capixaba.com.br"),
     ("Serra", "Unidade Laranjeiras", "Atendimento", "Hugo Alves", "Atendente",
-     "(27) 3333-0009", "hugo.alves@exemplar.com.br"),
+     "(27) 3333-0009", "hugo.alves@capixaba.com.br"),
     ("Serra", "Unidade Laranjeiras", "Logística", "Inês Castro", "Coordenadora",
-     "(27) 3333-0010", "logistica@exemplar.com.br"),
+     "(27) 3333-0010", "logistica@capixaba.com.br"),
     ("Cariacica", "Unidade Centro", "Atendimento", "João Pinto", "Atendente",
-     "(27) 3333-0011", "joao.pinto@exemplar.com.br"),
+     "(27) 3333-0011", "joao.pinto@capixaba.com.br"),
     ("Cariacica", "Unidade Centro", "TI", "Karla Mendes", "Analista de sistemas",
-     "(27) 3333-0012", "karla.mendes@exemplar.com.br"),
+     "(27) 3333-0012", "karla.mendes@capixaba.com.br"),
 ]
 
 SENHA_INICIAL = "bemvindo123"
 # Domínio institucional da demo: equivale à checagem de e-mail institucional
 # do sistema original (lá, sessão Google + intranet; aqui, login + domínio).
-DOMINIO_INSTITUCIONAL = "exemplar.com.br"
+DOMINIO_INSTITUCIONAL = "capixaba.com.br"
 
 
 def sha(s):

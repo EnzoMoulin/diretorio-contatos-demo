@@ -5,7 +5,7 @@
 > com login, permissões por local, solicitações de acesso, registro de
 > alterações e navegação em camadas com mapa).
 > **Nenhum dado real ou interno é usado aqui** — todos os contatos são
-> fictícios (Exemplar).
+> fictícios (Capixaba).
 
 ## Arquitetura (espelha o sistema original)
 - **Duas implantações isoladas, sem trânsito entre elas** — como no original
@@ -14,7 +14,7 @@
   - `/admin` interna: portão de login; sem token válido, nada além do portão aparece
 - **Portão institucional**: no original, sessão Google + intranet + domínio
   institucional (`AuthService.emailPermitidoNoPrivado`); aqui, login demo +
-  pedido exigindo e-mail `@exemplar.com.br` (validado no servidor, 400 fora do domínio)
+  pedido exigindo e-mail `@capixaba.com.br` (validado no servidor, 400 fora do domínio)
 - **Tabela de usuários decide permissões**: sem cadastro, mesmo no interno a
   visão seria só consulta; com cadastro, edita os locais do seu escopo
   (`acessos`, com herança municipio > unidade > setor); admin edita tudo
@@ -37,7 +37,7 @@
   e-mail + senha; com cadastro, eleva e libera gestão por escopo + Solicitações
   + Registro) e **Solicitar acesso** (modal do formulário); **Sair do acesso
   administrativo** volta à consulta, continua no interno.
-  Demo: admin@exemplar.com.br / admin123.
+  Demo: admin@capixaba.com.br / admin123.
 - **Gestão dentro da consulta, com escopo por nível**: o usuário cria/edita/remove
   contatos só onde tem cobertura (município, unidade ou setor, com herança de
   cima); fora dela, só consulta. Ao lado de cada nível selecionado sem cobertura,
