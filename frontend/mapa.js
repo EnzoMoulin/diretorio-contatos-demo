@@ -42,7 +42,7 @@ async function initMapa(mapId, msgId, locs, onSelect) {
     return false;
   }
   _mapaOK = true;
-  _map = L.map(mapId, { zoomControl: true, attributionControl: true, scrollWheelZoom: true })
+  _map = L.map(mapId, { zoomControl: true, attributionControl: true, scrollWheelZoom: true, zoomSnap: 0.5 })
     .setView([-19.5, -40.3], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(_map);
