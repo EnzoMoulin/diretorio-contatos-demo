@@ -215,7 +215,7 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-print-all{width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;line-height:1.2;margin-bottom:12px}
 .fc-section h3{font-size:15px;margin:8px 0 4px;color:#0f172a}
 .main-content{display:flex;flex-direction:column}
-.main-content footer{margin-top:auto}
+.main-content footer{margin:auto}
 .fc-btn{appearance:none;border:1px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:9px;padding:8px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .fc-btn:hover{background:#f8fafc}
 .fc-btn--primary{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
