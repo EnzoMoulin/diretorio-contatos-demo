@@ -70,6 +70,7 @@ function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
   $('crumb').textContent = parts.join(' › ');
   $('crumb').classList.toggle('hidden', !parts.length);
+  $('panel-head').classList.toggle('hidden', !!sel.loc);
   $('btn-print').classList.toggle('hidden', !sel.loc);
   const bv = $('btn-voltar');
   if (!sel.loc && !sel.uni && !sel.set) bv.classList.add('hidden');
