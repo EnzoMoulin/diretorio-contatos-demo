@@ -44,8 +44,8 @@ async function initMapa(mapId, msgId, locs, onSelect) {
   _mapaOK = true;
   _map = L.map(mapId, { zoomControl: true, attributionControl: true, scrollWheelZoom: true })
     .setView([-19.5, -40.3], 9);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    { maxZoom: 19, attribution: '&copy; OpenStreetMap &copy; CARTO' }).addTo(_map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(_map);
   const dens = {};
   (locs || []).forEach(l => { dens[norm(l.nome)] = l.total; });
   try {
