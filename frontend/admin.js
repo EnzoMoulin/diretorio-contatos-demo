@@ -100,10 +100,33 @@ function setLoc(id) {
   navTo(String(id));
 }
 
+function nomeLimpo(selId) {
+  return optLabel(selId).replace(/ \(\d+\)( ✓)?$/, '').replace(/ ✓$/, '');
+}
+
+function renderCrumb() {
+  const c = $('crumb');
+  if (!sel.loc) { c.innerHTML = ''; c.classList.add('hidden'); return; }
+  c.classList.remove('hidden');
+  const loc = esc(nomeLimpo('sel-loc'));
+  const uni = sel.uni ? esc(nomeLimpo('sel-uni')) : '';
+  const set = sel.set ? esc(nomeLimpo('sel-set')) : '';
+  c.innerHTML =
+    (sel.uni || sel.set ? `<button type="button" data-c="loc">${loc}</button>` : `<span>${loc}</span>`) +
+    (sel.uni ? ` › ` + (sel.set ? `<button type="button" data-c="uni">${uni}</button>` : `<span>${uni}</span>`) : '') +
+    (sel.set ? ` › <span>${set}</span>` : '');
+  c.querySelectorAll('[data-c]').forEach(b => {
+    b.onclick = () => {
+      if (b.dataset.c === 'loc') navTo(sel.loc);
+      else navTo(sel.loc, sel.uni);
+    };
+  });
+}
+
 function sync() {
-  const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
-  $('crumb').textContent = parts.join(' › ');
-  $('crumb').classList.add('hidden');
+  renderCrumb();
+  const row = $('sel-row');
+  if (row) row.classList.toggle('hidden', !!(sel.uni || sel.set));
   $('loc-count').classList.toggle('hidden', !!sel.loc);
   $('panel-head').classList.toggle('hidden', !!sel.loc);
   refreshSol();
@@ -328,7 +351,8 @@ async function buscar() {
     }
   }
   const slot = $('sel-slot');
-  if (slot && $('sel-row')) slot.appendChild($('sel-row'));
+  const row2 = $('sel-row');
+  if (slot && row2 && !sel.uni && !sel.set) slot.appendChild(row2);
   refreshTopo();
   bindCards();
 }

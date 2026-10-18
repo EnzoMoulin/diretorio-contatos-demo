@@ -69,6 +69,8 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:15
 .rows li{padding:10px 4px;border-bottom:1px solid #e2e8f0;font-size:14px}
 .menu-item.link{display:block;text-decoration:none}
 #ped-count:empty,#notif-count:empty{display:none}
+#crumb button{appearance:none;border:0;background:transparent;padding:0;color:#1d4ed8;font:inherit;font-weight:700;cursor:pointer}
+#crumb button:hover{text-decoration:underline}
 .rows li.nao-lida{background:#eff6ff}
 body[data-theme="dark"] .rows li.nao-lida{background:#1e3a8a33}
 /* ---- impressão ---- */
