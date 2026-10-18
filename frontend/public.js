@@ -17,7 +17,7 @@ function optLabel(selId) {
 }
 
 async function loadLocs() {
-  $('sel-loc').innerHTML = '<option value="">Localidade…</option>' +
+  $('sel-loc').innerHTML = '<option value="">Selecione o Município</option>' +
     locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})</option>`).join('');
 }
 
