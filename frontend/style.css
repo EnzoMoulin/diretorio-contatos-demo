@@ -116,7 +116,13 @@ body[data-theme="dark"] .rows li.nao-lida{background:#1e3a8a33}
 .fc-card h4{margin:0 0 6px;font-size:15px;color:#0f172a}
 .fc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .fc-pill{font-size:11px;background:#f1f5f9;color:#334155;border-radius:999px;padding:4px 8px}
-.fc-back{border:0;background:transparent;color:#1d4ed8;font-weight:700;padding:0;margin-bottom:12px;cursor:pointer}
+.fc-back{border:0;background:transparent;color:#1d4ed8;font-weight:700;padding:0;margin:0 auto 12px;cursor:pointer;display:block}
+.fc-breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:0 0 10px;color:#64748b;font-size:13px;line-height:1.5}
+.fc-breadcrumb button{appearance:none;border:0;background:transparent;padding:0;color:#1d4ed8;font:inherit;font-weight:700;cursor:pointer}
+.fc-breadcrumb button:hover{text-decoration:underline}
+.fc-breadcrumb-current{color:#475569;font-weight:700}
+.fc-copy-btn{border:1px solid #dbe3ed;background:#fff;border-radius:8px;padding:5px 7px;cursor:pointer;font-size:12px;color:#1d4ed8;font-weight:800}
+.fc-copy-btn:hover{background:#f1f5f9}
 .fc-contato{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f8fafc;border:1px solid #dbe3ed;border-radius:10px;margin-top:9px}
 .fc-contato-main{min-width:0}
 .fc-contato h4{margin:4px 0 0;font-size:14px;color:#0f172a}

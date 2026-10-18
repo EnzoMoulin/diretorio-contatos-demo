@@ -70,18 +70,20 @@ function nomeLimpo(selId) {
   return optLabel(selId).replace(/ \(\d+\)( ✓)?$/, '').replace(/ ✓$/, '');
 }
 
-function renderCrumb() {
-  const c = $('crumb');
-  if (!sel.loc) { c.innerHTML = ''; c.classList.add('hidden'); return; }
-  c.classList.remove('hidden');
+function chainHtml() {
+  if (!sel.loc) return '';
   const loc = esc(nomeLimpo('sel-loc'));
   const uni = sel.uni ? esc(nomeLimpo('sel-uni')) : '';
   const set = sel.set ? esc(nomeLimpo('sel-set')) : '';
-  c.innerHTML =
-    (sel.uni || sel.set ? `<button type="button" data-c="loc">${loc}</button>` : `<span>${loc}</span>`) +
-    (sel.uni ? ` › ` + (sel.set ? `<button type="button" data-c="uni">${uni}</button>` : `<span>${uni}</span>`) : '') +
-    (sel.set ? ` › <span>${set}</span>` : '');
-  c.querySelectorAll('[data-c]').forEach(b => {
+  return `<nav class="fc-breadcrumb">` +
+    (sel.uni || sel.set ? `<button type="button" data-c="loc">${loc}</button> › ` : `<span>${loc}</span>`) +
+    (sel.uni ? (sel.set ? `<button type="button" data-c="uni">${uni}</button> › ` : `<span>${uni}</span>`) : '') +
+    (sel.set ? `<span class="fc-breadcrumb-current">${set}</span>` : '') +
+    `</nav>`;
+}
+
+function bindChain(scope) {
+  scope.querySelectorAll('[data-c]').forEach(b => {
     b.onclick = () => {
       if (b.dataset.c === 'loc') navTo(sel.loc);
       else navTo(sel.loc, sel.uni);
@@ -90,7 +92,6 @@ function renderCrumb() {
 }
 
 function sync() {
-  renderCrumb();
   const row = $('sel-row');
   if (row) row.classList.toggle('hidden', !!(sel.uni || sel.set));
   $('loc-count').classList.toggle('hidden', !!sel.loc);
@@ -150,8 +151,8 @@ function cardNivel(tipo, id, nome, meta) {
 }
 
 function cardContato(c, caminho) {
-  const tel = c.telefone ? `<a class="fc-contato-valor" href="tel:${esc(c.telefone.replace(/\D/g, ''))}">${esc(c.telefone)}</a>` : '';
-  const mail = c.email ? `<a class="fc-contato-valor" href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : '';
+  const tel = c.telefone ? `<a class="fc-contato-valor" href="tel:${esc(c.telefone.replace(/\D/g, ''))}">${esc(c.telefone)}</a><button type="button" class="fc-copy-btn" data-copy="${esc(c.telefone)}" title="Copiar">⧉</button>` : '';
+  const mail = c.email ? `<a class="fc-contato-valor" href="mailto:${esc(c.email)}">${esc(c.email)}</a><button type="button" class="fc-copy-btn" data-copy="${esc(c.email)}" title="Copiar">⧉</button>` : '';
   return `<div class="fc-contato"><div class="fc-contato-main">` +
     `<span class="fc-contato-tipo">${esc(c.cargo || '')}${caminho ? ' · ' + esc(caminho) : ''}</span>` +
     `<h4>${esc(c.nome)}</h4></div>` +
@@ -159,6 +160,22 @@ function cardContato(c, caminho) {
 }
 
 function bindNav() {
+  bindChain($('lista'));
+  document.querySelectorAll('#lista [data-copy]').forEach(b => {
+    b.onclick = async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = b.dataset.copy;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+      }
+      const t = b.textContent;
+      b.textContent = '✓';
+      setTimeout(() => { b.textContent = t; }, 1200);
+    };
+  });
   document.querySelectorAll('#lista [data-nav]').forEach(el => {
     el.onclick = () => {
       const id = el.dataset.id, t = el.dataset.nav;
@@ -220,6 +237,7 @@ async function buscar() {
     box.innerHTML = `<button class="fc-back" data-back="loc">← ${esc(optLabel('sel-loc'))}</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(uniNome)}</h2>` +
       `<p class="fc-subtitle">${sets.length} Setores · ${ctts.length} Contatos</p></div></div>` +
+      chainHtml() +
       `<div id="sel-slot"></div>` +
       `<div class="fc-section"><h3>Setores</h3>` +
       (q
@@ -236,9 +254,13 @@ async function buscar() {
     box.innerHTML = (sel.set
       ? `<button class="fc-back" data-back="uni">← ${esc(optLabel('sel-uni'))}</button>` +
         `<div class="fc-head"><div><h2 class="fc-title">${esc(setNome)}</h2></div></div>` +
+        chainHtml() +
+        `<div><span class="fc-pill fc-pill-type">Setor</span></div>` +
         `<div id="sel-slot"></div>`
       : '') +
-      ctts.map(c => cardContato(c, sel.set ? '' : `${c.localidade} · ${c.unidade} · ${c.setor}`)).join('') ||
+      `<div class="fc-section"><h3>Contatos deste setor</h3>` +
+      ctts.map(c => cardContato(c, sel.set ? '' : `${c.localidade} · ${c.unidade} · ${c.setor}`)).join('') +
+      `</div>` ||
       '<div class="fc-empty">Nenhum contato.</div>';
   }
   const slot = $('sel-slot');
