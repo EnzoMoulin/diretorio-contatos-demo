@@ -69,7 +69,8 @@ function setLoc(id) { navTo(String(id)); }
 function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
   $('crumb').textContent = parts.join(' › ');
-  $('crumb').classList.toggle('hidden', !parts.length);
+  $('crumb').classList.add('hidden');
+  $('loc-count').classList.toggle('hidden', !!sel.loc);
   $('panel-head').classList.toggle('hidden', !!sel.loc);
   $('btn-print').classList.toggle('hidden', !sel.loc);
   const bv = $('btn-voltar');
@@ -171,12 +172,15 @@ async function buscar() {
     const porUni = {};
     ctts.forEach(c => { porUni[c.unidade_id] = (porUni[c.unidade_id] || 0) + 1; });
     const loc = locs.find(x => String(x.id) === String(sel.loc));
+    const nSet = unis.reduce((a, u) => a + (u.n_setores || 0), 0);
     box.innerHTML = `<button class="fc-back" data-back="home">← Localidades</button>` +
-      `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2></div></div>` +
+      `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2>` +
+      `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
+      `<div class="fc-section"><h3>Unidades</h3>` +
       unis.map(u => cardNivel('uni', u.id, u.nome,
         `<span class="fc-pill fc-pill-type">Unidade</span>` +
         pill(u.n_setores || 0, 'Setor', 'Setores') +
-        pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('');
+        pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('') + `</div>`;
   } else if (!sel.set && sel.uni) {
     const params = new URLSearchParams({ unidade_id: sel.uni, q });
     const [sets, ctts] = await Promise.all([
@@ -187,11 +191,13 @@ async function buscar() {
     ctts.forEach(c => { porSet[c.setor_id] = (porSet[c.setor_id] || 0) + 1; });
     const uniNome = optLabel('sel-uni');
     box.innerHTML = `<button class="fc-back" data-back="loc">← ${esc(optLabel('sel-loc'))}</button>` +
-      `<div class="fc-head"><div><h2 class="fc-title">${esc(uniNome)}</h2></div></div>` +
+      `<div class="fc-head"><div><h2 class="fc-title">${esc(uniNome)}</h2>` +
+      `<p class="fc-subtitle">${sets.length} Setores · ${ctts.length} Contatos</p></div></div>` +
+      `<div class="fc-section"><h3>Setores</h3>` +
       (q
         ? ctts.map(c => cardContato(c, c.setor)).join('') || '<div class="fc-empty">Nenhum contato.</div>'
         : sets.map(s => cardNivel('set', s.id, s.nome,
-            `<span class="fc-pill fc-pill-type">Setor</span>` + pill(porSet[s.id] || 0, 'contato', 'contatos'))).join(''));
+            `<span class="fc-pill fc-pill-type">Setor</span>` + pill(porSet[s.id] || 0, 'contato', 'contatos'))).join('') + `</div>`);
   } else {
     const params = new URLSearchParams({ q });
     if (sel.set) params.set('setor_id', sel.set);
