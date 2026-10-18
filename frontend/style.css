@@ -184,8 +184,9 @@ body[data-theme="dark"] code{background:#0f172a}
 .consulta-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2vw,24px);align-items:stretch}
 @media(max-width:900px){.consulta-layout{grid-template-columns:1fr}}
 /* consulta cabe na tela: painel rola por dentro, mapa preenche a altura */
-#view-consulta .consulta-layout{height:calc(100vh - 180px);min-height:440px}
-@media(max-width:900px){#view-consulta .consulta-layout{height:auto;min-height:0}}
+#view-consulta{display:flex;flex-direction:column;height:calc(100vh - 96px);min-height:0}
+#view-consulta .consulta-layout{flex:1 1 auto;min-height:0;height:auto}
+@media(max-width:900px){#view-consulta{height:auto}#view-consulta .consulta-layout{height:auto;min-height:0}}
 .fc-panel{max-height:100%}
 #consulta-mapa{height:100%;min-height:0}
 #view-consulta #map{min-height:0}
@@ -215,7 +216,7 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-print-all{width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;line-height:1.2;margin-bottom:12px}
 .fc-section h3{font-size:15px;margin:8px 0 4px;color:#0f172a}
 .main-content{display:flex;flex-direction:column}
-.main-content footer{margin:auto}
+.main-content footer{margin:10px 0 0}
 .fc-btn{appearance:none;border:1px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:9px;padding:8px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .fc-btn:hover{background:#f8fafc}
 .fc-btn--primary{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
