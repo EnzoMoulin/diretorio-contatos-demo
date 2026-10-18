@@ -360,6 +360,17 @@ body[data-theme="dark"] .config-row{border-color:#334155}
 body[data-theme="dark"] .config-label{color:#94a3b8}
 body[data-theme="dark"] .config-preview-box{background:#0f172a;border-color:#334155;color:#cbd5e1}
 body[data-theme="dark"] .config-card-subtitle{color:#94a3b8}
+body[data-theme="dark"] .fc-section h3{color:#f8fafc}
+body[data-theme="dark"] .fc-total-localidades{background:#1e3a8a;color:#bfdbfe}
+/* mapa no escuro: tiles escurecidos + controles escuros */
+body[data-theme="dark"] .leaflet-tile-pane{filter:brightness(.62) invert(1) contrast(.92) hue-rotate(180deg)}
+body[data-theme="dark"] .fc-map-legenda{background:rgba(30,41,59,.94);border-color:#475569;color:#cbd5e1}
+body[data-theme="dark"] .leaflet-bar a{background:#1e293b;color:#e2e8f0;border-color:#475569}
+body[data-theme="dark"] .leaflet-control-attribution{background:rgba(15,23,42,.8);color:#94a3b8}
+body[data-theme="dark"] .leaflet-control-attribution a{color:#93c5fd}
+body[data-theme="dark"] .leaflet-tooltip{background:#1e293b;border-color:#475569;color:#e2e8f0}
+body[data-theme="dark"] .tooltip-premium{color:#f8fafc}
+body[data-theme="dark"] .tooltip-premium small{color:#cbd5e1}
 /* ---- impressão (painel + folha limpa) ---- */
 @media print{
   @page{size:A4 portrait;margin:15mm 12mm}
