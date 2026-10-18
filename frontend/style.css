@@ -185,6 +185,7 @@ body[data-theme="dark"] code{background:#0f172a}
 .fc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .fc-title{font-size:21px;font-weight:800;color:#0f172a;margin:0 0 5px}
 .fc-subtitle{color:#64748b;font-size:13px;margin:0;line-height:1.5}
+.fc-subtitle .seta{font-size:1.3em;line-height:1}
 .fc-toolbar{display:flex;gap:8px;flex-wrap:wrap}
 .fc-toolbar-end{justify-content:flex-end;margin-bottom:4px}
 .fc-page-head{margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
