@@ -69,7 +69,6 @@ function setLoc(id) { navTo(String(id)); }
 function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
   $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um local ou busque';
-  $('sel-row').classList.toggle('hidden', !!sel.loc);
   $('btn-print').classList.toggle('hidden', !sel.loc);
   const bv = $('btn-voltar');
   if (!sel.loc && !sel.uni && !sel.set && !$('q').value.trim()) bv.classList.add('hidden');

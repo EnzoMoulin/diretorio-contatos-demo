@@ -31,7 +31,7 @@ async function initMapa(mapId, msgId, locs, onSelect) {
       }
     }).addTo(map);
     map.fitBounds(layer.getBounds(), { padding: [8, 8] });
-    map.zoomIn(1, { animate: false });
+    if (msg) msg.textContent = '';
     return true;
   } catch (e) {
     if (msg) msg.textContent = 'Mapa indisponível offline — use as localidades abaixo.';
