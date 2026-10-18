@@ -17,8 +17,8 @@ function corPorDensidade(n) {
 function estiloMunicipio(nome, total) {
   const isSel = _selecionado && norm(nome) === norm(_selecionado);
   return {
-    fillColor: isSel ? '#00adb5' : corPorDensidade(total),
-    fillOpacity: isSel ? 0.85 : (total ? 0.6 : 0.25),
+    fillColor: isSel ? '#00adb5' : (total ? '#1d63b8' : '#f1f5f9'),
+    fillOpacity: isSel ? 0.85 : (total ? 0.65 : 0.25),
     color: isSel ? '#0f172a' : (total ? '#3b82f6' : '#94a3b8'),
     weight: isSel ? 2.4 : 2,
     opacity: 1,
