@@ -481,7 +481,7 @@ function preencherLocais() {
 function abrirPedidoNovo() {
   $('modal-pedido').classList.remove('hidden');
   $('p-status').textContent = '';
-  $('ped-hint').textContent = 'Exigido e-mail institucional @capixaba.com.br (equivale ao vínculo da intranet).';
+  $('ped-hint').textContent = 'Exigido e-mail institucional @ligaes.com.br (equivale ao vínculo da intranet).';
   $('p-user').disabled = false;
   preencherLocais();
 }

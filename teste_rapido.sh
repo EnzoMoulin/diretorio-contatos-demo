@@ -26,9 +26,9 @@ echo "== login admin =="
 TA=$(curl -s -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"admin","senha":"admin123"}' | python3 -c "$TOK")
 echo "== me =="; curl -s "$B/api/me" -H "X-Admin-Token: $TA"; echo
 echo -n "login via email (200 esperado): "
-curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/login -H 'Content-Type: application/json' -d '{"email":"admin@capixaba.com.br","senha":"admin123"}'
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/login -H 'Content-Type: application/json' -d '{"email":"admin@ligaes.com.br","senha":"admin123"}'
 echo "== pedido c/ local =="
-curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"User VV","email":"u@capixaba.com.br","usuario":"uservv","motivo":"demo","localidade_id":2}'; echo
+curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"User VV","email":"u@ligaes.com.br","usuario":"uservv","motivo":"demo","localidade_id":2}'; echo
 echo -n "pedido c/ email externo (400 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"Fora","email":"f@gmail.com","usuario":"fora","localidade_id":2}'
 echo "== aprovar =="; curl -s -X POST $B/api/pedidos/1/aprovar -H "X-Admin-Token: $TA"; echo
@@ -49,7 +49,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PUT $B/api/contatos/$CIDV -H 'Conten
 echo -n "editar fora do escopo (403 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X PUT $B/api/contatos/1 -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d '{"nome":"invasao"}'
 echo "== pedido de setor =="
-curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d "{\"nome\":\"User VV\",\"email\":\"u@capixaba.com.br\",\"usuario\":\"uservv\",\"motivo\":\"mais um setor\",\"nivel\":\"setor\",\"alvo_id\":$SVV}"; echo
+curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d "{\"nome\":\"User VV\",\"email\":\"u@ligaes.com.br\",\"usuario\":\"uservv\",\"motivo\":\"mais um setor\",\"nivel\":\"setor\",\"alvo_id\":$SVV}"; echo
 echo "== pendentes com nivel =="; curl -s "$B/api/pedidos" -H "X-Admin-Token: $TA" | head -c 300; echo
 echo "== historico =="; curl -s "$B/api/historico" -H "X-Admin-Token: $TA" | head -c 150; echo
 echo "== resumo =="; curl -s "$B/api/resumo" -H "X-Admin-Token: $TA" | head -c 200; echo
@@ -62,7 +62,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/me/senha -H 'Content-Typ
 echo -n "login com nova senha (200 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"uservv","senha":"novasenha123"}'
 echo "== pedido sem usuario (default = inicio do email) =="
-curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"Sem User","email":"semuser@capixaba.com.br","motivo":"t","localidade_id":1}'; echo
+curl -s -X POST $B/api/pedidos -H 'Content-Type: application/json' -d '{"nome":"Sem User","email":"semuser@ligaes.com.br","motivo":"t","localidade_id":1}'; echo
 echo "== notificacoes do admin (deve listar solicitacoes) =="
 curl -s "$B/api/notificacoes" -H "X-Admin-Token: $TA" | head -c 300; echo
 echo -n "notificacoes sem token (403 esperado): "
