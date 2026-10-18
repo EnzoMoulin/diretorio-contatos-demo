@@ -68,17 +68,17 @@ function setLoc(id) { navTo(String(id)); }
 
 function sync() {
   const parts = [optLabel('sel-loc'), optLabel('sel-uni'), optLabel('sel-set')].filter(Boolean);
-  $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um local ou busque';
+  $('crumb').textContent = parts.length ? parts.join(' › ') : 'Selecione um município';
   $('btn-print').classList.toggle('hidden', !sel.loc);
   const bv = $('btn-voltar');
-  if (!sel.loc && !sel.uni && !sel.set && !$('q').value.trim()) bv.classList.add('hidden');
+  if (!sel.loc && !sel.uni && !sel.set) bv.classList.add('hidden');
   else {
     bv.classList.remove('hidden');
     bv.onclick = () => {
       if (sel.set) navTo(sel.loc, sel.uni);
       else if (sel.uni) navTo(sel.loc);
       else if (sel.loc) navTo('');
-      else { $('q').value = ''; buscar(); }
+      else { buscar(); }
     };
   }
   if (typeof destacarMunicipioMapa === 'function') {
@@ -152,7 +152,7 @@ function bindNav() {
 }
 
 async function buscar() {
-  const q = $('q').value.trim();
+  const q = '';
   const box = $('lista');
   if (!q && !sel.set && !sel.uni && !sel.loc) {
     box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
@@ -207,7 +207,7 @@ async function buscar() {
   bindNav();
 }
 
-$('q').addEventListener('input', buscar);
+/* busca removida — navegação por mapa, menu e cards */
 
 function aplicarTema() {
   const dark = (localStorage.getItem('demo-theme') || 'light') === 'dark';
