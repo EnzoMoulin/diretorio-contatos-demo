@@ -327,7 +327,14 @@ async function buscar() {
   }
   const slot = $('sel-slot');
   if (slot) slot.appendChild($('sel-row'));
+  refreshTopo();
   bindCards();
+}
+
+function refreshTopo() {
+  const panel = document.querySelector('.fc-panel');
+  $('btn-topo').classList.toggle('hidden',
+    panel.scrollHeight <= panel.clientHeight + 1);
 }
 let lastList = [];
 let editId = null;

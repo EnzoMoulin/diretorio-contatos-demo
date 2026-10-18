@@ -181,7 +181,7 @@ body[data-theme="dark"] code{background:#0f172a}
 #view-consulta #map{min-height:0}
 #map-msg{margin:6px 0 0}
 .fc-panel{width:100%;min-height:0;overflow-y:auto;background:#fff;border:1px solid #cbd5e1;border-radius:16px;padding:clamp(16px,2vw,24px);box-shadow:0 6px 18px rgba(15,23,42,.11);display:flex;flex-direction:column}
-.fc-panel #lista{flex:1 0 auto}
+.fc-panel #lista{flex:1 0 auto;padding-bottom:16px}
 .fc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .fc-title{font-size:21px;font-weight:800;color:#0f172a;margin:0 0 5px}
 .fc-subtitle{color:#64748b;font-size:13px;margin:0;line-height:1.5}
