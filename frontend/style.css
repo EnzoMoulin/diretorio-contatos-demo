@@ -216,7 +216,8 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-map-legenda .sem-contato{color:#94a3b8}
 .tooltip-premium{font-weight:800;font-size:13px;color:#0f172a}
 .tooltip-premium small{display:block;font-weight:600;font-size:11px;color:#475569}
-.fc-bottom-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0}
+.fc-bottom-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0}
+.fc-bottom-nav .nav-group{display:flex;gap:8px}
 .fc-pill-type{background:#dbeafe;color:#1e40af}
 #print-area{display:none}
 #consulta-mapa{width:100%;min-height:0;display:flex;flex-direction:column;padding:8px;overflow:hidden;background:#fff;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,.11)}
