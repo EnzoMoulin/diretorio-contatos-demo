@@ -194,7 +194,7 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-eyebrow{margin:0 0 4px;font-size:15px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1d4ed8}
 .fc-profile{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#334155;white-space:nowrap;box-shadow:0 1px 3px rgba(15,23,42,.06)}
 .fc-profile i{font-style:normal;color:#22c55e;font-size:10px}
-.fc-total-localidades{display:inline-flex;margin:12px 0 8px;background:#dbeafe;color:#1e40af;font-weight:800}
+.fc-total-localidades{display:inline-flex;align-self:flex-start;margin:12px 0 8px;background:#dbeafe;color:#1e40af;font-weight:800}
 .fc-print-all{width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;line-height:1.2;margin-bottom:12px}
 .fc-section h3{font-size:15px;margin:14px 0 4px;color:#0f172a}
 .main-content{display:flex;flex-direction:column}
