@@ -157,6 +157,8 @@ function bindNav() {
 async function buscar() {
   const q = '';
   const box = $('lista');
+  const selRow = $('sel-row');
+  if (selRow) document.querySelector('.fc-panel').insertBefore(selRow, box);
   if (!q && !sel.set && !sel.uni && !sel.loc) {
     document.querySelector('.fc-panel').insertBefore($('sel-row'), $('lista'));
     box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
@@ -217,7 +219,7 @@ async function buscar() {
       '<div class="fc-empty">Nenhum contato.</div>';
   }
   const slot = $('sel-slot');
-  if (slot) slot.appendChild($('sel-row'));
+  if (slot && $('sel-row')) slot.appendChild($('sel-row'));
   refreshTopo();
   bindNav();
 }

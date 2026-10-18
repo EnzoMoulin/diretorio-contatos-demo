@@ -260,6 +260,8 @@ async function buscar() {
   const box = $('lista');
   $('create-box').classList.add('hidden');
   $('save-status').textContent = '';
+  const selRow = $('sel-row');
+  if (selRow) document.querySelector('.fc-panel').insertBefore(selRow, box);
   if (!q && !sel.set && !sel.uni && !sel.loc) {
     document.querySelector('.fc-panel').insertBefore($('sel-row'), $('lista'));
     box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
@@ -326,7 +328,7 @@ async function buscar() {
     }
   }
   const slot = $('sel-slot');
-  if (slot) slot.appendChild($('sel-row'));
+  if (slot && $('sel-row')) slot.appendChild($('sel-row'));
   refreshTopo();
   bindCards();
 }
