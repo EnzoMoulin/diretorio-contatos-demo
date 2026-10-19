@@ -116,6 +116,14 @@ SEED = [
      "(27) 3333-0011", "joao.pinto@exemplo.jus.br"),
     ("Cariacica", "Fórum Cível de Cariacica", "Atendimento ao público", "Karla Mendes", "Analista de sistemas",
      "(27) 3333-0012", "atendimento.cariacica@exemplo.jus.br"),
+    ("Linhares", "Fórum Cível de Linhares", "1ª Vara Cível", "Rui Barbosa", "Atendente",
+     "(27) 3333-0013", "rui.barbosa@exemplo.jus.br"),
+    ("Colatina", "Fórum Cível de Colatina", "1ª Vara Cível", "Sofia Teles", "Atendente",
+     "(27) 3333-0014", "sofia.teles@exemplo.jus.br"),
+    ("Cachoeiro de Itapemirim", "Fórum Cível de Cachoeiro", "1ª Vara Cível", "Tiago Pires", "Atendente",
+     "(27) 3333-0015", "tiago.pires@exemplo.jus.br"),
+    ("Guarapari", "Fórum Cível de Guarapari", "Atendimento ao público", "Ursula Faria", "Atendente",
+     "(27) 3333-0016", "ursula.faria@exemplo.jus.br"),
 ]
 
 SENHA_INICIAL = "bemvindo123"
