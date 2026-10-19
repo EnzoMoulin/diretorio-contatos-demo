@@ -49,14 +49,15 @@
           <div class="fc-head" id="panel-head">
             <div>
               <h2 class="fc-title">Contatos do PJES</h2>
-              <p class="fc-subtitle">Consulte a estrutura completa por Comarca<span class="seta">→</span>Fórum<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione uma comarca no mapa ao lado, no menu de seleção ou na lista abaixo.</p>
+              <p class="fc-subtitle">Consulte a estrutura completa por Comarca<span class="seta">→</span>Fórum<span class="seta">→</span>Unidade<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione uma comarca no mapa ao lado, no menu de seleção ou na lista abaixo.</p>
             </div>
           </div>
           <span class="fc-pill fc-total-localidades" id="loc-count"></span>
           <p class="fc-subtitle" id="crumb"></p>
           <div class="fc-selects-row" id="sel-row">
-            <select id="sel-loc" class="fc-select" aria-label="Comarca"><option value="">Selecione uma comarca</option></select>
-            <select id="sel-uni" class="fc-select hidden" aria-label="Fórum" disabled><option value="">Fórum…</option></select>
+            <select id="sel-com" class="fc-select" aria-label="Comarca"><option value="">Selecione uma comarca</option></select>
+            <select id="sel-for" class="fc-select hidden" aria-label="Fórum" disabled><option value="">Fórum…</option></select>
+            <select id="sel-uni" class="fc-select hidden" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
             <select id="sel-set" class="fc-select hidden" aria-label="Setor" disabled><option value="">Setor…</option></select>
           </div>
           <div class="create-box hidden" id="create-box">
@@ -179,7 +180,7 @@
       <div class="manual-container">
         <div class="manual-hero">
           <h2>Bem-vindo ao Diretório de Contatos — Demo</h2>
-          <p>Consulta sem login, gestão com permissões por comarca, unidade e setor, e trilha de auditoria. Este manual cobre todos os fluxos com passos numerados e dicas.</p>
+          <p>Consulta sem login, gestão com permissões por comarca, fórum, unidade e setor, e trilha de auditoria. Este manual cobre todos os fluxos com passos numerados e dicas.</p>
           <div class="manual-hero-meta">
             <span>⚡ Consulta sem login</span>
             <span>🔒 Escopo por nível</span>
@@ -236,9 +237,9 @@
         <section id="m-consultar" class="panel manual-section">
           <div class="manual-section-head"><div><h3>🔍 02 — Consultar contatos</h3><p>Acesso livre, sem login. Mapa, menus e busca combináveis.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Clique no mapa ou nos menus</strong><p>Clique numa comarca com contatos no <code>mapa à esquerda</code> ou use os menus <code>Comarca → Fórum → Setor</code> no painel.</p></div></li>
-            <li><span class="manual-step-num">2</span><div><strong>Navegue pelos cards</strong><p>Cada nível abre cards clicáveis com a contagem de contatos — Comarca → Fórum → Setor → contatos, com botão de voltar.</p></div></li>
-            <li><span class="manual-step-num">3</span><div><strong>Busque por qualquer nível</strong><p>O campo de busca alcança nome, cargo, telefone, e-mail, setor, unidade e comarca — pode combinar busca + nível.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Clique no mapa ou nos menus</strong><p>Clique numa comarca com contatos no <code>mapa à esquerda</code> ou use o menu <code>Comarca → Fórum → Unidade → Setor</code> no painel.</p></div></li>
+            <li><span class="manual-step-num">2</span><div><strong>Navegue pelos cards</strong><p>Cada nível abre cards clicáveis com a contagem de contatos — Comarca → Fórum → Unidade → Setor → contatos, com botão de voltar.</p></div></li>
+            <li><span class="manual-step-num">3</span><div><strong>Busque por qualquer nível</strong><p>O campo de busca alcança nome, cargo, telefone, e-mail, setor, unidade, fórum e comarca — pode combinar busca + nível.</p></div></li>
             <li><span class="manual-step-num">4</span><div><strong>Use os contatos</strong><p><code>Telefone</code> abre o discador (<code>tel:</code>), <code>E-mail</code> abre seu app de e-mail (<code>mailto:</code>).</p></div></li>
           </ol>
           <div class="manual-tip"><span>💡</span><div><strong>Dica:</strong> digite no campo de busca para filtrar contatos instantaneamente — não precisa apertar Enter.</div></div>
@@ -259,16 +260,16 @@
           </ol>
         </section>
         <section id="m-escopo" class="panel manual-section" style="border-left:4px solid #2563eb">
-          <div class="manual-section-head"><div><h3>🏛️ 05 — Escopo por nível</h3><p>O pilar de permissão: comarca cobre tudo abaixo; fórum cobre seus setores.</p></div></div>
+          <div class="manual-section-head"><div><h3>🏛️ 05 — Escopo por nível</h3><p>O pilar de permissão: comarca cobre tudo abaixo; fórum cobre unidades e setores; unidade cobre seus setores.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Herança</strong><p>Comarca → todos os fóruns e setores dentro. Fórum → todos os setores dentro. Setor → só ele.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Herança</strong><p>Comarca → tudo abaixo. Fórum → todas as unidades e setores dentro. Unidade → todos os setores dentro. Setor → só ele.</p></div></li>
             <li><span class="manual-step-num">2</span><div><strong>Solicitar por nível</strong><p>Ao lado de cada menu sem cobertura há <code>Solicitar acesso</code>, com confirmação explicando a cobertura integral.</p></div></li>
           </ol>
         </section>
         <section id="m-aprovar" class="panel manual-section">
           <div class="manual-section-head"><div><h3>👥 06 — Aprovar solicitações</h3><p>Fila de pedidos pendentes; ao aprovar, o usuário já entra com escopo.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Abra Solicitações de acesso</strong><p>O pedido mostra nome, e-mail, usuário e o nível pedido (comarca, unidade ou setor).</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Abra Solicitações de acesso</strong><p>O pedido mostra nome, e-mail, usuário e o nível pedido (comarca, fórum, unidade ou setor).</p></div></li>
             <li><span class="manual-step-num">2</span><div><strong>Aprove</strong><p>O novo usuário entra com a senha inicial e recebe uma notificação avisando.</p></div></li>
           </ol>
         </section>
@@ -289,7 +290,7 @@
           <div class="manual-section-head"><div><h3>⚙️ 10 — Configurações</h3><p>Modo escuro para todos; conta e troca de senha para logados.</p></div></div>
         </section>
         <section id="m-imprimir" class="panel manual-section">
-          <div class="manual-section-head"><div><h3>🖨️ 11 — Imprimir ou salvar PDF</h3><p>O botão aparece após selecionar uma comarca e imprime todos os contatos do nível atual (comarca, unidade ou setor). Dashboard e Registro têm botão próprio; a folha sai limpa em A4.</p></div></div>
+          <div class="manual-section-head"><div><h3>🖨️ 11 — Imprimir ou salvar PDF</h3><p>O botão aparece após selecionar uma comarca e imprime todos os contatos do nível atual (comarca, fórum, unidade ou setor). Dashboard e Registro têm botão próprio; a folha sai limpa em A4.</p></div></div>
         </section>
         <section id="m-faq" class="panel manual-section">
           <div class="manual-section-head"><div><h3>❓ 12 — Perguntas frequentes</h3></div></div>
@@ -360,7 +361,7 @@
   </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="mapa.js?v=15"></script>
-<script src="admin.js?v=19"></script>
+<script src="mapa.js?v=16"></script>
+<script src="admin.js?v=20"></script>
 </body>
 </html>

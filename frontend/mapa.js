@@ -14,7 +14,7 @@ function corPorDensidade(n) {
   return '#1d63b8';
 }
 
-function estiloMunicipio(nome, total) {
+function estiloComarca(nome, total) {
   const isSel = _selecionado && norm(nome) === norm(_selecionado);
   return {
     fillColor: isSel ? '#00adb5' : (total ? '#93c5fd' : '#f1f5f9'),
@@ -25,12 +25,12 @@ function estiloMunicipio(nome, total) {
   };
 }
 
-function destacarMunicipioMapa(nome) {
+function destacarComarcaMapa(nome) {
   _selecionado = nome || '';
   if (!_layer) return;
   _layer.eachLayer(l => {
     const nm = l.feature.properties.name || '';
-    l.setStyle(estiloMunicipio(nm, l._total || 0));
+    l.setStyle(estiloComarca(nm, l._total || 0));
   });
 }
 
@@ -53,7 +53,7 @@ async function initMapa(mapId, msgId, locs, onSelect) {
     _layer = L.geoJSON(gj, {
       style: f => {
         const nome = String(f.properties.name || '').trim();
-        return estiloMunicipio(nome, dens[norm(nome)] || 0);
+        return estiloComarca(nome, dens[norm(nome)] || 0);
       },
       onEachFeature: (f, l) => {
         const nome = String(f.properties.name || '').trim();
