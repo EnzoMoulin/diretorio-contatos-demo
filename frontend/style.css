@@ -209,6 +209,8 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-page-head .fc-subtitle{font-size:14px}
 #panel-head .fc-title{font-size:18px}
 #panel-head .fc-subtitle{font-size:13px;text-align:justify;margin-top:6px}
+.fc-subtitle .seta{margin:0 1px}
+.fc-subtitle .seta::after{content:"\200b"}
 .sidebar-public .sidebar-header span{font-size:12px}
 .sidebar-header span{font-size:14px}
 .sidebar-user{font-size:14px}
