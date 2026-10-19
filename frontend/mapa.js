@@ -90,7 +90,7 @@ async function initMapa(mapId, msgId, locs, onSelect) {
     const legenda = L.control({ position: 'bottomright' });
     legenda.onAdd = () => {
       const div = L.DomUtil.create('div', 'fc-map-legenda');
-      div.innerHTML = '<span class="tem-contato">● Municípios com contatos</span>' +
+      div.innerHTML = '<span class="tem-contato">● Comarcas com contatos</span>' +
         '<span class="sem-contato">● Sem contatos cadastrados</span>';
       return div;
     };

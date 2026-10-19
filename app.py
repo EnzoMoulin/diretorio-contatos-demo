@@ -1,10 +1,11 @@
-"""Diretório de contatos — demo para portfólio (stdlib Python, sem dependências).
+"""Diretório de contatos do PJES — reimplementação para portfólio (stdlib Python).
 
-Inspirado em experiência prévia com diretório institucional de contatos:
-consulta pública + área administrativa com login + histórico de alterações
-+ solicitação de acesso + navegação em camadas (localidade > unidade > setor).
-Todo o código e os dados aqui são fictícios e genéricos, criados do zero
-para demonstração. Nenhum dado real ou interno é utilizado.
+Case real de estágio no TJES (MVP original em Google Apps Script + Sheets),
+aqui reescrito em Python + SQLite como evolução da arquitetura: consulta
+pública + área administrativa com login + histórico de alterações
++ solicitação de acesso + navegação em camadas (comarca > fórum > setor).
+Comarcas reais do ES; fóruns/setores representativos; pessoas, telefones e
+e-mails 100% fictícios. Nenhum dado real ou interno é utilizado.
 
 Como rodar:
     python3 app.py
@@ -87,38 +88,40 @@ CREATE TABLE IF NOT EXISTS pedidos (
     criado_em TEXT NOT NULL DEFAULT (datetime('now')));
 """
 
-# (localidade, unidade, setor, nome, cargo, telefone, email) — tudo fictício
+# (comarca, fórum, setor, nome, cargo, telefone, email)
+# Comarcas reais do ES; fóruns e setores representativos (nomenclatura típica).
+# Nomes de pessoas, telefones e e-mails 100% fictícios (domínio reservado).
 SEED = [
-    ("Vitória", "Unidade Centro", "Atendimento", "Ana Souza", "Atendente",
-     "(27) 3333-0001", "atendimento@ligaes.com.br"),
-    ("Vitória", "Unidade Centro", "Atendimento", "Paulo Reis", "Atendente",
-     "(27) 3333-0007", "paulo.reis@ligaes.com.br"),
-    ("Vitória", "Unidade Centro", "Suporte", "Bruno Lima", "Técnico de suporte",
-     "(27) 3333-0002", "suporte@ligaes.com.br"),
-    ("Vitória", "Unidade Jardim", "Financeiro", "Carla Dias", "Analista financeira",
-     "(27) 3333-0003", "financeiro@ligaes.com.br"),
-    ("Vitória", "Unidade Jardim", "RH", "Diego Rocha", "Analista de RH",
-     "(27) 3333-0004", "rh@ligaes.com.br"),
-    ("Vila Velha", "Unidade Praia", "Atendimento", "Elisa Prado", "Atendente",
-     "(27) 3333-0005", "elisaprado@ligaes.com.br"),
-    ("Vila Velha", "Unidade Praia", "TI", "Fabio Nunes", "Desenvolvedor",
-     "(27) 3333-0006", "ti@ligaes.com.br"),
-    ("Vila Velha", "Unidade Centro", "Suporte", "Gabi Moura", "Técnica de suporte",
-     "(27) 3333-0008", "gabi.moura@ligaes.com.br"),
-    ("Serra", "Unidade Laranjeiras", "Atendimento", "Hugo Alves", "Atendente",
-     "(27) 3333-0009", "hugo.alves@ligaes.com.br"),
-    ("Serra", "Unidade Laranjeiras", "Logística", "Inês Castro", "Coordenadora",
-     "(27) 3333-0010", "logistica@ligaes.com.br"),
-    ("Cariacica", "Unidade Centro", "Atendimento", "João Pinto", "Atendente",
-     "(27) 3333-0011", "joao.pinto@ligaes.com.br"),
-    ("Cariacica", "Unidade Centro", "TI", "Karla Mendes", "Analista de sistemas",
-     "(27) 3333-0012", "karla.mendes@ligaes.com.br"),
+    ("Vitória", "Fórum Cível de Vitória", "1ª Vara Cível", "Ana Souza", "Atendente",
+     "(27) 3333-0001", "atendimento@exemplo.jus.br"),
+    ("Vitória", "Fórum Cível de Vitória", "1ª Vara Cível", "Paulo Reis", "Atendente",
+     "(27) 3333-0007", "paulo.reis@exemplo.jus.br"),
+    ("Vitória", "Fórum Cível de Vitória", "2ª Vara Cível", "Bruno Lima", "Técnico de suporte",
+     "(27) 3333-0002", "suporte@exemplo.jus.br"),
+    ("Vitória", "Fórum Criminal de Vitória", "Vara Criminal", "Carla Dias", "Analista judiciária",
+     "(27) 3333-0003", "criminal@exemplo.jus.br"),
+    ("Vitória", "Fórum Criminal de Vitória", "Distribuição", "Diego Rocha", "Distribuidor",
+     "(27) 3333-0004", "distribuicao@exemplo.jus.br"),
+    ("Vila Velha", "Fórum Des. Afonso Cláudio", "1ª Vara Cível", "Elisa Prado", "Atendente",
+     "(27) 3333-0005", "elisaprado@exemplo.jus.br"),
+    ("Vila Velha", "Fórum Des. Afonso Cláudio", "Atendimento ao público", "Fabio Nunes", "Atendente",
+     "(27) 3333-0006", "atendimento.vv@exemplo.jus.br"),
+    ("Vila Velha", "Fórum Des. Afonso Cláudio", "2ª Vara Cível", "Gabi Moura", "Técnica judiciária",
+     "(27) 3333-0008", "gabi.moura@exemplo.jus.br"),
+    ("Serra", "Fórum Cível da Serra", "1ª Vara Cível", "Hugo Alves", "Atendente",
+     "(27) 3333-0009", "hugo.alves@exemplo.jus.br"),
+    ("Serra", "Fórum Cível da Serra", "Atendimento ao público", "Inês Castro", "Coordenadora",
+     "(27) 3333-0010", "atendimento.serra@exemplo.jus.br"),
+    ("Cariacica", "Fórum Cível de Cariacica", "1ª Vara Cível", "João Pinto", "Atendente",
+     "(27) 3333-0011", "joao.pinto@exemplo.jus.br"),
+    ("Cariacica", "Fórum Cível de Cariacica", "Atendimento ao público", "Karla Mendes", "Analista de sistemas",
+     "(27) 3333-0012", "atendimento.cariacica@exemplo.jus.br"),
 ]
 
 SENHA_INICIAL = "bemvindo123"
-# Domínio institucional da demo: equivale à checagem de e-mail institucional
+# Domínio institucional fictício: equivale à checagem de e-mail institucional
 # do sistema original (lá, sessão Google + intranet; aqui, login + domínio).
-DOMINIO_INSTITUCIONAL = "ligaes.com.br"
+DOMINIO_INSTITUCIONAL = "exemplo.jus.br"
 
 
 def sha(s):
@@ -514,9 +517,11 @@ class Handler(BaseHTTPRequestHandler):
                  usuario, data.get("motivo", ""),
                  loc_id, nivel, alvo))
             for aid in admin_ids(con):
+                nivel_txt = {"municipio": "comarca", "unidade": "fórum",
+                             "setor": "setor"}.get(nivel, nivel)
                 notify(con, aid, "solicitacao",
                        f"Nova solicitação de {data.get('nome')} ({usuario}):"
-                       f" {nivel} id {alvo or '-'}")
+                       f" {nivel_txt} id {alvo or '-'}")
             log(con, "pedido", None,
                 f"solicitação de acesso: {data.get('nome')} ({usuario})")
             con.commit()

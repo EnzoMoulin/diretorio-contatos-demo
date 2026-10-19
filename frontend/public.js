@@ -17,14 +17,14 @@ function optLabel(selId) {
 }
 
 async function loadLocs() {
-  $('sel-loc').innerHTML = '<option value="">Selecione um município</option>' +
+  $('sel-loc').innerHTML = '<option value="">Selecione uma comarca</option>' +
     locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})</option>`).join('');
 }
 
 async function onLoc(skip) {
   sel.loc = $('sel-loc').value; sel.uni = ''; sel.set = '';
   const su = $('sel-uni'), ss = $('sel-set');
-  su.innerHTML = '<option value="">Unidade…</option>';
+  su.innerHTML = '<option value="">Fórum…</option>';
   ss.innerHTML = '<option value="">Setor…</option>';
   ss.disabled = true;
   if (sel.loc) {
@@ -201,9 +201,9 @@ async function buscar() {
   if (selRow) document.querySelector('.fc-panel').insertBefore(selRow, box);
   if (!q && !sel.set && !sel.uni && !sel.loc) {
     document.querySelector('.fc-panel').insertBefore($('sel-row'), $('lista'));
-    box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
+    box.innerHTML = `<div class="fc-section"><h3>Comarcas</h3>` + locs.map(l =>
       cardNivel('loc', l.id, l.nome,
-        pill(l.n_unidades || 0, 'Unidade', 'Unidades') +
+        pill(l.n_unidades || 0, 'Fórum', 'Fóruns') +
         pill(l.n_setores || 0, 'Setor', 'Setores') +
         pill(l.total, 'contato', 'contatos'))
     ).join('') + `</div>` || '<div class="fc-empty">Nenhum local.</div>';
@@ -216,13 +216,13 @@ async function buscar() {
     ctts.forEach(c => { porUni[c.unidade_id] = (porUni[c.unidade_id] || 0) + 1; });
     const loc = locs.find(x => String(x.id) === String(sel.loc));
     const nSet = unis.reduce((a, u) => a + (u.n_setores || 0), 0);
-    box.innerHTML = `<button class="fc-back" data-back="home">← Municípios</button>` +
+    box.innerHTML = `<button class="fc-back" data-back="home">← Comarcas</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2>` +
-      `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
+      `<p class="fc-subtitle">${unis.length} Fóruns · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
       `<div id="sel-slot"></div>` +
-      `<div class="fc-section"><h3>Unidades</h3>` +
+      `<div class="fc-section"><h3>Fóruns</h3>` +
       unis.map(u => cardNivel('uni', u.id, u.nome,
-        `<span class="fc-pill fc-pill-type">Unidade</span>` +
+        `<span class="fc-pill fc-pill-type">Fórum</span>` +
         pill(u.n_setores || 0, 'Setor', 'Setores') +
         pill(porUni[u.id] || 0, 'contato', 'contatos'))).join('') + `</div>`;
   } else if (!sel.set && sel.uni) {
@@ -299,7 +299,7 @@ $('toggle-dark-mode').onchange = (e) => {
     };
   });
   locs = await get('/api/localidades');
-  $('loc-count').textContent = `${locs.length} Municípios`;
+  $('loc-count').textContent = `${locs.length} Comarcas`;
   await loadLocs();
   $('sel-loc').onchange = () => onLoc();
   $('sel-uni').onchange = () => onUni();

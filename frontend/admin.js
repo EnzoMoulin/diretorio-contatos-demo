@@ -41,11 +41,11 @@ function marcaEscopo(locId) {
 }
 
 async function loadLocs() {
-  $('sel-loc').innerHTML = '<option value="">Selecione um município</option>' +
+  $('sel-loc').innerHTML = '<option value="">Selecione uma comarca</option>' +
     locs.map(l => `<option value="${l.id}">${esc(l.nome)} (${l.total})${cobre('municipio', l.id) ? ' ✓' : ''}</option>`).join('');
-  $('loc-count').textContent = `${locs.length} Municípios`;
+  $('loc-count').textContent = `${locs.length} Comarcas`;
   sel.loc = ''; sel.uni = ''; sel.set = '';
-  $('sel-uni').innerHTML = '<option value="">Unidade…</option>';
+  $('sel-uni').innerHTML = '<option value="">Fórum…</option>';
   $('sel-set').innerHTML = '<option value="">Setor…</option>';
   $('sel-uni').disabled = true;
   $('sel-set').disabled = true;
@@ -54,7 +54,7 @@ async function loadLocs() {
 async function onLoc(skip) {
   sel.loc = $('sel-loc').value; sel.uni = ''; sel.set = '';
   const su = $('sel-uni'), ss = $('sel-set');
-  su.innerHTML = '<option value="">Unidade…</option>';
+  su.innerHTML = '<option value="">Fórum…</option>';
   ss.innerHTML = '<option value="">Setor…</option>';
   ss.disabled = true;
   if (sel.loc) {
@@ -304,9 +304,9 @@ async function buscar() {
   if (selRow) document.querySelector('.fc-panel').insertBefore(selRow, box);
   if (!q && !sel.set && !sel.uni && !sel.loc) {
     document.querySelector('.fc-panel').insertBefore($('sel-row'), $('lista'));
-    box.innerHTML = `<div class="fc-section"><h3>Municípios</h3>` + locs.map(l =>
+    box.innerHTML = `<div class="fc-section"><h3>Comarcas</h3>` + locs.map(l =>
       cardNivel('loc', l.id, l.nome + (cobre('municipio', l.id) ? ' ✓' : ''),
-        pill(l.n_unidades || 0, 'Unidade', 'Unidades') +
+        pill(l.n_unidades || 0, 'Fórum', 'Fóruns') +
         pill(l.n_setores || 0, 'Setor', 'Setores') +
         pill(l.total, 'contato', 'contatos'), solBtnNivel('municipio', l.id))
     ).join('') + `</div>` || '<div class="fc-empty">Nenhum local.</div>';
@@ -320,13 +320,13 @@ async function buscar() {
     ctts.forEach(c => { porUni[c.unidade_id] = (porUni[c.unidade_id] || 0) + 1; });
     const loc = locs.find(x => String(x.id) === String(sel.loc));
     const nSet = unis.reduce((a, u) => a + (u.n_setores || 0), 0);
-    box.innerHTML = `<button class="fc-back" data-back="home">← Municípios</button>` +
+    box.innerHTML = `<button class="fc-back" data-back="home">← Comarcas</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(loc ? loc.nome : '')}</h2>` +
-      `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
+      `<p class="fc-subtitle">${unis.length} Fóruns · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
       `<div id="sel-slot"></div>` +
-      `<div class="fc-section"><h3>Unidades</h3>` +
+      `<div class="fc-section"><h3>Fóruns</h3>` +
       unis.map(u => cardNivel('uni', u.id, u.nome + (cobre('unidade', u.id) ? ' ✓' : ''),
-        `<span class="fc-pill fc-pill-type">Unidade</span>` +
+        `<span class="fc-pill fc-pill-type">Fórum</span>` +
         pill(u.n_setores || 0, 'Setor', 'Setores') +
         pill(porUni[u.id] || 0, 'contato', 'contatos'), solBtnNivel('unidade', u.id))).join('') + `</div>`;
   } else if (!sel.set && sel.uni) {
@@ -481,7 +481,7 @@ function preencherLocais() {
 function abrirPedidoNovo() {
   $('modal-pedido').classList.remove('hidden');
   $('p-status').textContent = '';
-  $('ped-hint').textContent = 'Exigido e-mail institucional @ligaes.com.br (equivale ao vínculo da intranet).';
+  $('ped-hint').textContent = 'Exigido e-mail institucional @exemplo.jus.br (equivale ao vínculo da intranet).';
   $('p-user').disabled = false;
   preencherLocais();
 }
@@ -508,11 +508,11 @@ async function abrirConf(nivel, id, nome) {
   let texto = '';
   if (nivel === 'municipio') {
     const unis = await (await fetch('/api/unidades?localidade_id=' + id)).json();
-    texto = `Solicitar acesso ao município <b>${esc(nome)}</b> inteiro — ` +
-            `todas as ${unis.length} unidade(s) e seus setores?`;
+    texto = `Solicitar acesso à comarca <b>${esc(nome)}</b> inteira — ` +
+            `todos os ${unis.length} fóruns e seus setores?`;
   } else if (nivel === 'unidade') {
     const sets = await (await fetch('/api/setores?unidade_id=' + id)).json();
-    texto = `Solicitar acesso à unidade <b>${esc(nome)}</b> inteira — ` +
+    texto = `Solicitar acesso ao fórum <b>${esc(nome)}</b> inteiro — ` +
             `todos os ${sets.length} setor(es)?`;
   } else {
     texto = `Solicitar acesso ao setor <b>${esc(nome)}</b>?`;
@@ -550,11 +550,11 @@ async function carregarDashboard() {
   const totalEdit = munEdit.reduce((a, l) => a + l.total, 0);
   const totalGeral = locs.reduce((a, l) => a + l.total, 0);
   $('dash-sub').textContent = me.escopo === 'all'
-    ? `Admin: ${totalGeral} contatos em ${locs.length} municípios.`
-    : `Você edita ${totalEdit} de ${totalGeral} contatos (${munEdit.length} município(s) com cobertura total).`;
+    ? `Admin: ${totalGeral} contatos em ${locs.length} comarcas.`
+    : `Você edita ${totalEdit} de ${totalGeral} contatos (${munEdit.length} comarca(s) com cobertura total).`;
   $('dash-cards').innerHTML = [
-    ['🏙️ Municípios', locs.length],
-    ['🏢 Unidades', r.por_unidade.length],
+    ['🏙️ Comarcas', locs.length],
+    ['🏢 Fóruns', r.por_unidade.length],
     ['🗂️ Setores', r.por_setor.length],
     ['👥 Contatos (total)', totalGeral],
     ['✏️ Contatos editáveis', me.escopo === 'all' ? totalGeral : totalEdit],
@@ -631,7 +631,7 @@ async function carregarPedidos() {
   $('ped-count').textContent = n || '';
   $('pedidos').innerHTML = (Array.isArray(lista) ? lista : []).map(p =>
     `<li><b>${esc(p.nome)}</b> (${esc(p.email)}) — usuário: <code>${esc(p.usuario_desejado)}</code>` +
-    (p.alvo_nome ? ` — ${esc(p.nivel)}: <b>${esc(p.alvo_nome)}</b>` : (p.localidade ? ` — local: <b>${esc(p.localidade)}</b>` : '')) +
+    (p.alvo_nome ? ` — ${esc({municipio:'comarca',unidade:'fórum',setor:'setor'}[p.nivel]||p.nivel)}: <b>${esc(p.alvo_nome)}</b>` : (p.localidade ? ` — local: <b>${esc(p.localidade)}</b>` : '')) +
     (p.motivo ? ` — ${esc(p.motivo)}` : '') +
     ` <button class="btn-primary" data-id="${p.id}">aprovar</button></li>`
   ).join('') || '<li>Nenhuma solicitação pendente.</li>';

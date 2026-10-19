@@ -11,7 +11,7 @@
 <div class="app-container">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <svg class="sidebar-logo" viewBox="0 0 150 42" aria-label="LigaES"><defs><linearGradient id="li-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="42" height="42" rx="10" fill="url(#li-g)"/><path d="M25 4 12 23h8l-3 15 15-20h-9z" fill="#FACC15"/><text x="50" y="29" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800"><tspan fill="#fff">Liga</tspan><tspan fill="#60A5FA">ES</tspan></text></svg>
+      <svg class="sidebar-logo" viewBox="0 0 150 42" aria-label="PJES"><defs><linearGradient id="li-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="42" height="42" rx="10" fill="url(#li-g)"/><path d="M25 4 12 23h8l-3 15 15-20h-9z" fill="#FACC15"/><text x="50" y="29" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800"><tspan fill="#fff">PJ</tspan><tspan fill="#60A5FA">ES</tspan></text></svg>
       <div class="sidebar-brand-copy">
         <span>Acesso interno</span>
       </div>
@@ -37,26 +37,26 @@
     <section id="view-consulta">
       <div class="fc-page-head">
         <div>
-          <p class="fc-eyebrow">Central de contatos</p>
+          <p class="fc-eyebrow">Diretório de contatos</p>
         </div>
         <span class="fc-profile" id="profile-badge"><i>●</i> Visitante</span>
       </div>
       <div class="consulta-layout">
-        <section id="consulta-mapa" aria-label="Mapa dos municípios">
-          <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
+        <section id="consulta-mapa" aria-label="Mapa dos comarcas">
+          <div id="map" role="region" aria-label="Mapa interativo dos comarcas"></div>
           <p class="hint" id="map-msg"></p>
         </section>
         <div class="fc-panel">
           <div class="fc-head" id="panel-head">
             <div>
-              <p class="fc-subtitle">Consulte a estrutura completa por Município<span class="seta">→</span>Unidade<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione um município no mapa ao lado, no menu de seleção ou na lista abaixo.</p>
+              <p class="fc-subtitle">Consulte a estrutura completa por Comarca<span class="seta">→</span>Fórum<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione uma comarca no mapa ao lado, no menu de seleção ou na lista abaixo.</p>
             </div>
           </div>
           <span class="fc-pill fc-total-localidades" id="loc-count"></span>
           <p class="fc-subtitle" id="crumb"></p>
           <div class="fc-selects-row" id="sel-row">
-            <select id="sel-loc" class="fc-select" aria-label="Localidade"><option value="">Selecione um município</option></select>
-            <select id="sel-uni" class="fc-select hidden" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
+            <select id="sel-loc" class="fc-select" aria-label="Comarca"><option value="">Selecione uma comarca</option></select>
+            <select id="sel-uni" class="fc-select hidden" aria-label="Fórum" disabled><option value="">Fórum…</option></select>
             <select id="sel-set" class="fc-select hidden" aria-label="Setor" disabled><option value="">Setor…</option></select>
           </div>
           <div class="create-box hidden" id="create-box">
@@ -87,7 +87,7 @@
       <button class="btn-ghost dark noprint" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
       <p class="hint" id="dash-sub">Somente seus escopos.</p>
       <div class="dash-grid" id="dash-cards"></div>
-      <h3>Contatos por município (seu acesso)</h3>
+      <h3>Contatos por comarca (seu acesso)</h3>
       <div id="dash-mun"></div>
       <h3>Últimas alterações</h3>
       <ul id="dash-ult"></ul>
@@ -179,7 +179,7 @@
       <div class="manual-container">
         <div class="manual-hero">
           <h2>Bem-vindo ao Diretório de Contatos — Demo</h2>
-          <p>Consulta sem login, gestão com permissões por município, unidade e setor, e trilha de auditoria. Este manual cobre todos os fluxos com passos numerados e dicas.</p>
+          <p>Consulta sem login, gestão com permissões por comarca, unidade e setor, e trilha de auditoria. Este manual cobre todos os fluxos com passos numerados e dicas.</p>
           <div class="manual-hero-meta">
             <span>⚡ Consulta sem login</span>
             <span>🔒 Escopo por nível</span>
@@ -236,9 +236,9 @@
         <section id="m-consultar" class="panel manual-section">
           <div class="manual-section-head"><div><h3>🔍 02 — Consultar contatos</h3><p>Acesso livre, sem login. Mapa, menus e busca combináveis.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Clique no mapa ou nos menus</strong><p>Clique num município com contatos no <code>mapa à esquerda</code> ou use os menus <code>Localidade → Unidade → Setor</code> no painel.</p></div></li>
-            <li><span class="manual-step-num">2</span><div><strong>Navegue pelos cards</strong><p>Cada nível abre cards clicáveis com a contagem de contatos — Localidade → Unidade → Setor → contatos, com botão de voltar.</p></div></li>
-            <li><span class="manual-step-num">3</span><div><strong>Busque por qualquer nível</strong><p>O campo de busca alcança nome, cargo, telefone, e-mail, setor, unidade e município — pode combinar busca + nível.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Clique no mapa ou nos menus</strong><p>Clique numa comarca com contatos no <code>mapa à esquerda</code> ou use os menus <code>Comarca → Fórum → Setor</code> no painel.</p></div></li>
+            <li><span class="manual-step-num">2</span><div><strong>Navegue pelos cards</strong><p>Cada nível abre cards clicáveis com a contagem de contatos — Comarca → Fórum → Setor → contatos, com botão de voltar.</p></div></li>
+            <li><span class="manual-step-num">3</span><div><strong>Busque por qualquer nível</strong><p>O campo de busca alcança nome, cargo, telefone, e-mail, setor, unidade e comarca — pode combinar busca + nível.</p></div></li>
             <li><span class="manual-step-num">4</span><div><strong>Use os contatos</strong><p><code>Telefone</code> abre o discador (<code>tel:</code>), <code>E-mail</code> abre seu app de e-mail (<code>mailto:</code>).</p></div></li>
           </ol>
           <div class="manual-tip"><span>💡</span><div><strong>Dica:</strong> digite no campo de busca para filtrar contatos instantaneamente — não precisa apertar Enter.</div></div>
@@ -246,7 +246,7 @@
         <section id="m-acesso" class="panel manual-section">
           <div class="manual-section-head"><div><h3>🔑 03 — Acesso e solicitação</h3><p>Sem cadastro a visão é só consulta; com cadastro, gestão no seu escopo.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Sem cadastro: Solicitar acesso</strong><p>Preencha nome, e-mail institucional <code>@ligaes.com.br</code> e o local. Usuário é opcional — vira o início do e-mail.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Sem cadastro: Solicitar acesso</strong><p>Preencha nome, e-mail institucional <code>@exemplo.jus.br</code> e o local. Usuário é opcional — vira o início do e-mail.</p></div></li>
             <li><span class="manual-step-num">2</span><div><strong>Com cadastro: Acesso administrativo</strong><p>Entre com e-mail + senha. Os níveis editáveis vêm marcados com <code>✓</code>.</p></div></li>
             <li><span class="manual-step-num">3</span><div><strong>Sair do acesso administrativo</strong><p>Volta à consulta sem sair do acesso interno.</p></div></li>
           </ol>
@@ -259,16 +259,16 @@
           </ol>
         </section>
         <section id="m-escopo" class="panel manual-section" style="border-left:4px solid #2563eb">
-          <div class="manual-section-head"><div><h3>🏛️ 05 — Escopo por nível</h3><p>O pilar de permissão: município cobre tudo abaixo; unidade cobre seus setores.</p></div></div>
+          <div class="manual-section-head"><div><h3>🏛️ 05 — Escopo por nível</h3><p>O pilar de permissão: comarca cobre tudo abaixo; fórum cobre seus setores.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Herança</strong><p>Município → todas as unidades e setores dentro. Unidade → todos os setores dentro. Setor → só ele.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Herança</strong><p>Comarca → todos os fóruns e setores dentro. Fórum → todos os setores dentro. Setor → só ele.</p></div></li>
             <li><span class="manual-step-num">2</span><div><strong>Solicitar por nível</strong><p>Ao lado de cada menu sem cobertura há <code>Solicitar acesso</code>, com confirmação explicando a cobertura integral.</p></div></li>
           </ol>
         </section>
         <section id="m-aprovar" class="panel manual-section">
           <div class="manual-section-head"><div><h3>👥 06 — Aprovar solicitações</h3><p>Fila de pedidos pendentes; ao aprovar, o usuário já entra com escopo.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Abra Solicitações de acesso</strong><p>O pedido mostra nome, e-mail, usuário e o nível pedido (município, unidade ou setor).</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Abra Solicitações de acesso</strong><p>O pedido mostra nome, e-mail, usuário e o nível pedido (comarca, unidade ou setor).</p></div></li>
             <li><span class="manual-step-num">2</span><div><strong>Aprove</strong><p>O novo usuário entra com a senha inicial e recebe uma notificação avisando.</p></div></li>
           </ol>
         </section>
@@ -289,7 +289,7 @@
           <div class="manual-section-head"><div><h3>⚙️ 10 — Configurações</h3><p>Modo escuro para todos; conta e troca de senha para logados.</p></div></div>
         </section>
         <section id="m-imprimir" class="panel manual-section">
-          <div class="manual-section-head"><div><h3>🖨️ 11 — Imprimir ou salvar PDF</h3><p>O botão aparece após selecionar um município e imprime todos os contatos do nível atual (município, unidade ou setor). Dashboard e Registro têm botão próprio; a folha sai limpa em A4.</p></div></div>
+          <div class="manual-section-head"><div><h3>🖨️ 11 — Imprimir ou salvar PDF</h3><p>O botão aparece após selecionar uma comarca e imprime todos os contatos do nível atual (comarca, unidade ou setor). Dashboard e Registro têm botão próprio; a folha sai limpa em A4.</p></div></div>
         </section>
         <section id="m-faq" class="panel manual-section">
           <div class="manual-section-head"><div><h3>❓ 12 — Perguntas frequentes</h3></div></div>
@@ -307,8 +307,8 @@
 <div class="modal hidden" id="modal-login">
   <div class="modal-box">
     <h2>Acesso administrativo</h2>
-    <p class="hint">Entre com sua conta cadastrada. Demo: admin@ligaes.com.br / admin123.</p>
-    <label>E-mail ou usuário<input id="user" value="admin@ligaes.com.br" autocomplete="username"></label>
+    <p class="hint">Entre com sua conta cadastrada. Demo: admin@exemplo.jus.br / admin123.</p>
+    <label>E-mail ou usuário<input id="user" value="admin@exemplo.jus.br" autocomplete="username"></label>
     <label>Senha<input id="pass" type="password" value="admin123" autocomplete="current-password"></label>
     <div class="modal-actions">
       <button id="l-cancel" class="btn-ghost">Cancelar</button>
@@ -320,9 +320,9 @@
 <div class="modal hidden" id="modal-pedido">
   <div class="modal-box">
     <h2>Solicitar acesso administrativo</h2>
-    <p class="hint" id="ped-hint">Exigido e-mail institucional @ligaes.com.br (equivale ao vínculo da intranet).</p>
+    <p class="hint" id="ped-hint">Exigido e-mail institucional @exemplo.jus.br (equivale ao vínculo da intranet).</p>
     <label>Nome*<input id="p-nome"></label>
-    <label>E-mail institucional*<input id="p-email" placeholder="voce@ligaes.com.br"></label>
+    <label>E-mail institucional*<input id="p-email" placeholder="voce@exemplo.jus.br"></label>
     <label>Usuário desejado <span class="hint">(opcional — padrão: início do e-mail)</span><input id="p-user"></label>
     <label>Local de acesso<select id="p-loc"></select></label>
     <label>Motivo<input id="p-motivo"></label>
@@ -361,6 +361,6 @@
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="mapa.js?v=15"></script>
-<script src="admin.js?v=18"></script>
+<script src="admin.js?v=19"></script>
 </body>
 </html>

@@ -11,9 +11,9 @@
 <div class="app-container">
   <aside class="sidebar sidebar-public">
     <div class="sidebar-header">
-      <svg class="sidebar-logo" viewBox="0 0 150 42" aria-label="LigaES"><defs><linearGradient id="li-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="42" height="42" rx="10" fill="url(#li-g)"/><path d="M25 4 12 23h8l-3 15 15-20h-9z" fill="#FACC15"/><text x="50" y="29" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800"><tspan fill="#fff">Liga</tspan><tspan fill="#60A5FA">ES</tspan></text></svg>
+      <svg class="sidebar-logo" viewBox="0 0 150 42" aria-label="PJES"><defs><linearGradient id="li-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="42" height="42" rx="10" fill="url(#li-g)"/><path d="M25 4 12 23h8l-3 15 15-20h-9z" fill="#FACC15"/><text x="50" y="29" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800"><tspan fill="#fff">PJ</tspan><tspan fill="#60A5FA">ES</tspan></text></svg>
       <div class="sidebar-brand-copy">
-        <span>Empresa fictícia de energia</span>
+        <span>Case TJES · dados fictícios</span>
       </div>
     </div>
     <nav class="sidebar-menu" aria-label="Navegação principal">
@@ -29,26 +29,26 @@
     <section id="view-consulta">
       <div class="fc-page-head">
         <div>
-          <p class="fc-eyebrow">Central de contatos</p>
+          <p class="fc-eyebrow">Diretório de contatos</p>
         </div>
         <span class="fc-profile"><i>●</i> Visitante</span>
       </div>
       <div class="consulta-layout">
-        <section id="consulta-mapa" aria-label="Mapa dos municípios">
-          <div id="map" role="region" aria-label="Mapa interativo dos municípios"></div>
+        <section id="consulta-mapa" aria-label="Mapa dos comarcas">
+          <div id="map" role="region" aria-label="Mapa interativo dos comarcas"></div>
           <p class="hint" id="map-msg"></p>
         </section>
         <div class="fc-panel">
           <div class="fc-head" id="panel-head">
             <div>
-              <p class="fc-subtitle">Consulte a estrutura completa por Município<span class="seta">→</span>Unidade<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione um município no mapa ao lado, no menu de seleção ou na lista abaixo.</p>
+              <p class="fc-subtitle">Consulte a estrutura completa por Comarca<span class="seta">→</span>Fórum<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione uma comarca no mapa ao lado, no menu de seleção ou na lista abaixo.</p>
             </div>
           </div>
           <span class="fc-pill fc-total-localidades" id="loc-count"></span>
           <p class="fc-subtitle" id="crumb"></p>
           <div class="fc-selects-row" id="sel-row">
-            <select id="sel-loc" class="fc-select" aria-label="Localidade"><option value="">Selecione um município</option></select>
-            <select id="sel-uni" class="fc-select hidden" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
+            <select id="sel-loc" class="fc-select" aria-label="Comarca"><option value="">Selecione uma comarca</option></select>
+            <select id="sel-uni" class="fc-select hidden" aria-label="Fórum" disabled><option value="">Fórum…</option></select>
             <select id="sel-set" class="fc-select hidden" aria-label="Setor" disabled><option value="">Setor…</option></select>
           </div>
           <div id="lista"></div>
@@ -121,7 +121,7 @@
         </div>
         <div class="panel manual-hero">
           <h2>Consulta pública de contatos</h2>
-          <p>Encontre Unidades, Setores, telefones e e-mails pelo mapa ou pelos menus de Município.</p>
+          <p>Encontre Fóruns, Setores, telefones e e-mails pelo mapa ou pelos menus de Comarca.</p>
           <div class="manual-hero-meta">
             <span>🗺️ Navegação pelo mapa</span>
             <span>☎️ Contatos clicáveis</span>
@@ -131,40 +131,40 @@
         <div class="panel manual-toc-panel">
           <h3>📑 Neste manual</h3>
           <div class="manual-toc-grid">
-            <a href="#manual-consultar"><span class="toc-num">01</span> Localizar um município</a>
+            <a href="#manual-consultar"><span class="toc-num">01</span> Localizar uma comarca</a>
             <a href="#manual-navegar"><span class="toc-num">02</span> Navegar pelos contatos</a>
             <a href="#manual-imprimir"><span class="toc-num">03</span> Imprimir ou salvar PDF</a>
             <a href="#manual-dicas-publicas"><span class="toc-num">04</span> Dicas de uso</a>
           </div>
         </div>
         <section id="manual-consultar" class="panel manual-section">
-          <div class="manual-section-head"><div><h3>🗺️ 01 — Localizar um município</h3><p>Use o mapa ou os menus no painel de consulta.</p></div></div>
+          <div class="manual-section-head"><div><h3>🗺️ 01 — Localizar uma comarca</h3><p>Use o mapa ou os menus no painel de consulta.</p></div></div>
           <ol class="manual-steps">
             <li><span class="manual-step-num">1</span><div><strong>Abra "Consulta"</strong><p>Clique em <code>☎ Consulta</code> na barra lateral.</p></div></li>
-            <li><span class="manual-step-num">2</span><div><strong>Escolha pelo mapa</strong><p>Clique num município destacado no mapa à esquerda.</p></div></li>
-            <li><span class="manual-step-num">3</span><div><strong>Ou use o menu</strong><p>Selecione o município na lista do painel.</p></div></li>
+            <li><span class="manual-step-num">2</span><div><strong>Escolha pelo mapa</strong><p>Clique numa comarca destacado no mapa à esquerda.</p></div></li>
+            <li><span class="manual-step-num">3</span><div><strong>Ou use o menu</strong><p>Selecione a comarca na lista do painel.</p></div></li>
           </ol>
         </section>
         <section id="manual-navegar" class="panel manual-section">
-          <div class="manual-section-head"><div><h3>🏛️ 02 — Navegar pelos contatos</h3><p>A estrutura segue Município, Unidade e Setor.</p></div></div>
+          <div class="manual-section-head"><div><h3>🏛️ 02 — Navegar pelos contatos</h3><p>A estrutura segue Comarca, Fórum e Setor.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Selecione um município</strong><p>Confira os badges de Unidades, Setores e Contatos e clique no município desejado.</p></div></li>
-            <li><span class="manual-step-num">2</span><div><strong>Abra uma Unidade ou um Setor</strong><p>Use os cards da estrutura e o botão de voltar para percorrer os níveis.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Selecione uma comarca</strong><p>Confira os badges de Fóruns, Setores e Contatos e clique na comarca desejada.</p></div></li>
+            <li><span class="manual-step-num">2</span><div><strong>Abra um Fórum ou um Setor</strong><p>Use os cards da estrutura e o botão de voltar para percorrer os níveis.</p></div></li>
             <li><span class="manual-step-num">3</span><div><strong>Use o contato</strong><p>Clique no telefone para abrir o discador e no e-mail para abrir seu aplicativo de mensagens.</p></div></li>
           </ol>
         </section>
         <section id="manual-imprimir" class="panel manual-section">
           <div class="manual-section-head"><div><h3>🖨️ 03 — Imprimir ou salvar PDF</h3><p>Os documentos são preparados para impressão em folha A4.</p></div></div>
           <ol class="manual-steps">
-            <li><span class="manual-step-num">1</span><div><strong>Selecione um município</strong><p>O botão <span class="manual-kbd">Imprimir / Salvar PDF</span> aparece após a seleção.</p></div></li>
-            <li><span class="manual-step-num">2</span><div><strong>Município, Unidade ou Setor</strong><p>O botão imprime todos os contatos do nível atual.</p></div></li>
+            <li><span class="manual-step-num">1</span><div><strong>Selecione uma comarca</strong><p>O botão <span class="manual-kbd">Imprimir / Salvar PDF</span> aparece após a seleção.</p></div></li>
+            <li><span class="manual-step-num">2</span><div><strong>Comarca, Fórum ou Setor</strong><p>O botão imprime todos os contatos do nível atual.</p></div></li>
             <li><span class="manual-step-num">3</span><div><strong>Salvar como arquivo</strong><p>Na janela de impressão do navegador, escolha o destino <code>Salvar como PDF</code>.</p></div></li>
           </ol>
         </section>
         <section id="manual-dicas-publicas" class="panel manual-section">
           <div class="manual-section-head"><div><h3>💡 04 — Dicas de uso</h3><p>Recursos disponíveis na consulta pública.</p></div></div>
           <div class="manual-cols">
-            <div class="panel"><strong>Navegação</strong><p>Use o mapa, o menu de município e os cards para percorrer os níveis.</p></div>
+            <div class="panel"><strong>Navegação</strong><p>Use o mapa, o menu de comarca e os cards para percorrer os níveis.</p></div>
             <div class="panel"><strong>Modo escuro</strong><p>Use a aba Configurações para alternar a aparência. A preferência fica salva neste navegador.</p></div>
           </div>
           <div class="manual-info"><span>ℹ️</span><div>Em telas menores, o mapa e o painel se reorganizam automaticamente. Use o botão de voltar para retornar ao nível anterior.</div></div>
@@ -176,6 +176,6 @@
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="mapa.js?v=15"></script>
-<script src="public.js?v=18"></script>
+<script src="public.js?v=19"></script>
 </body>
 </html>
