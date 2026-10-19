@@ -164,8 +164,8 @@ body[data-theme="dark"] code{background:#0f172a}
 .sidebar-header{display:flex;flex-direction:row;align-items:center;gap:10px;padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
 .sidebar-logo{height:56px;width:56px;flex:0 0 auto}
 .sidebar-brand-copy{min-width:0;margin-left:0}
-.sidebar-brand-copy strong{display:block;font-size:18px;font-weight:800;color:#fff;line-height:1.1}
-.sidebar-brand-copy span{font-size:12px;color:#94a3b8}
+.sidebar-brand-copy strong{display:block;font-size:20px;font-weight:800;color:#fff;line-height:1.1}
+.sidebar-brand-copy span{font-size:14px;color:#94a3b8}
 .sidebar-header h2{font-size:20px}
 .sidebar-header span{display:block;margin-top:3px;font-size:12px;line-height:1.35;color:#cbd5e1;opacity:.86}
 .sidebar-menu{padding:14px 12px}
@@ -211,7 +211,7 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 #panel-head .fc-subtitle{font-size:13px;text-align:justify;margin-top:6px}
 .fc-subtitle .seta{margin:0 1px}
 .fc-subtitle .seta::after{content:"\200b"}
-.sidebar-public .sidebar-header span{font-size:12px}
+.sidebar-public .sidebar-header span{font-size:14px}
 .sidebar-header span{font-size:14px}
 .sidebar-user{font-size:14px}
 .sidebar-public .sidebar-footer{padding:12px 12px 26px}
