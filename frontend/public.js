@@ -263,11 +263,14 @@ async function buscar() {
     const porUni = {};
     ctts.forEach(c => { porUni[c.unidade_id] = (porUni[c.unidade_id] || 0) + 1; });
     const nSet = unis.reduce((a, u) => a + (u.n_setores || 0), 0);
+    const gerais = ctts.filter(c => c.setor_virtual && c.unidade_virtual);
     box.innerHTML = `<button class="fc-back" data-back="com">← ${esc(optLabel('sel-com'))}</button>` +
       `<div class="fc-head"><div><h2 class="fc-title">${esc(optLabel('sel-for'))}</h2>` +
       `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
       chainHtml() +
       `<div id="sel-slot"></div>` +
+      (gerais.length ? `<div class="fc-section"><h3>Contatos gerais</h3>` +
+        gerais.map(c => cardContato(c, '')).join('') + `</div>` : '') +
       `<div class="fc-section"><h3>Unidades</h3>` +
       unis.map(u => cardNivel('uni', u.id, u.nome,
         `<span class="fc-pill fc-pill-type">Unidade</span>` +
