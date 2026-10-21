@@ -71,7 +71,7 @@
 ## Stack
 - Backend: Python 3, somente biblioteca padrão (`http.server` + `sqlite3`) — zero dependências
 - Frontend: HTML + CSS + JS puro (sem framework); mapa com Leaflet via CDN
-- Banco: SQLite local (`contatos.db`, criado na primeira execução, 16 registros fictícios)
+- Banco: SQLite local (`contatos.db`, criado na primeira execução, ~1900 registros da base mascarada + `seed_pjes.json` versionado)
 
 ## Como rodar
 ```bash

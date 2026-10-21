@@ -52,11 +52,12 @@ CREATE TABLE IF NOT EXISTS comarcas (
 CREATE TABLE IF NOT EXISTS foruns (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     comarca_id INTEGER NOT NULL REFERENCES comarcas(id),
-    nome TEXT NOT NULL);
+    nome TEXT NOT NULL, endereco TEXT NOT NULL DEFAULT '',
+    cep TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS unidades (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     forum_id INTEGER NOT NULL REFERENCES foruns(id),
-    nome TEXT NOT NULL);
+    nome TEXT NOT NULL, endereco TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS setores (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     unidade_id INTEGER NOT NULL REFERENCES unidades(id),
@@ -151,6 +152,86 @@ def get_db():
     return con
 
 
+def _carregar_seed_json(con):
+    """Seed a partir da base mascarada (seed_pjes.json). Devolve True se usou."""
+    pj = BASE / "seed_pjes.json"
+    if not pj.exists():
+        return False
+    seed = json.loads(pj.read_text(encoding="utf-8"))
+    coms = {}
+    for c in seed.get("comarcas", []):
+        coms[c["id"]] = con.execute(
+            "INSERT INTO comarcas (nome) VALUES (?)", (c["nome"],)).lastrowid
+    fors = {}
+    for f in seed.get("foruns", []):
+        if f["comarca_id"] not in coms:
+            continue
+        fors[f["id"]] = con.execute(
+            "INSERT INTO foruns (comarca_id, nome, endereco, cep) VALUES (?,?,?,?)",
+            (coms[f["comarca_id"]], f["nome"], f.get("endereco", ""),
+             f.get("cep", ""))).lastrowid
+    uns = {}
+    for u in seed.get("unidades", []):
+        if u["forum_id"] not in fors:
+            continue
+        uns[u["id"]] = con.execute(
+            "INSERT INTO unidades (forum_id, nome, endereco) VALUES (?,?,?)",
+            (fors[u["forum_id"]], u["nome"], u.get("endereco", ""))).lastrowid
+    # unidades/setores genéricos por fórum (contatos gerais + órfãos)
+    auto_u, auto_s = {}, {}
+    for fid in fors.values():
+        uid = con.execute(
+            "INSERT INTO unidades (forum_id, nome) VALUES (?,?)",
+            (fid, "Atendimento geral")).lastrowid
+        auto_u[fid] = uid
+    sets = {}
+    for s in seed.get("setores", []):
+        if s["forum_id"] not in fors:
+            continue
+        uid = uns.get(s["unidade_id"])
+        if uid is None:  # setor órfão -> cai nos gerais do fórum
+            fdb = fors[s["forum_id"]]
+            if fdb not in auto_s:
+                auto_s[fdb] = con.execute(
+                    "INSERT INTO setores (unidade_id, nome) VALUES (?,?)",
+                    (auto_u[fdb], "Contatos gerais")).lastrowid
+            uid = auto_u[fdb]
+            sid = auto_s[fdb]
+        else:
+            sid = con.execute(
+                "INSERT INTO setores (unidade_id, nome) VALUES (?,?)",
+                (uid, s["nome"])).lastrowid
+        sets[s["id"]] = sid
+    import re as _re
+    TIPO_COL = {"TELEFONE": "telefone", "EMAIL": "email", "RAMAL": "telefone",
+                "WHATSAPP": "telefone"}
+    for ct in seed.get("contatos", []):
+        if ct["forum"] not in fors:
+            continue
+        fdb = fors[ct["forum"]]
+        if ct.get("geral") or not ct.get("setor"):
+            if fdb not in auto_s:
+                auto_s[fdb] = con.execute(
+                    "INSERT INTO setores (unidade_id, nome) VALUES (?,?)",
+                    (auto_u[fdb], "Contatos gerais")).lastrowid
+            sid = auto_s[fdb]
+        else:
+            sid = sets.get(ct["setor"])
+            if sid is None:
+                continue
+        tnorm = _re.sub(r"[^A-Z]", "", str(ct.get("tipo", "")).upper())
+        col = TIPO_COL.get(tnorm, "telefone")
+        valor = ct.get("valor", "")
+        nome = ct.get("desc", "") or valor
+        con.execute(
+            "INSERT INTO contatos (setor_id, nome, cargo, telefone, email)"
+            " VALUES (?,?,?,?,?)",
+            (sid, nome, str(ct.get("tipo", "")),
+             valor if col == "telefone" else "",
+             valor if col == "email" else ""))
+    return True
+
+
 def init_db():
     con = get_db()
     tabelas = {r["name"] for r in con.execute(
@@ -167,7 +248,9 @@ def init_db():
         """)
     con.executescript(SCHEMA)
     n = con.execute("SELECT COUNT(*) AS c FROM contatos").fetchone()["c"]
-    if n == 0:
+    if n == 0 and _carregar_seed_json(con):
+        pass  # base mascarada completa
+    elif n == 0:
         coms, fors, uns, sets = {}, {}, {}, {}
         for com, fr, un, st, nome, cargo, tel, mail in SEED:
             if com not in coms:
@@ -191,6 +274,7 @@ def init_db():
             con.execute(
                 "INSERT INTO contatos (setor_id, nome, cargo, telefone, email)"
                 " VALUES (?,?,?,?,?)", (sets[key_s], nome, cargo, tel, mail))
+    if n == 0:
         con.execute(
             "INSERT INTO usuarios (usuario, senha_sha256, aprovado, admin, email)"
             " VALUES (?,?,1,1,?) ON CONFLICT(usuario) DO NOTHING",
@@ -354,7 +438,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json([dict(r) for r in rows])
             if u.path == "/api/foruns":
                 rows = con.execute(
-                    "SELECT f.id, f.nome, f.comarca_id,"
+                    "SELECT f.id, f.nome, f.comarca_id, f.endereco, f.cep,"
                     " COUNT(DISTINCT u.id) AS n_unidades,"
                     " COUNT(DISTINCT s.id) AS n_setores,"
                     " COUNT(ct.id) AS total FROM foruns f"
@@ -366,7 +450,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json([dict(r) for r in rows])
             if u.path == "/api/unidades":
                 rows = con.execute(
-                    "SELECT u.id, u.nome, u.forum_id,"
+                    "SELECT u.id, u.nome, u.forum_id, u.endereco,"
                     " COUNT(DISTINCT s.id) AS n_setores,"
                     " COUNT(ct.id) AS total FROM unidades u"
                     " LEFT JOIN setores s ON s.unidade_id=u.id"

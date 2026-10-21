@@ -38,10 +38,23 @@ echo "== login uservv =="
 TV=$(curl -s -X POST $B/api/login -H 'Content-Type: application/json' -d '{"usuario":"uservv","senha":"bemvindo123"}' | python3 -c "$TOK")
 curl -s "$B/api/me" -H "X-Admin-Token: $TV"; echo
 # setor de Vila Velha (unidade da comarca 2) vs setor de Vitória (comarca 1)
-FIDVV=$(curl -s "$B/api/foruns?comarca_id=2" | python3 -c "$SID")
-UIDVV=$(curl -s "$B/api/unidades?forum_id=$FIDVV" | python3 -c "$SID")
-SVV=$(curl -s "$B/api/setores?unidade_id=$UIDVV" | python3 -c "$SID")
-SVT=$(curl -s "$B/api/setores?unidade_id=1" | python3 -c "$SID")
+# primeiro setor com conteúdo de cada comarca (1=Vitória, 2=Vila Velha na base atual)
+IDS=$(curl -s "$B/api/comarcas" | python3 -c "
+import json,sys,urllib.request
+base = 'http://localhost:8000'
+def get(p):
+    return json.load(urllib.request.urlopen(base + p))
+out = {}
+for cid in ('1', '2'):
+    for f in get('/api/foruns?comarca_id=' + cid):
+        for u in get('/api/unidades?forum_id=%d' % f['id']):
+            ss = get('/api/setores?unidade_id=%d' % u['id'])
+            if ss:
+                out[cid] = (f['id'], u['id'], ss[0]['id'])
+                break
+        if cid in out: break
+print(out['1'][0], out['1'][1], out['1'][2], out['2'][0], out['2'][1], out['2'][2])")
+set -- $IDS; FIDVT=$1; UIDVT=$2; SVT=$3; FIDVV=$4; UIDVV=$5; SVV=$6
 echo -n "criar no proprio local (201 esperado): "
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $B/api/contatos -H 'Content-Type: application/json' -H "X-Admin-Token: $TV" -d "{\"setor_id\":$SVV,\"nome\":\"QA VV\",\"telefone\":\"(27) 3333-0088\"}"
 echo -n "criar fora do escopo (403 esperado): "
