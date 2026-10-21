@@ -389,3 +389,8 @@ body[data-theme="dark"] .tooltip-premium small{color:#cbd5e1}
   .card{box-shadow:none;border:none}
   table{font-size:12px}
 }
+.fc-catalog-counts{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 8px}
+.fc-total-comarcas{display:inline-flex;background:#dbeafe;color:#1e40af;font-weight:800}
+.fc-total-orgaos{display:inline-flex;background:#ede9fe;color:#5b21b6;font-weight:800}
+.fc-municipios-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.fc-municipios-grid .fc-card{margin-top:0}
