@@ -37,29 +37,7 @@
           <p class="hint" id="map-msg"></p>
         </section>
         <div class="fc-panel">
-          <div class="fc-head" id="panel-head">
-            <div>
-              <h2 class="fc-title">Contatos do PJES</h2>
-              <p class="fc-subtitle">Consulte a estrutura completa por Comarca<span class="seta">→</span>Fórum<span class="seta">→</span>Unidade<span class="seta">→</span>Setor<span class="seta">→</span>Contatos. Selecione uma comarca no mapa ao lado, no menu suspenso ou na lista abaixo.</p>
-            </div>
-          </div>
-          <span class="fc-pill fc-total-localidades" id="loc-count"></span>
-          <p class="fc-subtitle" id="crumb"></p>
-          <div class="fc-selects-row" id="sel-row">
-            <select id="sel-com" class="fc-select" aria-label="Comarca"><option value="">Selecione uma comarca</option></select>
-            <select id="sel-for" class="fc-select hidden" aria-label="Fórum" disabled><option value="">Fórum…</option></select>
-            <select id="sel-uni" class="fc-select hidden" aria-label="Unidade" disabled><option value="">Unidade…</option></select>
-            <select id="sel-set" class="fc-select hidden" aria-label="Setor" disabled><option value="">Setor…</option></select>
-          </div>
-          <div id="lista"></div>
-          <div id="print-area"></div>
-          <div class="fc-bottom-nav">
-            <div class="nav-group">
-              <button type="button" class="fc-btn hidden" id="btn-voltar">← Voltar</button>
-              <button type="button" class="fc-btn" id="btn-topo">↑ Voltar ao topo</button>
-            </div>
-            <button type="button" class="fc-btn hidden" id="btn-print" title="Imprimir / Salvar PDF dos contatos do nível selecionado">🖨️ Imprimir / Salvar PDF</button>
-          </div>
+          <div id="lista"><div class="fc-empty">Carregando contatos...</div></div>
         </div>
       </div>
     </section>
@@ -171,11 +149,10 @@
         </section>
       </div>
     </section>
-    <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados de exemplo</footer>
+    <footer>Python stdlib + HTML/CSS/JS · Leaflet + GeoJSON público · dados mascarados</footer>
   </main>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="mapa.js?v=16"></script>
-<script src="public.js?v=20"></script>
+<script src="public.js?v=21"></script>
 </body>
 </html>
