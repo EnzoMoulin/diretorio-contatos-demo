@@ -361,7 +361,7 @@ def _carregar_seed_json(con):
     TIPO_COL = {"TELEFONE": "telefone", "EMAIL": "email", "RAMAL": "telefone",
                 "WHATSAPP": "telefone", "FAX": "telefone", "CELULAR": "telefone"}
     for i, ct in enumerate(seed.get("contatos", [])):
-        alvo = ct.get("uo") or ct.get("setor") or ct.get("uni")
+        alvo = next((c for c in (ct.get("uo"), ct.get("setor"), ct.get("uni")) if c and c in node_db), "")
         kind = node_kind.get(alvo)
         if kind == "s":
             sid, dono = node_db[alvo], ("s", node_db[alvo])
