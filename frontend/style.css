@@ -76,12 +76,9 @@ body[data-theme="dark"] .rows li.nao-lida{background:#1e3a8a33}
 /* ---- impressão ---- */
 .print-head{margin:6px 0}
 @media print{
-  @page{size:A4 portrait;margin:15mm 12mm}
-  .sidebar,#map,.cascade,input,select,footer,.modal,.noprint,.btn-ghost,.btn-primary,.btn-del,.btn-edit,#map-msg{display:none!important}
-  body{background:#fff!important}
-  .main-content{margin:0;padding:0}
-  .card{box-shadow:none;border:none}
-  table{font-size:12px}
+  .fc-back,.fc-search,.fc-select,.fc-toolbar,.fc-access,.fc-print-footer,.fc-copy-btn{display:none!important}
+  .fc-panel{height:auto;overflow:visible;border:0;box-shadow:none}
+  .fc-contato,.fc-card{break-inside:avoid}
 }
 .consulta-grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:16px;align-items:start}
 @media (max-width:900px){.consulta-grid{grid-template-columns:1fr}}
@@ -376,21 +373,13 @@ body[data-theme="dark"] .leaflet-tooltip{background:#1e293b;border-color:#475569
 body[data-theme="dark"] .tooltip-premium{color:#f8fafc}
 body[data-theme="dark"] .tooltip-premium small{color:#cbd5e1}
 /* ---- impressão (painel + folha limpa) ---- */
-@media print{
-  @page{size:A4 portrait;margin:15mm 12mm}
-  .sidebar,#consulta-mapa,input,select,button,footer,.modal,.noprint,.print-head,#map-msg,.fc-toolbar,.fc-access,.create-box{display:none!important}
-  body{background:#fff!important}
-  .consulta-layout{grid-template-columns:1fr}
-  .fc-panel{border:0;box-shadow:none;height:auto;overflow:visible}
-  .fc-contato,.fc-card{break-inside:avoid}
-  #print-area{display:block!important}
-  #lista,.fc-search,#sel-row,.fc-back,.fc-bottom-nav,#crumb{display:none!important}
-  .main-content{margin:0;padding:0}
-  .card{box-shadow:none;border:none}
-  table{font-size:12px}
-}
+
 .fc-catalog-counts{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 8px}
 .fc-total-comarcas{display:inline-flex;background:#dbeafe;color:#1e40af;font-weight:800}
 .fc-total-orgaos{display:inline-flex;background:#ede9fe;color:#5b21b6;font-weight:800}
 .fc-municipios-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
 .fc-municipios-grid .fc-card{margin-top:0}
+.fc-btn{appearance:none;border:1px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:9px;padding:8px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.fc-btn:hover{background:#f8fafc}
+.fc-print-footer{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid #e2e8f0}
+.fc-print-footer .fc-btn{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding-inline:18px}
