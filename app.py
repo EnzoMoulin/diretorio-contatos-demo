@@ -88,6 +88,10 @@ CREATE TABLE IF NOT EXISTS contatos (
     observacao TEXT NOT NULL DEFAULT '',
     ordem_num REAL, ordem_idx INTEGER NOT NULL DEFAULT 0,
     atualizado_em TEXT NOT NULL DEFAULT (datetime('now')));
+CREATE TABLE IF NOT EXISTS uteis (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL DEFAULT '',
+    nome TEXT NOT NULL, tipo TEXT NOT NULL DEFAULT '',
+    valor TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS historico (
     id INTEGER PRIMARY KEY AUTOINCREMENT, acao TEXT NOT NULL,
     contato_id INTEGER, detalhe TEXT NOT NULL DEFAULT '',
@@ -389,6 +393,9 @@ def _carregar_seed_json(con):
              valor if col == "telefone" else "",
              valor if col == "email" else "", ct.get("desc", ""),
              ct.get("obs", ""), ct.get("ordem"), i))
+    for u in seed.get("uteis", []):
+        con.execute("INSERT INTO uteis (uid, nome, tipo, valor) VALUES (?,?,?,?)",
+                    (u.get("id", ""), u.get("nome", ""), u.get("tipo", ""), u.get("valor", "")))
     return True
 
 
@@ -511,7 +518,9 @@ def build_hierarquia(con):
             "qtdUnidades": cont_sel(nos_m) + sum(f["qtdUnidades"] for f in foruns_pub),
             "qtdContatos": len(gerais_m) + sum(n["qtdContatos"] for n in nos_m) + sum(f["qtdContatos"] for f in foruns_pub),
             "contatos": gerais_m, "nos": nos_m, "foruns": foruns_pub})
-    return {"municipios": municipios}
+    uteis = [{"id": u["uid"], "nome": u["nome"], "tipo": u["tipo"], "valor": u["valor"]}
+             for u in con.execute("SELECT uid, nome, tipo, valor FROM uteis ORDER BY id").fetchall()]
+    return {"municipios": municipios, "uteis": uteis}
 
 
 def init_db():

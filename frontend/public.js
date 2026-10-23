@@ -280,6 +280,7 @@
     estado.forumId = "";
     estado.noId = "";
     var municipios = (estado.dados && estado.dados.municipios) || [];
+    var uteis = (estado.dados && estado.dados.uteis) || [];
     var totalOrgaos = municipios.filter(ehOrgao).length;
     var totalComarcas = municipios.length - totalOrgaos;
     var cardsMunicipios = municipios.map(function (m) {
@@ -302,7 +303,13 @@
         (totalComarcas ? '<span class="fc-pill fc-total-comarcas">' + esc(rotuloQuantidade(totalComarcas, "Comarca", "Comarcas")) + "</span>" : "") + "</div>" : "") +
       '<select id="fc-comarca" class="fc-select">' + opcoesComarcas(municipios, "") + "</select>" +
       '<button type="button" class="fc-btn fc-print-all" id="fc-print-all" title="Imprimir / Salvar PDF de todos os contatos">🖨 Imprimir / Salvar PDF</button>' +
-      '<div class="fc-section"><h3>Comarcas e Órgãos</h3><div class="fc-municipios-grid">' + cardsMunicipios + "</div></div>";
+      '<div class="fc-section"><h3>Comarcas e Órgãos</h3><div class="fc-municipios-grid">' + cardsMunicipios + "</div></div>" +
+      (uteis.length ? '<div class="fc-section"><h3>Telefones úteis</h3><div class="fc-contatos">' + uteis.map(function (u) {
+        var href = hrefContato(u.tipo, u.valor);
+        var valorHtml = href ? '<a class="fc-contato-valor" href="' + esc(href) + '">' + esc(u.valor) + "</a>" : '<span class="fc-contato-valor">' + esc(u.valor) + "</span>";
+        return '<article class="fc-contato"><div class="fc-contato-main"><span class="fc-contato-tipo">' + esc(fmtTipoContato(u.tipo)) + "</span><h4>" + esc(u.nome || u.valor) + "</h4></div>" +
+          '<div class="fc-contato-side">' + valorHtml + "</div></article>";
+      }).join("") + "</div></div>" : "");
     var seletor = document.getElementById("fc-comarca");
     if (seletor) seletor.onchange = function () { if (seletor.value) abrirMunicipio(seletor.value); };
     var imprimir = document.getElementById("fc-print-all");
