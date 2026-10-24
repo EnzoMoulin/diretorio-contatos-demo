@@ -264,9 +264,9 @@
   function cardContatosGerais(contatos, comPrint) {
     var lista = contatos || [];
     return '<div class="fc-section"><div class="fc-card fc-card--toggle" data-gerais-toggle title="Expandir/recolher contatos gerais">' +
-      '<div class="fc-card-head"><div><h4>Contatos gerais</h4></div>' +
+      '<div class="fc-card-head"><div><h4>Contatos Gerais</h4></div>' +
       '<div class="fc-meta">' + badgeQuantidade(lista.length, "Contato", "Contatos") +
-      (comPrint ? '<button type="button" class="fc-icon-btn" data-gerais-print title="Imprimir / Salvar PDF dos Contatos gerais">🖨</button>' : "") +
+      (comPrint ? '<button type="button" class="fc-icon-btn" data-gerais-print title="Imprimir / Salvar PDF dos Contatos Gerais">🖨</button>' : "") +
       '<span class="fc-toggle" aria-hidden="true">\u25be</span></div></div></div>' +
       '<div data-gerais-body hidden>' + (lista.length ? contatosCards(lista) : '<div class="fc-empty">Sem contatos gerais.</div>') + "</div></div>";
   }
@@ -656,7 +656,7 @@
     var corpo = (m.contatos || []).length
       ? "<ul>" + (m.contatos || []).map(contatoPrint).join("") + "</ul>"
       : '<p class="muted">Sem contatos gerais.</p>';
-    abrirImpressao("Contatos gerais — TJES",
+    abrirImpressao("Contatos Gerais — TJES",
       "<section><h2>TJES</h2>" +
       '<p class="meta">' + esc(m.endereco || "Endereço não informado") +
       (m.cep ? " • CEP " + esc(m.cep) : "") + "</p>" + corpo + "</section>");
@@ -669,7 +669,7 @@
     var corpo = (f.contatos || []).length
       ? "<ul>" + (f.contatos || []).map(contatoPrint).join("") + "</ul>"
       : '<p class="muted">Sem contatos gerais.</p>';
-    abrirImpressao("Contatos gerais — " + f.nome,
+    abrirImpressao("Contatos Gerais — " + f.nome,
       "<section><h2>" + esc(f.nome) + "</h2>" +
       '<p class="meta">' + esc(ehOrgao(m) ? "TJES" : m.nome) + " • " +
       esc(f.endereco || "Endereço não informado") +

@@ -389,7 +389,7 @@ async function buscar() {
       `<p class="fc-subtitle">${unis.length} Unidades · ${nSet} Setores · ${ctts.length} Contatos</p></div></div>` +
       chainHtml() +
       `<div id="sel-slot"></div>` +
-      (gerais.length ? `<div class="fc-section"><h3>Contatos gerais</h3>` +
+      (gerais.length ? `<div class="fc-section"><h3>Contatos Gerais</h3>` +
         gerais.map(c => cardContato(c, '')).join('') + `</div>` : '') +
       `<div class="fc-section"><h3>Unidades</h3>` +
       unis.map(u => cardNivel('uni', u.id, u.nome + (cobre('unidade', u.id) ? ' ✓' : ''),

@@ -202,7 +202,7 @@ def _carregar_seed_legado(con, seed):
             " VALUES (?,?,?,?)",
             (fors[u["forum_id"]], u["nome"], u.get("endereco", ""),
              u.get("ordem", 0))).lastrowid
-    # auto sob demanda: unidade "Atendimento geral" + setor "Contatos gerais"
+    # auto sob demanda: unidade "Atendimento geral" + setor "Contatos Gerais"
     auto_u, auto_s, auto_su = {}, {}, {}
 
     def _auto_unidade(fdb, ordem):
@@ -218,7 +218,7 @@ def _carregar_seed_legado(con, seed):
             auto_s[fdb] = con.execute(
                 "INSERT INTO setores (unidade_id, nome, ordem, virtual)"
                 " VALUES (?,?,?,1)",
-                (_auto_unidade(fdb, 10 ** 9), "Contatos gerais", 10 ** 9)).lastrowid
+                (_auto_unidade(fdb, 10 ** 9), "Contatos Gerais", 10 ** 9)).lastrowid
         return auto_s[fdb]
 
     def _auto_setor_unidade(udb):
@@ -226,7 +226,7 @@ def _carregar_seed_legado(con, seed):
             auto_su[udb] = con.execute(
                 "INSERT INTO setores (unidade_id, nome, ordem, virtual)"
                 " VALUES (?,?,?,1)",
-                (udb, "Contatos gerais", 10 ** 9)).lastrowid
+                (udb, "Contatos Gerais", 10 ** 9)).lastrowid
         return auto_su[udb]
 
     sets = {}
@@ -358,7 +358,7 @@ def _carregar_seed_json(con):
             auto_s[udb] = con.execute(
                 "INSERT INTO setores (unidade_id, nome, ordem_num, virtual)"
                 " VALUES (?,?,NULL,1)",
-                (udb, "Contatos gerais")).lastrowid
+                (udb, "Contatos Gerais")).lastrowid
         return auto_s[udb]
 
     import re as _re
@@ -424,7 +424,7 @@ def build_hierarquia(con):
         ct_por_setor.setdefault(c["setor_id"], []).append(c)
     for lst in ct_por_setor.values():
         lst.sort(key=_ordem)
-    # setor auto "Contatos gerais" de cada unidade auto -> dono (forum/comarca)
+    # setor auto "Contatos Gerais" de cada unidade auto -> dono (forum/comarca)
     gerais_por_forum, gerais_por_mun = {}, {}
     for u in unis:
         if not u["virtual"]:
