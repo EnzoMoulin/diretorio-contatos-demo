@@ -220,7 +220,7 @@
   }
 
   function opcoesComarcas(comarcas, selecionado) {
-    return '<option value="">Selecione a Comarca</option>' + (comarcas || []).map(function (m) {
+    return '<option value="">Selecione a Comarca</option>' + (comarcas || []).filter(function (m) { return !ehOrgao(m); }).map(function (m) {
       return '<option value="' + esc(m.id) + '"' + (String(m.id) === String(selecionado) ? " selected" : "") + ">" + esc(m.nome) + "</option>";
     }).join("");
   }
@@ -273,14 +273,24 @@
     }
   }
 
-  function barraNavegacaoInferior(rotuloVoltar) {
-    return '<div class="fc-bottom-nav"><button type="button" class="fc-btn" id="fc-back-bottom">← ' + esc(rotuloVoltar || "Voltar") + '</button>' +
+  function marcarMenuV2(v) {
+    try {
+      var all = document.querySelectorAll(".menu-item");
+      for (var i = 0; i < all.length; i++) all[i].classList.remove("active");
+      var btn = document.querySelector('.menu-item[data-view="' + v + '"]');
+      if (btn) btn.classList.add("active");
+    } catch (e) {}
+  }
+
+  function barraNavegacaoInferior(rotuloVoltar, semLinha) {
+    return '<div class="fc-bottom-nav' + (semLinha ? " fc-bottom-nav--colado" : "") + '"><button type="button" class="fc-btn" id="fc-back-bottom">← ' + esc(rotuloVoltar || "Voltar") + '</button>' +
       '<button type="button" class="fc-btn" data-scroll-top title="Voltar ao topo">↑ Voltar ao topo</button></div>';
   }
 
   function renderInicio() {
     var c = host();
     if (!c) return;
+    marcarMenuV2("consulta");
     estado.comarcaId = "";
     estado.forumId = "";
     estado.noId = "";
@@ -319,6 +329,7 @@
     estado.comarcaId = String(id);
     estado.forumId = "";
     estado.noId = "";
+    marcarMenuV2("consulta");
     var m = comarcaAtual();
     if (!m) return;
     if (ehOrgao(m)) renderOrgao();
@@ -385,7 +396,7 @@
       contatosCards(m.contatos || []) + "</div>" +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((m.nos || []).length ? (m.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
-      "</div>" + botaoImpressaoLocalidade("COMARCA") + barraNavegacaoInferior("Comarcas");
+      "</div>" + botaoImpressaoLocalidade("COMARCA") + barraNavegacaoInferior("Comarcas", true);
     document.getElementById("fc-back-home").onclick = renderInicio;
     document.getElementById("fc-back-bottom").onclick = renderInicio;
     document.getElementById("fc-print-comarca").onclick = imprimirOrgao;
@@ -411,11 +422,13 @@
       if (ehOrgao(comarcas[i])) { orgao = comarcas[i]; break; }
     }
     if (orgao) abrirComarca(orgao.id);
+    marcarMenuV2("tjes");
   }
 
   function renderUteis() {
     var c = host();
     if (!c) return;
+    marcarMenuV2("uteis");
     estado.comarcaId = "";
     estado.forumId = "";
     estado.noId = "";
@@ -434,7 +447,7 @@
       '<div class="fc-print-footer"><button type="button" class="fc-btn" data-scroll-top title="Voltar ao topo">↑ Voltar ao topo</button>' +
       '<button type="button" class="fc-btn" id="fc-print-uteis" title="Imprimir / Salvar PDF">🖨 Imprimir / Salvar PDF</button></div>';
     document.getElementById("fc-print-uteis").onclick = function () {
-      abrirImpressao("Telefones Úteis — PJES", "<ul>" + uteis.map(contatoPrint).join("") + "</ul>");
+      abrirImpressao("Telefones Úteis — PJES", "<ul>" + uteis.map(function (u) { return contatoPrint({ tipo: u.tipo, descricao: u.nome, valor: u.valor }); }).join("") + "</ul>");
     };
     vincularAcoes();
   }
@@ -470,7 +483,7 @@
       contatosCards(f.contatos || []) + "</div>" +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((f.nos || []).length ? (f.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
-      "</div>" + botaoImpressaoLocalidade("FORUM") + barraNavegacaoInferior(m.nome);
+      "</div>" + botaoImpressaoLocalidade("FORUM") + barraNavegacaoInferior(m.nome, true);
     document.getElementById("fc-back-comarca").onclick = renderForuns;
     document.getElementById("fc-back-bottom").onclick = renderForuns;
     document.getElementById("fc-print-forum").onclick = imprimirForum;
@@ -524,7 +537,7 @@
         ? '<div class="fc-section"><div class="fc-section-title"><h3>Setores</h3></div>' +
           no.filhos.map(cardNo).join("") + "</div>"
         : "") +
-      botaoImpressaoLocalidade("UNIDADE", tipoTela) + barraNavegacaoInferior(pai ? pai.nome : raiz.nome);
+      botaoImpressaoLocalidade("UNIDADE", tipoTela) + barraNavegacaoInferior(pai ? pai.nome : raiz.nome, true);
     document.getElementById("fc-back-no").onclick = function () {
       if (pai) abrirNo(pai.id);
       else { estado.noId = ""; if (ehOrgao(m)) renderOrgao(); else renderForum(); }
@@ -599,14 +612,13 @@
   function imprimirOrgao() {
     var m = comarcaAtual();
     if (!m) return;
-    var gerais = (m.contatos || []).length
+    var corpo = (m.contatos || []).length
       ? "<ul>" + (m.contatos || []).map(contatoPrint).join("") + "</ul>"
       : '<p class="muted">Sem contatos gerais.</p>';
-    abrirImpressao("Contatos — TJES",
+    abrirImpressao("Contatos gerais — TJES",
       "<section><h2>TJES</h2>" +
       '<p class="meta">' + esc(m.endereco || "Endereço não informado") +
-      (m.cep ? " • CEP " + esc(m.cep) : "") + "</p>" + gerais +
-      (m.nos || []).map(function (no) { return noPrint(no, 0); }).join("") + "</section>");
+      (m.cep ? " • CEP " + esc(m.cep) : "") + "</p>" + corpo + "</section>");
   }
 
   function imprimirForum() {
