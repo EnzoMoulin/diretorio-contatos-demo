@@ -265,11 +265,23 @@
     vincularCopias();
     var tops = document.querySelectorAll("[data-scroll-top]");
     for (var i = 0; i < tops.length; i++) {
-      tops[i].onclick = function () {
-        var painel = document.querySelector(".fc-panel");
-        if (painel && typeof painel.scrollTo === "function") painel.scrollTo({ top: 0, behavior: "smooth" });
-        else if (host()) host().scrollIntoView({ behavior: "smooth", block: "start" });
-      };
+      tops[i].onclick = (function (btn) {
+        return function () {
+          var el = btn.parentElement;
+          while (el) {
+            try {
+              var st = window.getComputedStyle(el);
+              if ((st.overflowY === "auto" || st.overflowY === "scroll") && el.scrollHeight > el.clientHeight + 4) {
+                el.scrollTo({ top: 0, behavior: "smooth" });
+                return;
+              }
+            } catch (e) {}
+            el = el.parentElement;
+          }
+          try { window.scrollTo({ top: 0, behavior: "smooth" }); }
+          catch (e) { if (host()) host().scrollIntoView({ behavior: "smooth", block: "start" }); }
+        };
+      })(tops[i]);
     }
   }
 
@@ -483,7 +495,7 @@
       contatosCards(f.contatos || []) + "</div>" +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((f.nos || []).length ? (f.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
-      "</div>" + botaoImpressaoLocalidade("FORUM") + barraNavegacaoInferior(m.nome, true);
+      "</div>" + botaoImpressaoLocalidade("FORUM") + barraNavegacaoInferior("Fóruns", true);
     document.getElementById("fc-back-comarca").onclick = renderForuns;
     document.getElementById("fc-back-bottom").onclick = renderForuns;
     document.getElementById("fc-print-forum").onclick = imprimirForum;
@@ -537,7 +549,7 @@
         ? '<div class="fc-section"><div class="fc-section-title"><h3>Setores</h3></div>' +
           no.filhos.map(cardNo).join("") + "</div>"
         : "") +
-      botaoImpressaoLocalidade("UNIDADE", tipoTela) + barraNavegacaoInferior(pai ? pai.nome : raiz.nome, true);
+      botaoImpressaoLocalidade("UNIDADE", tipoTela) + barraNavegacaoInferior(pai ? "Unidade" : (ehOrgao(m) ? "TJES" : "Fórum"), true);
     document.getElementById("fc-back-no").onclick = function () {
       if (pai) abrirNo(pai.id);
       else { estado.noId = ""; if (ehOrgao(m)) renderOrgao(); else renderForum(); }
