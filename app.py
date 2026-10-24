@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS foruns (
 CREATE TABLE IF NOT EXISTS unidades (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     forum_id INTEGER REFERENCES foruns(id),
-    municipio_id INTEGER REFERENCES comarcas(id),
+    comarca_id INTEGER REFERENCES comarcas(id),
     nome TEXT NOT NULL, tipo TEXT NOT NULL DEFAULT 'UNIDADE',
     endereco TEXT NOT NULL DEFAULT '', cep TEXT NOT NULL DEFAULT '',
     observacao TEXT NOT NULL DEFAULT '',
@@ -302,13 +302,13 @@ def _carregar_seed_json(con):
         if not no.get("ativo", True):
             continue
         fdb = fors.get(no["forum"])
-        mdb = coms.get(no["mun"]) if not fdb else None
+        mdb = coms.get(no["comarca"]) if not fdb else None
         if fdb is None and mdb is None:
             continue
         if no["pai"]:
             continue  # filhos na segunda passada
         uid = con.execute(
-            "INSERT INTO unidades (forum_id, municipio_id, nome, tipo,"
+            "INSERT INTO unidades (forum_id, comarca_id, nome, tipo,"
             " endereco, cep, observacao, selecionavel, ordem_num, ordem_idx)"
             " VALUES (?,?,?,?,?,?,?,?,?,?)",
             (fdb, mdb, no["nome"], no.get("tipo", "UNIDADE") or "UNIDADE",
@@ -348,7 +348,7 @@ def _carregar_seed_json(con):
         key = ("f", fdb) if fdb else ("m", mdb)
         if key not in auto_u:
             auto_u[key] = con.execute(
-                "INSERT INTO unidades (forum_id, municipio_id, nome,"
+                "INSERT INTO unidades (forum_id, comarca_id, nome,"
                 " ordem_num, virtual) VALUES (?,?,?,NULL,1)",
                 (fdb, mdb, "Atendimento geral")).lastrowid
         return auto_u[key]
@@ -373,7 +373,7 @@ def _carregar_seed_json(con):
             sid, dono = _auto_setor(node_db[alvo]), ("u", node_db[alvo])
         else:
             fdb = fors.get(ct.get("forum"))
-            mkey = ct.get("mun")
+            mkey = ct.get("comarca")
             if fdb:
                 sid, dono = _auto_setor(_auto_unidade(fdb, None)), ("f", fdb)
             elif mkey and mkey in coms:
@@ -424,7 +424,7 @@ def build_hierarquia(con):
         ct_por_setor.setdefault(c["setor_id"], []).append(c)
     for lst in ct_por_setor.values():
         lst.sort(key=_ordem)
-    # setor auto "Contatos gerais" de cada unidade auto -> dono (forum/municipio)
+    # setor auto "Contatos gerais" de cada unidade auto -> dono (forum/comarca)
     gerais_por_forum, gerais_por_mun = {}, {}
     for u in unis:
         if not u["virtual"]:
@@ -433,7 +433,7 @@ def build_hierarquia(con):
             if not s["virtual"]:
                 continue
             dest = (gerais_por_forum if u["forum_id"] else gerais_por_mun)
-            dest.setdefault(u["forum_id"] or u["municipio_id"], []).extend(
+            dest.setdefault(u["forum_id"] or u["comarca_id"], []).extend(
                 ct_por_setor.get(s["id"], []))
     for lst in gerais_por_forum.values():
         lst.sort(key=_ordem)
@@ -482,7 +482,7 @@ def build_hierarquia(con):
     def cont_sel(lista):
         return sum(1 for n in lista if n["selecionavelAcesso"])
 
-    municipios = []
+    comarcas = []
     for c in sorted((x for x in coms), key=_ordem):
         f_do = sorted((f for f in fors
                        if f["comarca_id"] == c["id"]), key=_ordem)
@@ -504,13 +504,13 @@ def build_hierarquia(con):
                 "qtdContatos": len(gerais) + sum(n["qtdContatos"] for n in nos),
                 "contatos": gerais, "nos": nos})
         roots_m = sorted(
-            (u for u in unis if u["municipio_id"] == c["id"]
+            (u for u in unis if u["comarca_id"] == c["id"]
              and not u["virtual"]),
             key=_ordem)
         nos_m = [ser_no(u, c["endereco"], c["cep"])
                  for u in roots_m]
         gerais_m = [contato_pub(x) for x in gerais_por_mun.get(c["id"], [])]
-        municipios.append({
+        comarcas.append({
             "id": c["id"], "nome": c["nome"], "codigoIbge": c["codigo_ibge"],
             "tipo": c["tipo"], "endereco": c["endereco"], "cep": c["cep"],
             "email": c["email"], "observacao": c["observacao"],
@@ -520,7 +520,7 @@ def build_hierarquia(con):
             "contatos": gerais_m, "nos": nos_m, "foruns": foruns_pub})
     uteis = [{"id": u["uid"], "nome": u["nome"], "tipo": u["tipo"], "valor": u["valor"]}
              for u in con.execute("SELECT uid, nome, tipo, valor FROM uteis ORDER BY id").fetchall()]
-    return {"municipios": municipios, "uteis": uteis}
+    return {"comarcas": comarcas, "uteis": uteis}
 
 
 def init_db():
@@ -530,7 +530,7 @@ def init_db():
     precisa_migrar = ("localidades" in tabelas or "usuarios_locais" in tabelas)
     if "unidades" in tabelas and not precisa_migrar:
         try:
-            con.execute("SELECT municipio_id FROM unidades LIMIT 1")
+            con.execute("SELECT comarca_id FROM unidades LIMIT 1")
         except Exception:
             precisa_migrar = True
     if precisa_migrar:
