@@ -345,6 +345,7 @@
     var m = comarcaAtual();
     if (!m) return;
     if (ehOrgao(m)) renderOrgao();
+    else if ((m.foruns || []).length === 1) abrirForum(m.foruns[0].id);
     else renderForuns();
     destacarMapa(m.codigoIbge);
   }
