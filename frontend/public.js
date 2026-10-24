@@ -318,6 +318,16 @@
     } catch (e) {}
   }
 
+  function barraAcoesUnidade(tipoNo, rotuloVoltar) {
+    var rotulo = tipoNo === "Setor" ? "Setor" : "Unidade";
+    var artigo = rotulo === "Unidade" ? "da" : "do";
+    return '<div class="fc-print-footer fc-actions-row">' +
+      '<button type="button" class="fc-btn" id="fc-back-bottom">\u2190 ' + esc(rotuloVoltar || "Voltar") + "</button>" +
+      '<button type="button" class="fc-btn" id="fc-print-unit" title="Imprimir / Salvar PDF dos contatos ' +
+      artigo + " " + rotulo + '">🖨 Imprimir / Salvar PDF</button>' +
+      '<button type="button" class="fc-btn" data-scroll-top title="Voltar ao topo">\u2191 Voltar ao topo</button></div>';
+  }
+
   function barraNavegacaoInferior(rotuloVoltar, semLinha) {
     return '<div class="fc-bottom-nav' + (semLinha ? " fc-bottom-nav--colado" : "") + '"><button type="button" class="fc-btn" id="fc-back-bottom">← ' + esc(rotuloVoltar || "Voltar") + '</button>' +
       '<button type="button" class="fc-btn" data-scroll-top title="Voltar ao topo">↑ Voltar ao topo</button></div>';
@@ -578,7 +588,7 @@
         ? '<div class="fc-section"><div class="fc-section-title"><h3>Setores</h3></div>' +
           no.filhos.map(cardNo).join("") + "</div>"
         : "") +
-      botaoImpressaoLocalidade("UNIDADE", tipoTela) + barraNavegacaoInferior(pai ? "Unidade" : (ehOrgao(m) ? "TJES" : "Fórum"), true);
+      barraAcoesUnidade(tipoTela, pai ? "Unidade" : (ehOrgao(m) ? "TJES" : "Fórum"));
     document.getElementById("fc-back-no").onclick = function () {
       if (pai) abrirNo(pai.id);
       else { estado.noId = ""; if (ehOrgao(m)) renderOrgao(); else renderForum(); }
