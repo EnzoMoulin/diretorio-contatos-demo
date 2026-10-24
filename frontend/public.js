@@ -226,9 +226,9 @@
   }
 
   function botaoImpressaoLocalidade(tipo, tipoNo) {
-    var rotulo = tipo === "COMARCA" ? "Órgão" : (tipo === "FORUM" ? "Fórum" : (tipoNo === "Setor" ? "Setor" : "Unidade"));
+    var rotulo = tipo === "COMARCA" ? "TJES" : (tipo === "FORUM" ? "Fórum" : (tipoNo === "Setor" ? "Setor" : "Unidade"));
     var artigo = rotulo === "Unidade" ? "da" : "do";
-    var id = tipo === "FORUM" || tipo === "COMARCA" ? "fc-print-forum" : "fc-print-unit";
+    var id = tipo === "FORUM" ? "fc-print-forum" : (tipo === "COMARCA" ? "fc-print-comarca" : "fc-print-unit");
     return '<div class="fc-print-footer">' +
       '<button type="button" class="fc-btn" id="' + id + '" title="Imprimir / Salvar PDF dos contatos ' +
       artigo + " " + rotulo + '">🖨 Imprimir / Salvar PDF</button></div>';
@@ -301,7 +301,8 @@
       (comarcas.length ? '<div class="fc-catalog-counts">' +
         (totalComarcas ? '<span class="fc-pill fc-total-comarcas">' + esc(rotuloQuantidade(totalComarcas, "Comarca", "Comarcas")) + "</span>" : "") + "</div>" : "") +
       '<select id="fc-comarca" class="fc-select">' + opcoesComarcas(comarcas.filter(function (m) { return !ehOrgao(m); }), "") + "</select>" +
-      '<div class="fc-section"><h3>Comarcas</h3><div class="fc-comarcas-grid">' + cardsComarcas + "</div></div>";
+      '<div class="fc-section fc-section--comarcas"><div class="fc-section-title"><h3>Comarcas</h3></div><div class="fc-comarcas-grid">' + cardsComarcas + "</div></div>" +
+      '<div class="fc-print-footer"><button type="button" class="fc-btn" data-scroll-top title="Voltar ao topo">↑ Voltar ao topo</button></div>';
     var seletor = document.getElementById("fc-comarca");
     if (seletor) seletor.onchange = function () { if (seletor.value) abrirComarca(seletor.value); };
     var cards = document.querySelectorAll("[data-comarca]");
@@ -384,9 +385,10 @@
       contatosCards(m.contatos || []) + "</div>" +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((m.nos || []).length ? (m.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
-      "</div>" + barraNavegacaoInferior("Comarcas");
+      "</div>" + botaoImpressaoLocalidade("COMARCA") + barraNavegacaoInferior("Comarcas");
     document.getElementById("fc-back-home").onclick = renderInicio;
     document.getElementById("fc-back-bottom").onclick = renderInicio;
+    document.getElementById("fc-print-comarca").onclick = imprimirOrgao;
     var seletor = document.getElementById("fc-comarca");
     if (seletor) seletor.onchange = function () {
       if (this.value && String(this.value) !== String(estado.comarcaId)) abrirComarca(this.value);
@@ -592,6 +594,19 @@
     w.document.open();
     w.document.write(html);
     w.document.close();
+  }
+
+  function imprimirOrgao() {
+    var m = comarcaAtual();
+    if (!m) return;
+    var gerais = (m.contatos || []).length
+      ? "<ul>" + (m.contatos || []).map(contatoPrint).join("") + "</ul>"
+      : '<p class="muted">Sem contatos gerais.</p>';
+    abrirImpressao("Contatos — TJES",
+      "<section><h2>TJES</h2>" +
+      '<p class="meta">' + esc(m.endereco || "Endereço não informado") +
+      (m.cep ? " • CEP " + esc(m.cep) : "") + "</p>" + gerais +
+      (m.nos || []).map(function (no) { return noPrint(no, 0); }).join("") + "</section>");
   }
 
   function imprimirForum() {
