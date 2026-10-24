@@ -240,10 +240,10 @@ body[data-theme="dark"] .fc-page-head{border-color:#334155}
 .fc-map-legenda .sem-contato{color:#94a3b8}
 .tooltip-premium{font-weight:800;font-size:13px;color:#0f172a}
 .tooltip-premium small{display:block;font-weight:600;font-size:11px;color:#475569}
-.fc-bottom-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:12px;background:#fff;padding-bottom:4px}
+.fc-bottom-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:20px 0 4px;padding-top:14px;border-top:1px solid #e2e8f0;background:#fff;padding-bottom:4px}
 body[data-theme="dark"] .fc-bottom-nav{background:#1e293b;border-color:#334155}
 .fc-bottom-nav .nav-group{display:flex;gap:8px}
-.fc-bottom-nav--colado{border-top:0;margin-top:4px;padding-top:0}
+.fc-bottom-nav--colado{margin-top:10px}
 .fc-bottom-nav .fc-btn{max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fc-icon-btn{border:1px solid #cbd5e1;background:#fff;border-radius:8px;min-width:34px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
 .fc-icon-btn:hover{background:#f1f5f9}

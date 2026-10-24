@@ -796,6 +796,20 @@
     } catch (e) {}
   }
 
+  function atualizarMapaDados() {
+    if (!estado.mapa || !estado.geojson) return;
+    try {
+      estado.geojson.eachLayer(function (layer) {
+        layer.setStyle(estiloComarca(layer.feature));
+        var codigo = codigoComarca(layer.feature);
+        var p = (layer.feature && layer.feature.properties) || {};
+        var nome = String(p.name || "Comarca");
+        layer.bindTooltip(rotuloMapaComarca(codigo, nome), { sticky: true });
+      });
+      estado.mapa.invalidateSize();
+    } catch (e) {}
+  }
+
   function recarregar(mostrarCarregando) {
     if (estado.carregando) return;
     estado.carregando = true;
@@ -803,6 +817,7 @@
     fetch("/api/hierarquia").then(function (r) { return r.json(); }).then(function (dados) {
       estado.carregando = false;
       estado.dados = dados && dados.comarcas ? dados : { comarcas: [] };
+      atualizarMapaDados();
       renderInicio();
     }).catch(function (erro) {
       estado.carregando = false;
