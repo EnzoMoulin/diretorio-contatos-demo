@@ -261,8 +261,30 @@
     }).join("") + "</div>";
   }
 
+  function cardContatosGerais(contatos) {
+    var lista = contatos || [];
+    return '<div class="fc-section"><div class="fc-card fc-card--toggle" data-gerais-toggle title="Expandir/recolher contatos gerais">' +
+      '<div class="fc-card-head"><div><h4>Contatos gerais</h4></div>' +
+      '<div class="fc-meta">' + badgeQuantidade(lista.length, "Contato", "Contatos") +
+      '<span class="fc-toggle" aria-hidden="true">\u25be</span></div></div></div>' +
+      '<div data-gerais-body hidden>' + (lista.length ? contatosCards(lista) : '<div class="fc-empty">Sem contatos gerais.</div>') + "</div></div>";
+  }
+
   function vincularAcoes() {
     vincularCopias();
+    var cards = document.querySelectorAll("[data-gerais-toggle]");
+    for (var g = 0; g < cards.length; g++) {
+      cards[g].onclick = (function (card) {
+        return function () {
+          var body = card.nextElementSibling;
+          if (!body) return;
+          var abrir = body.hasAttribute("hidden");
+          if (abrir) body.removeAttribute("hidden");
+          else body.setAttribute("hidden", "");
+          card.classList.toggle("aberto", abrir);
+        };
+      })(cards[g]);
+    }
     var tops = document.querySelectorAll("[data-scroll-top]");
     for (var i = 0; i < tops.length; i++) {
       tops[i].onclick = (function (btn) {
@@ -405,8 +427,7 @@
       badgeQuantidade(m.qtdUnidades, "Unidade", "Unidades") + "</div>" +
       '<div class="fc-address-row"><div class="fc-inherit"><strong>Endereço do TJES:</strong> ' + linkEndereco(m.endereco) +
       (m.cep ? " • CEP " + esc(m.cep) : "") + "</div></div>" +
-      '<div class="fc-section"><div class="fc-section-title"><h3>Contatos gerais</h3></div>' +
-      contatosCards(m.contatos || []) + "</div>" +
+      cardContatosGerais(m.contatos || []) +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((m.nos || []).length ? (m.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
       "</div>" + botaoImpressaoLocalidade("COMARCA") + barraNavegacaoInferior("Comarcas", true);
@@ -492,8 +513,7 @@
       badgeQuantidade(f.qtdUnidades, "Unidade", "Unidades") + "</div>" +
       '<div class="fc-address-row"><div class="fc-inherit"><strong>Endereço do Fórum:</strong> ' + linkEndereco(f.endereco) +
       (f.cep ? " • CEP " + esc(f.cep) : "") + "</div></div>" +
-      '<div class="fc-section"><div class="fc-section-title"><h3>Contatos gerais</h3></div>' +
-      contatosCards(f.contatos || []) + "</div>" +
+      cardContatosGerais(f.contatos || []) +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((f.nos || []).length ? (f.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
       "</div>" + botaoImpressaoLocalidade("FORUM") + barraNavegacaoInferior("Fóruns", true);
@@ -663,6 +683,22 @@
     return String(p.CD_MUN || p.codmun || p.id || p.code || "").replace(/\D/g, "");
   }
 
+  function comarcaPorCodigo(codigo) {
+    var lista = (estado.dados && estado.dados.comarcas) || [];
+    for (var i = 0; i < lista.length; i++) {
+      if (String(lista[i].codigoIbge || "").replace(/\D/g, "") === codigo) return lista[i];
+    }
+    return null;
+  }
+
+  function rotuloMapaComarca(codigo, nome) {
+    var m = comarcaPorCodigo(codigo);
+    if (!m || Number(m.qtdContatos || 0) === 0) return esc(nome) + "<br><small>Sem contatos cadastrados</small>";
+    var nf = Number(m.qtdForuns || (m.foruns || []).length || 0);
+    var nc = Number(m.qtdContatos || 0);
+    return esc(nome) + "<br><small>" + nf + (nf === 1 ? " Fórum" : " Fóruns") + " • " + nc + (nc === 1 ? " contato" : " contatos") + "</small>";
+  }
+
   function comarcaComContatos(codigo) {
     return (estado.dados.comarcas || []).some(function (m) {
       return String(m.codigoIbge || "").replace(/\D/g, "") === codigo && Number(m.qtdContatos || 0) > 0;
@@ -715,7 +751,7 @@
             var nome = String(p.name || "Comarca");
             var tem = comarcaComContatos(codigo);
             layer.bindTooltip(
-              esc(nome) + (tem ? "<br><small>Possui contatos cadastrados</small>" : "<br><small>Sem contatos cadastrados</small>"),
+              rotuloMapaComarca(codigo, nome),
               { sticky: true });
             if (tem) {
               layer.on("click", function () {
