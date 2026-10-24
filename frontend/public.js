@@ -261,11 +261,12 @@
     }).join("") + "</div>";
   }
 
-  function cardContatosGerais(contatos) {
+  function cardContatosGerais(contatos, comPrint) {
     var lista = contatos || [];
     return '<div class="fc-section"><div class="fc-card fc-card--toggle" data-gerais-toggle title="Expandir/recolher contatos gerais">' +
       '<div class="fc-card-head"><div><h4>Contatos gerais</h4></div>' +
       '<div class="fc-meta">' + badgeQuantidade(lista.length, "Contato", "Contatos") +
+      (comPrint ? '<button type="button" class="fc-icon-btn" data-gerais-print title="Imprimir / Salvar PDF dos Contatos gerais">🖨</button>' : "") +
       '<span class="fc-toggle" aria-hidden="true">\u25be</span></div></div></div>' +
       '<div data-gerais-body hidden>' + (lista.length ? contatosCards(lista) : '<div class="fc-empty">Sem contatos gerais.</div>') + "</div></div>";
   }
@@ -275,7 +276,8 @@
     var cards = document.querySelectorAll("[data-gerais-toggle]");
     for (var g = 0; g < cards.length; g++) {
       cards[g].onclick = (function (card) {
-        return function () {
+        return function (e) {
+          if (e && e.target && e.target.closest && e.target.closest("[data-gerais-print]")) return;
           var body = card.nextElementSibling;
           if (!body) return;
           var abrir = body.hasAttribute("hidden");
@@ -427,13 +429,16 @@
       badgeQuantidade(m.qtdUnidades, "Unidade", "Unidades") + "</div>" +
       '<div class="fc-address-row"><div class="fc-inherit"><strong>Endereço do TJES:</strong> ' + linkEndereco(m.endereco) +
       (m.cep ? " • CEP " + esc(m.cep) : "") + "</div></div>" +
-      cardContatosGerais(m.contatos || []) +
+      cardContatosGerais(m.contatos || [], true) +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((m.nos || []).length ? (m.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
-      "</div>" + botaoImpressaoLocalidade("COMARCA") + barraNavegacaoInferior("Comarcas", true);
+      "</div>" + barraNavegacaoInferior("Comarcas", true);
     document.getElementById("fc-back-home").onclick = renderInicio;
     document.getElementById("fc-back-bottom").onclick = renderInicio;
-    document.getElementById("fc-print-comarca").onclick = imprimirOrgao;
+    (function () {
+      var bp = document.querySelector("[data-gerais-print]");
+      if (bp) bp.onclick = function (e) { if (e && e.stopPropagation) e.stopPropagation(); imprimirOrgao(); };
+    })();
     var seletor = document.getElementById("fc-comarca");
     if (seletor) seletor.onchange = function () {
       if (this.value && String(this.value) !== String(estado.comarcaId)) abrirComarca(this.value);
@@ -513,13 +518,16 @@
       badgeQuantidade(f.qtdUnidades, "Unidade", "Unidades") + "</div>" +
       '<div class="fc-address-row"><div class="fc-inherit"><strong>Endereço do Fórum:</strong> ' + linkEndereco(f.endereco) +
       (f.cep ? " • CEP " + esc(f.cep) : "") + "</div></div>" +
-      cardContatosGerais(f.contatos || []) +
+      cardContatosGerais(f.contatos || [], true) +
       '<div class="fc-section"><div class="fc-section-title"><h3>Unidades e Setores</h3></div>' +
       ((f.nos || []).length ? (f.nos || []).map(cardNo).join("") : '<div class="fc-empty">Nenhuma Unidade cadastrada.</div>') +
-      "</div>" + botaoImpressaoLocalidade("FORUM") + barraNavegacaoInferior("Fóruns", true);
+      "</div>" + barraNavegacaoInferior("Fóruns", true);
     document.getElementById("fc-back-comarca").onclick = renderForuns;
     document.getElementById("fc-back-bottom").onclick = renderForuns;
-    document.getElementById("fc-print-forum").onclick = imprimirForum;
+    (function () {
+      var bp = document.querySelector("[data-gerais-print]");
+      if (bp) bp.onclick = function (e) { if (e && e.stopPropagation) e.stopPropagation(); imprimirForum(); };
+    })();
     var cards = document.querySelectorAll("[data-no]");
     for (var i = 0; i < cards.length; i++) {
       (function (el) {
@@ -564,7 +572,7 @@
       '<div class="fc-address-row"><div class="fc-inherit"><strong>Endereço:</strong> ' + linkEndereco(no.enderecoExibicao) +
       (no.cepExibicao ? " • CEP " + esc(no.cepExibicao) : "") +
       (no.endereco ? "" : ' <span class="fc-muted">(' + (pai ? "herdado da Unidade" : (ehOrgao(m) ? "herdado do TJES" : "herdado do Fórum")) + ")</span>") + "</div></div>" +
-      '<div class="fc-section"><div class="fc-section-title"><h3>Contatos ' + (tipoTela === "Setor" ? "deste setor" : "desta Unidade") + "</h3></div>" +
+      '<div class="fc-section"><div class="fc-section-title"><h3>Contatos ' + (tipoTela === "Setor" ? "deste Setor" : "desta Unidade") + "</h3></div>" +
       contatosCards(no.contatos || []) + "</div>" +
       ((no.filhos || []).length
         ? '<div class="fc-section"><div class="fc-section-title"><h3>Setores</h3></div>' +
